@@ -11,7 +11,7 @@ from scipy.integrate import ode
 import matplotlib.pyplot as plt
 
 # SPECIFY B FILE:
-bfile = '/home/aplm/bmjg46/extra/2016to2017_DATA/dibyendu_eclipse/prantika-5sep/Br_76days/bg00000000.00.nc'
+bfile = 'bPF.nc'
 
 # SPECIFY DIRECTION OF VIEWER:
 lon0 = n.deg2rad(290.7)
@@ -139,7 +139,7 @@ brp[r2 > 1] = -bmax
 # - set up figure:
 plt.figure(figsize=(6,6))
 ax = plt.subplot(111)
-ax.set_axis_bgcolor('k')
+# ax.set_axis_bgcolor('k')
 cmap0 = plt.cm.get_cmap('gray')
 cmap = plt.cm.get_cmap('bwr')
 # - plot br on the solar surface:
@@ -168,6 +168,6 @@ plt.tick_params(axis='both', which='both', bottom='off', top='off', \
                 left='off', right='off', labelbottom='off', \
                 labelleft='off')
 # - save figure to file:
-plt.savefig('fl.png', bbox_inches='tight')
+# plt.savefig('fl.png', bbox_inches='tight')
 # - display on screen:
 plt.show()
