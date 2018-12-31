@@ -1,4 +1,5 @@
 sphinx-automodapi
 numpydoc
-matplotlib
+sunpy_sphinx_theme
+numpy
 scipy

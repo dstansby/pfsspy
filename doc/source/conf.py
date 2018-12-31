@@ -16,11 +16,21 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import sys
+# from sunpy_sphinx_theme.conf import *
+import unittest.mock as mock
 
+# from sunpy_sphinx_theme import get_html_theme_path
+# html_theme_path = get_html_theme_path()
 # -- Project information -----------------------------------------------------
 
+# Pretend these modules exits so readthedocs builds
+MOCK_MODULES = ['matplotlib.pyplot']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
+
 project = 'pfsspy'
-copyright = '2017, Anthony Yeates, 2018- pfsspy contributors'
+copyright = '2018-2019 pfsspy contributors'
 author = 'pfsspy contributors'
 
 # The short X.Y version
@@ -79,6 +89,8 @@ pygments_style = None
 # a list of builtin themes.
 #
 html_theme = 'alabaster'
+# html_theme = 'sunpy'
+# html_sidebars = {'**': ['docsidebar.html']}
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
