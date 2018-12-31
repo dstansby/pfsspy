@@ -1,15 +1,10 @@
-
-deps-run: &deps-install
-  name: Install Python dependencies
+doc-run: &doc-build
+  name: Build documentation
   command: |
     python3 -m venv venv
     . venv/bin/activate
     pip install --quiet --user -r requirements/docs.txt
     pip install --user .
-
-doc-run: &doc-build
-  name: Build documentation
-  command: |
     PATH=$PATH:/home/circleci/.local/bin
     make html SPHINXOPTS='-W -q'
   working_directory: doc
@@ -21,7 +16,6 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - checkout
-      - run: *deps-install
       - run: *doc-build
       - store_artifacts:
           path: doc/build/html
