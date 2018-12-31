@@ -1,5 +1,4 @@
+-r base.txt
 sphinx-automodapi
 numpydoc
 sunpy_sphinx_theme
-numpy
-scipy
