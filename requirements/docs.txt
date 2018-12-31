@@ -1,4 +1,6 @@
 -r base.txt
+
+pillow
 sphinx-automodapi
 numpydoc
 sunpy_sphinx_theme
