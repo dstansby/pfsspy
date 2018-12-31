@@ -31,6 +31,27 @@ class Input:
         self.np = np
         self.rss = rss
 
+    @property
+    def ds(self):
+        """
+        Spacing in cos(theta).
+        """
+        return 2.0 / self.ns
+
+    @property
+    def dr(self):
+        """
+        Spacing in log(r).
+        """
+        return n.log(self.rss) / self.nr
+
+    @property
+    def dp(self):
+        """
+        Spacing in phi.
+        """
+        return 2 * n.pi / self.np
+
 
 class Output:
     '''
@@ -94,9 +115,9 @@ def pfss(input, filename='', output='a', testQ=False):
     rss = input.rss
 
     # Coordinates:
-    ds = 2.0 / ns
-    dp = 2 * n.pi / np
-    dr = n.log(rss) / nr
+    ds = input.ds
+    dp = input.dp
+    dr = input.dr
 
     rg = n.linspace(0, n.log(rss), nr + 1)
     rc = n.linspace(0.5 * dr, n.log(rss) - 0.5 * dr, nr)
@@ -109,7 +130,7 @@ def pfss(input, filename='', output='a', testQ=False):
     Fp = sg * 0  # Lp/Ls on p-ribs
     Fp[1:-1] = n.sqrt(1 - sg[1:-1]**2) / (n.arcsin(sc[1:]) - n.arcsin(sc[:-1])) * dp
     Vg = Fp / ds / dp
-    Fs = (n.arcsin(sg[1:]) - n.arcsin(sg[:-1]))/n.sqrt(1 - sc**2) / dp  # Ls/Lp on s-ribs
+    Fs = (n.arcsin(sg[1:]) - n.arcsin(sg[:-1])) / n.sqrt(1 - sc**2) / dp  # Ls/Lp on s-ribs
     Uc = Fs / ds / dp
 
     # FFT in phi of photospheric distribution at each latitude:
@@ -150,7 +171,7 @@ def pfss(input, filename='', output='a', testQ=False):
         # - compute radial term for each l (for this m):
         for l in range(ns):
             # - sum c_{lm} + d_{lm}
-            cdlm = n.dot(Q[:,l], brt[:,m])/lam[l]
+            cdlm = n.dot(Q[:, l], brt[:, m]) / lam[l]
             # - ratio c_{lm}/d_{lm} [numerically safer this way up]
             ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
             dlm = cdlm / (1.0 + ratio)
@@ -299,13 +320,13 @@ def pfss(input, filename='', output='a', testQ=False):
 
         if (output == 'bg'):
             # Weighted average to grid points:
-            brg = br[:-1, :-1, :] + br[1:,:-1,:] + br[1:,1:,:] + br[:-1,1:,:]
-            bsg = bs[:-1, :, :-1] + bs[1:,:,:-1] + bs[1:,:,1:] + bs[:-1,:,1:]
-            bpg = bp[:, :-1, :-1] + bp[:,1:,:-1] + bp[:,1:,1:] + bp[:,:-1,1:]
-            for i in range(np+1):
-                brg[i,:,:] /= 2*(Sbr[:-1,:] + Sbr[1:,:])
-                bsg[i,:,:] /= 2*(Sbs[:,:-1] + Sbs[:,1:])
-            for i in range(np+1):
+            brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1: ,1:, :] + br[:-1, 1:, :]
+            bsg = bs[:-1, :, :-1] + bs[1:, :, :-1] + bs[1:, :, 1:] + bs[:-1, :, 1:]
+            bpg = bp[:, :-1, :-1] + bp[:, 1:, :-1] + bp[:, 1:, 1:] + bp[:, :-1, 1:]
+            for i in range(np + 1):
+                brg[i, :, :] /= 2 * (Sbr[:-1, :] + Sbr[1:, :])
+                bsg[i, :, :] /= 2 * (Sbs[:, :-1] + Sbs[:, 1:])
+            for i in range(np + 1):
                 bpg[i, :, :] /= Sbp[:-1, :-1] + Sbp[1:, :-1] + Sbp[1:, 1:] + Sbp[:-1, 1:]
 
             if len(filename):
