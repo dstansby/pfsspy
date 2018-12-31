@@ -25,7 +25,7 @@ class Output:
         self.alp = alp
 
 
-def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
+def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     r"""
     Compute PFSS model.
 
@@ -39,7 +39,6 @@ def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
 
     Output depends on the flag 'output':
 
-    - output='none': as it says
     - output='a': ar*Lr, as*Ls, ap*Lp on cell edges.
     - output='bc': br, bs, bp on the centres of the cell faces.
     - output='bg': br, bs, bp (weighted) averaged to grid points.
@@ -61,11 +60,11 @@ def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
 
-    filename : str
-        Output filename.
+    filename : str, optional
+        Output filename. If empty don't save to file. Defaults to empty.
 
-    ouput : str
-        String from ``('none', 'a', 'bc', 'bg')``.
+    ouput : str, optional
+        String from ``('a', 'bc', 'bg')``.
 
     testQ : bool
         If ``True``, compare the discrete eigenfunctions Qj_{lm} to
@@ -76,8 +75,10 @@ def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
     ds = 2.0 / ns
     dp = 2 * n.pi / np
     dr = n.log(rss) / nr
+
     rg = n.linspace(0, n.log(rss), nr + 1)
     rc = n.linspace(0.5 * dr, n.log(rss) - 0.5 * dr, nr)
+
     sg = n.linspace(-1, 1, ns + 1)
     sc = n.linspace(-1 + 0.5 * ds, 1 - 0.5 * ds, ns)
 
@@ -170,18 +171,17 @@ def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
         for i in range(np + 1):
             als[i, :, j] = Fs * (psi[j, :, ((i - 1) % np)] - psi[j, :, ((i) % np)])
         for i in range(np):
-            alp[i,1:-1,j] = Fp[1:-1]*(psi[j,1:,i] - psi[j,:-1,i])
+            alp[i, 1:-1, j] = Fp[1:-1] * (psi[j, 1:, i] - psi[j, :-1, i])
 
     # Output to netcdf file:
     r = n.exp(rg)
     th = n.arccos(sg)
     ph = n.linspace(0, 2 * n.pi, np + 1)
 
-    if (output == 'none'):
-        return Output(r, th, ph, alr, als, alp)
-
     if (output == 'a'):
-        pfsspy.output.a(filename, r, th, ph, alr, als, alp)
+        if len(filename):
+            pfsspy.output.a(filename, r, th, ph, alr, als, alp)
+        return Output(r, th, ph, alr, als, alp)
 
     if ((output == 'bc') | (output == 'bg')):
         rc = n.linspace(-0.5 * dr, n.log(rss) + 0.5 * dr, nr + 2)
@@ -200,18 +200,18 @@ def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
             dnp[0, k] = dnp[1, k]
             dnp[-1, k] = dnp[-2, k]
             for j in range(1, ns):
-                dns[j,k] = rrc[k]*(n.arcsin(sc[j]) - n.arcsin(sc[j-1]))
-            dns[0,k] = dns[1,k]
-            dns[-1,k] = dns[-2,k]
-        for j in range(ns+2):
-            dnr[j] = rrc[0]*(n.exp(dr) - 1)
+                dns[j, k] = rrc[k] * (n.arcsin(sc[j]) - n.arcsin(sc[j - 1]))
+            dns[0, k] = dns[1, k]
+            dns[-1, k] = dns[-2, k]
+        for j in range(ns + 2):
+            dnr[j] = rrc[0] * (n.exp(dr) - 1)
         dnr[0] = -dnr[0]
         dnr[-1] = -dnr[-1]
 
         # Required area factors:
-        Sbr = n.zeros((ns+2,nr+1))
-        for k in range(nr+1):
-            Sbr[1:-1,k] = n.exp(2*rg[k])*ds*dp
+        Sbr = n.zeros((ns+2, nr+1))
+        for k in range(nr + 1):
+            Sbr[1:-1, k] = n.exp(2 * rg[k])*ds*dp
             Sbr[0,k] = Sbr[1,k]
             Sbr[-1,k] = Sbr[-2,k]
         Sbs = n.zeros((ns+1,nr+2))
@@ -271,7 +271,9 @@ def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
             for i in range(np + 1):
                 bp[i, :, :] = bp[i, :, :] / Sbp
 
-            pfsspy.output.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
+            if len(filename):
+                pfsspy.output.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
+            return br, bs, bp
 
         if (output == 'bg'):
             # Weighted average to grid points:
@@ -284,4 +286,6 @@ def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
             for i in range(np+1):
                 bpg[i,:,:] /= Sbp[:-1,:-1] + Sbp[1:,:-1] + Sbp[1:,1:] + Sbp[:-1,1:]
 
-            pfsspy.output.bg(filename, r, th, ph, brg, bsg, bpg)
+            if len(filename):
+                pfsspy.output.bg(filename, r, th, ph, brg, bsg, bpg)
+            return brg, bsg, bpg
