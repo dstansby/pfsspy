@@ -57,16 +57,16 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     # - create off-diagonal part of the matrix:
     A = n.zeros((ns, ns))
     for j in range(ns-1):
-        A[j,j+1] = -Vg[j+1]
-        A[j+1,j] = A[j,j+1]
+        A[j, j+1] = -Vg[j+1]
+        A[j+1, j] = A[j, j+1]
     # - term required for m-dependent part of matrix:
     mu = n.fft.fftfreq(np)
-    mu = 4*n.sin(n.pi*mu)**2
+    mu = 4 * n.sin(n.pi * mu)**2
     # - initialise:
-    psir = n.zeros((nr+1, ns), dtype='complex')
-    psi = n.zeros((nr+1, ns, np), dtype='complex')
+    psir = n.zeros((nr + 1, ns), dtype='complex')
+    psi = n.zeros((nr + 1, ns, np), dtype='complex')
     e1 = n.exp(dr)
-    fact = n.sinh(dr)*(e1 - 1)
+    fact = n.sinh(dr) * (e1 - 1)
 
     if (testQ):
         import scipy.special as sp
@@ -74,7 +74,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
         plt.figure()
 
     # Loop over azimuthal modes (positive m):
-    for m in range(np//2 + 1):
+    for m in range(np // 2 + 1):
         # - set diagonal terms of matrix:
         for j in range(ns):
             A[j,j] = Vg[j] + Vg[j+1] + Uc[j]*mu[m]
@@ -224,17 +224,17 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
             bp[i,-1,:] = -bp[i1,-2,:]
             bp[i,0,:] = -bp[i1,1,:]
 
-        if (output=='bc'):
+        if (output == 'bc'):
             # Remove area factors:
-            for i in range(np+2):
-                br[i,:,:] = br[i,:,:]/Sbr
-                bs[i,:,:] = bs[i,:,:]/Sbs
-            for i in range(np+1):
-                bp[i,:,:] = bp[i,:,:]/Sbp
+            for i in range(np + 2):
+                br[i, :, :] = br[i, :, :] / Sbr
+                bs[i, :, :] = bs[i, :, :] / Sbs
+            for i in range(np + 1):
+                bp[i, :, :] = bp[i, :, :] / Sbp
 
             output_netcdf.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
 
-        if (output=='bg'):
+        if (output == 'bg'):
             # Weighted average to grid points:
             brg = br[:-1,:-1,:] + br[1:,:-1,:] + br[1:,1:,:] + br[:-1,1:,:]
             bsg = bs[:-1,:,:-1] + bs[1:,:,:-1] + bs[1:,:,1:] + bs[:-1,:,1:]
