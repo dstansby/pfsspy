@@ -5,17 +5,19 @@ from scipy.integrate import ode
 import matplotlib.pyplot as plt
 
 
-def plot_2d():
+def plot_2d(fname):
     """
     Script for reading magnetic field from netcdf file, tracing some magnetic field
     lines, and plotting the result in the plane-of-sky.
 
     Note that the netcdf file must be of grid point type (i.e. br, bth, bph all
     co-located at the mesh points).
-    """
-    # SPECIFY B FILE:
-    bfile = 'bPF.nc'
 
+    Parameters
+    ----------
+    fname : str
+        Location of netcdf file with magnetic field data.
+    """
     # SPECIFY DIRECTION OF VIEWER:
     lon0 = n.deg2rad(290.7)
     lat0 = n.deg2rad(6.93)
@@ -90,7 +92,7 @@ def plot_2d():
     #-----------------------------------------------------------------------
     # COMPUTE FIELD LINES:
     # - read in magnetic field:
-    fh = netcdf.netcdf_file(bfile, 'r', mmap=False)
+    fh = netcdf.netcdf_file(fname, 'r', mmap=False)
     r = fh.variables['r'][:]
     th = fh.variables['th'][:]
     ph = fh.variables['ph'][:]
@@ -115,7 +117,7 @@ def plot_2d():
     x0 = n.stack((r0*n.cos(ph0)*n.sin(th0), r0*n.sin(ph0)*n.sin(th0), r0*n.cos(th0)), axis=0)
 
     # MAKE PROJECTION OF Br ON SOLAR SURFACE:
-    fh = netcdf.netcdf_file(bfile, 'r', mmap=False)
+    fh = netcdf.netcdf_file(fname, 'r', mmap=False)
     th = fh.variables['th'][:]
     ph = fh.variables['ph'][:]
     br = fh.variables['br'][:][:,:,0]
