@@ -109,3 +109,4 @@ venv.bak/
 
 # Doc files
 doc/source/api/*
+doc/source/auto_examples/*
