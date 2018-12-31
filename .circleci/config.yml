@@ -9,7 +9,9 @@ deps-run: &deps-install
 
 doc-run: &doc-build
   name: Build documentation
-  command: make html SPHINXOPTS='-W -q'
+  command: |
+    PATH='$PATH:/home/circleci/.local/bin'
+    make html SPHINXOPTS='-W -q'
   working_directory: doc
 
 version: 2
