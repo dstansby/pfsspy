@@ -1,2 +1,4 @@
 sphinx-automodapi
 numpydoc
+matplotlib
+scipy
