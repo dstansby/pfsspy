@@ -3,7 +3,29 @@ import scipy.linalg as la
 import pfsspy.output
 
 
-def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
+class Output:
+    '''
+    Output of PFSS modelling.
+
+    Parameters
+    ----------
+    r :
+    th :
+    ph :
+    alr :
+    als :
+    alp :
+    '''
+    def __init__(self, r, th, ph, alr, als, alp):
+        self.r = r
+        self.th = th
+        self.ph = ph
+        self.alr = alr
+        self.als = als
+        self.alp = alp
+
+
+def pfss(br0, nr, ns, np, rss, filename='', output='none', testQ=False):
     r"""
     Compute PFSS model.
 
@@ -153,31 +175,31 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     # Output to netcdf file:
     r = n.exp(rg)
     th = n.arccos(sg)
-    ph = n.linspace(0, 2*n.pi, np+1)
+    ph = n.linspace(0, 2 * n.pi, np + 1)
 
-    if (output=='none'):
-         return alr, als, alp
+    if (output == 'none'):
+        return Output(r, th, ph, alr, als, alp)
 
-    if (output=='a'):
+    if (output == 'a'):
         pfsspy.output.a(filename, r, th, ph, alr, als, alp)
 
-    if ((output=='bc') | (output=='bg')):
-        rc = n.linspace(-0.5*dr, n.log(rss)+0.5*dr, nr+2)
+    if ((output == 'bc') | (output == 'bg')):
+        rc = n.linspace(-0.5 * dr, n.log(rss) + 0.5 * dr, nr + 2)
         rrc = n.exp(rc)
-        thc = n.zeros(ns+2) - 1
+        thc = n.zeros(ns + 2) - 1
         thc[1:-1] = n.arccos(sc)
-        pc = n.linspace(-0.5*dp, 2*n.pi+0.5*dp, np+2)
+        pc = n.linspace(-0.5 * dp, 2 * n.pi + 0.5 * dp, np + 2)
 
         # Required face normals:
-        dnp = n.zeros((ns+2,2))
-        dns = n.zeros((ns+1,2))
-        dnr = n.zeros(ns+2)
+        dnp = n.zeros((ns + 2, 2))
+        dns = n.zeros((ns + 1, 2))
+        dnr = n.zeros(ns + 2)
         for k in range(2):
-            for j in range(1,ns+1):
-                dnp[j,k] = rrc[k]*n.sqrt(1 - sc[j-1]**2)*dp
-            dnp[0,k] = dnp[1,k]
-            dnp[-1,k] = dnp[-2,k]
-            for j in range(1,ns):
+            for j in range(1, ns + 1):
+                dnp[j, k] = rrc[k] * n.sqrt(1 - sc[j - 1]**2) * dp
+            dnp[0, k] = dnp[1, k]
+            dnp[-1, k] = dnp[-2, k]
+            for j in range(1, ns):
                 dns[j,k] = rrc[k]*(n.arcsin(sc[j]) - n.arcsin(sc[j-1]))
             dns[0,k] = dns[1,k]
             dns[-1,k] = dns[-2,k]
