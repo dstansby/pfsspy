@@ -18,16 +18,11 @@
 
 import sys
 # from sunpy_sphinx_theme.conf import *
-import unittest.mock as mock
+# import unittest.mock as mock
 
 # from sunpy_sphinx_theme import get_html_theme_path
 # html_theme_path = get_html_theme_path()
 # -- Project information -----------------------------------------------------
-
-# Pretend these modules exits so readthedocs builds
-MOCK_MODULES = ['matplotlib.pyplot']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
 
 project = 'pfsspy'
 copyright = '2018-2019 pfsspy contributors'
