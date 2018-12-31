@@ -6,35 +6,19 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     """
         Extrapolate 3D PFSS using eigenfunction method in r,s,p coordinates, on the dumfric grid (equally spaced in
         rho=ln(r/rsun), s=cos(theta0), and p=phi).
-       
+
         The output should have zero current to machine precision,
         when computed with the DuMFriC staggered discretization.
-       
+
         Output depends on the flag 'output':
          output='none': as it says
          output='a': ar*Lr, as*Ls, ap*Lp on cell edges.
          output='bc': br, bs, bp on the centres of the cell faces.
          output='bg': br, bs, bp (weighted) averaged to grid points.
-        
+
         Set testQ=True to compare the discrete eigenfunctions Qj_{lm}  to Plm(cos(th)).
-        
-    Copyright (C) Anthony R. Yeates, Durham University 29/8/17
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
     """
-    
+
     # Coordinates:
     ds = 2.0/ns
     dp = 2*n.pi/np
@@ -43,15 +27,15 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     rc = n.linspace(0.5*dr, n.log(rss)-0.5*dr, nr)
     sg = n.linspace(-1, 1, ns+1)
     sc = n.linspace(-1 + 0.5*ds, 1 - 0.5*ds, ns)
-    
+
     k = n.linspace(0, nr, nr+1)
-    
+
     Fp = sg*0 # Lp/Ls on p-ribs
     Fp[1:-1] = n.sqrt(1 - sg[1:-1]**2)/(n.arcsin(sc[1:]) - n.arcsin(sc[:-1]))*dp
     Vg = Fp/ds/dp
     Fs = (n.arcsin(sg[1:]) - n.arcsin(sg[:-1]))/n.sqrt(1 - sc**2)/dp # Ls/Lp on s-ribs
     Uc = Fs/ds/dp
-    
+
     # FFT in phi of photospheric distribution at each latitude:
     brt = n.fft.rfft(br0, axis=1)
 
@@ -69,7 +53,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     psi = n.zeros((nr+1, ns, np), dtype='complex')
     e1 = n.exp(dr)
     fact = n.sinh(dr)*(e1 - 1)
-    
+
     if (testQ):
         import scipy.special as sp
         import matplotlib.pyplot as plt
@@ -100,7 +84,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
         psi[:,:,m] = n.dot(psir, Q.T)
         if (m > 0):
             psi[:,:,np-m] = n.conj(psi[:,:,m])
-        
+
         if (testQ & (m==6)):
             isrt = n.argsort(lam, axis=0) # sort eigenvalues
             lam = lam[isrt]
@@ -118,9 +102,9 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
             plt.legend()
             plt.savefig('Q.png',bbox_inches='tight')
             plt.show()
-            
+
     del(psir, mu, A)
-            
+
     # Compute psi by inverse fft:
     psi = n.real(n.fft.ifft(psi, axis=2))
 
@@ -128,31 +112,31 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     alr = n.zeros((np+1, ns+1, nr))
     als = n.zeros((np+1, ns, nr+1))
     alp = n.zeros((np, ns+1, nr+1))
-    
+
     for j in range(nr+1):
         for i in range(np+1):
             als[i,:,j] = Fs*(psi[j,:,((i-1)%np)] - psi[j,:,((i)%np)])
         for i in range(np):
             alp[i,1:-1,j] = Fp[1:-1]*(psi[j,1:,i] - psi[j,:-1,i])
-  
+
     # Output to netcdf file:
     r = n.exp(rg)
     th = n.arccos(sg)
     ph = n.linspace(0, 2*n.pi, np+1)
-    
+
     if (output=='none'):
          return alr, als, alp
-    
+
     if (output=='a'):
         output_netcdf.a(filename, r, th, ph, alr, als, alp)
-        
+
     if ((output=='bc') | (output=='bg')):
         rc = n.linspace(-0.5*dr, n.log(rss)+0.5*dr, nr+2)
         rrc = n.exp(rc)
         thc = n.zeros(ns+2) - 1
         thc[1:-1] = n.arccos(sc)
         pc = n.linspace(-0.5*dp, 2*n.pi+0.5*dp, np+2)
-        
+
         # Required face normals:
         dnp = n.zeros((ns+2,2))
         dns = n.zeros((ns+1,2))
@@ -170,7 +154,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
             dnr[j] = rrc[0]*(n.exp(dr) - 1)
         dnr[0] = -dnr[0]
         dnr[-1] = -dnr[-1]
-        
+
         # Required area factors:
         Sbr = n.zeros((ns+2,nr+1))
         for k in range(nr+1):
@@ -189,7 +173,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
                 Sbp[j,k] = 0.5*n.exp(2*rc[k] - dr)*(n.exp(2*dr) - 1)*(n.arcsin(sg[j]) - n.arcsin(sg[j-1]))
             Sbp[0,k] = Sbp[1,k]
             Sbp[-1,k] = Sbp[-2,k]
-                
+
         # Compute br*Sbr, bs*Sbs, bp*Sbp at cell centres by Stokes theorem:
         br = n.zeros((np+2,ns+2,nr+1))
         bs = n.zeros((np+2,ns+1,nr+2))
@@ -213,7 +197,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
         for i in range(np+1):
             bp[i,:,0] = Sbp[:,0]/dnp[:,0]*(bp[i,:,1]*dnp[:,1]/Sbp[:,1] + br[i,:,0]*dnr[:]/Sbr[:,0] - br[i+1,:,0]*dnr[:]/Sbr[:,0])
         for i in range(np+2):
-            bs[i,:,0] = Sbs[:,0]/dns[:,0]*(bs[i,:,1]*dns[:,1]/Sbs[:,1] + br[i,:-1,0]*dnr[:-1]/Sbr[:-1,0] - br[i,1:,0]*dnr[1:]/Sbr[1:,0])        
+            bs[i,:,0] = Sbs[:,0]/dns[:,0]*(bs[i,:,1]*dns[:,1]/Sbs[:,1] + br[i,:-1,0]*dnr[:-1]/Sbr[:-1,0] - br[i,1:,0]*dnr[1:]/Sbr[1:,0])
         # - polar boundaries as in dumfric:
         for i in range(np+2):
             i1 = (i + np//2) % np
@@ -225,7 +209,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
             i1 = (i + np//2) % np
             bp[i,-1,:] = -bp[i1,-2,:]
             bp[i,0,:] = -bp[i1,1,:]
-               
+
         if (output=='bc'):
             # Remove area factors:
             for i in range(np+2):
@@ -233,7 +217,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
                 bs[i,:,:] = bs[i,:,:]/Sbs
             for i in range(np+1):
                 bp[i,:,:] = bp[i,:,:]/Sbp
-                       
+
             output_netcdf.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
 
         if (output=='bg'):
@@ -246,7 +230,5 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
                 bsg[i,:,:] /= 2*(Sbs[:,:-1] + Sbs[:,1:])
             for i in range(np+1):
                 bpg[i,:,:] /= Sbp[:-1,:-1] + Sbp[1:,:-1] + Sbp[1:,1:] + Sbp[:-1,1:]
-            
-            output_netcdf.bg(filename, r, th, ph, brg, bsg, bpg)
 
-            
+            output_netcdf.bg(filename, r, th, ph, brg, bsg, bpg)

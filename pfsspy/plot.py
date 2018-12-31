@@ -1,24 +1,8 @@
 """
-    Script for reading magnetic field from netcdf file, tracing some magnetic field lines, and plotting the result in the plane-of-sky.
-    
-    Note that the netcdf file must be of grid point type (i.e. br, bth, bph all
-    co-located at the mesh points).
-    
-    Copyright (C) Anthony R. Yeates, Durham University 21/9/17
+Script for reading magnetic field from netcdf file, tracing some magnetic field lines, and plotting the result in the plane-of-sky.
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+Note that the netcdf file must be of grid point type (i.e. br, bth, bph all
+co-located at the mesh points).
 """
 import numpy as n
 from scipy.io import netcdf
@@ -63,7 +47,7 @@ def trace(x0, dtf=1e-2, tol=1e-2, nrefine=3):
     - uses implicit Adams method (up to order 12).
     - the parameter dtf is the maximum step-size, which
     will be the output resolution of the field line in most of the domain.
-    - the tolerance for tracing is tol*dt.  
+    - the tolerance for tracing is tol*dt.
     - nrefine is the number of times to refine the step-size to get close
     to the boundary.
     """
@@ -135,7 +119,7 @@ br = fh.variables['br'][:][:,:,0]
 fh.close()
 # - make regular grid interpolator:
 s = n.cos(th)
-br2 = rgi((ph,s), br, bounds_error=False, fill_value=-bmax)   
+br2 = rgi((ph,s), br, bounds_error=False, fill_value=-bmax)
 # - project on to sphere:
 xx = n.linspace(-1, 1, 256)
 y2, z2 = n.meshgrid(xx, xx, indexing='ij')
@@ -143,14 +127,14 @@ r2 = n.sqrt(y2**2 + z2**2)
 x2 = y2*0
 x2[r2 <= 1] = n.sqrt(1.0 - r2[r2 <= 1]**2)
 x2, z2 = n.cos(lat0)*x2 - n.sin(lat0)*z2, n.sin(lat0)*x2 + n.cos(lat0)*z2
-x2, y2 = n.cos(lon0)*x2 - n.sin(lon0)*y2, n.sin(lon0)*x2 + n.cos(lon0)*y2    
+x2, y2 = n.cos(lon0)*x2 - n.sin(lon0)*y2, n.sin(lon0)*x2 + n.cos(lon0)*y2
 x2[r2 > 1] = 0
 y2[r2 > 1] = 0
-sp = z2    
+sp = z2
 php = (n.arctan2(y2, x2) + 2*n.pi) % (2*n.pi)
 brp = br2(n.stack((php, sp), axis=2))
 brp[r2 > 1] = -bmax
-    
+
 # PLOT:
 # - set up figure:
 plt.figure(figsize=(6,6))
@@ -160,12 +144,12 @@ cmap0 = plt.cm.get_cmap('gray')
 cmap = plt.cm.get_cmap('bwr')
 # - plot br on the solar surface:
 lev = n.linspace(-bmax, bmax, 128)
-y2, z2 = n.meshgrid(xx, xx, indexing='ij')  
+y2, z2 = n.meshgrid(xx, xx, indexing='ij')
 plt.contourf(y2, z2, brp, lev, cmap=cmap0, extend='both')
 # - trace and plot field lines:
 nl = n.size(r0)
 for j in range(nl):
-    xl, yl, zl = trace(x0[:,j:j+1]) 
+    xl, yl, zl = trace(x0[:,j:j+1])
     #   - rotate to correct viewing direction:
     xl, yl = xl*n.cos(lon0) + yl*n.sin(lon0), -xl*n.sin(lon0) + yl*n.cos(lon0)
     xl, zl = xl*n.cos(lat0) + zl*n.sin(lat0), -xl*n.sin(lat0) + zl*n.cos(lat0)
@@ -179,7 +163,7 @@ rmax = 2.5
 ax.set_xlim(-rmax, rmax)
 ax.set_ylim(-rmax, rmax)
 ax.text(1.5, -2.25, '$\phi = $%4.2f$^\circ$' % (lon0*180/n.pi), family='serif', color='white', fontsize=9)
-ax.text(1.5, -2.42, '$\lambda = $%4.2f$^\circ$' % (lat0*180/n.pi), family='serif', color='white', fontsize=9) 
+ax.text(1.5, -2.42, '$\lambda = $%4.2f$^\circ$' % (lat0*180/n.pi), family='serif', color='white', fontsize=9)
 plt.tick_params(axis='both', which='both', bottom='off', top='off', \
                 left='off', right='off', labelbottom='off', \
                 labelleft='off')
@@ -187,5 +171,3 @@ plt.tick_params(axis='both', which='both', bottom='off', top='off', \
 plt.savefig('fl.png', bbox_inches='tight')
 # - display on screen:
 plt.show()
-
-
