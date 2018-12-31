@@ -1,6 +1,9 @@
 """
 Script for reading in map of Br(theta, phi) on the solar surface, computing a
 PFSS extrapolation, and outputting to a netcdf file.
+
+Running this script requires a test file input, that can be found here:
+https://github.com/antyeates1983/pfss/raw/master/test.dat
 """
 import numpy as np
 from scipy.interpolate import interp2d
@@ -22,7 +25,7 @@ rss = 2.5
 # INPUT MAP OF br(theta,phi)
 d = 180.0 / np.pi
 # - read in map from SFT simulation:
-br0 = np.loadtxt('pfsspy/test.dat')    # DEMO -- replace this with your own map
+br0 = np.loadtxt('test.dat')    # DEMO -- replace this with your own map
 ns0 = np.size(br0, axis=0)
 np0 = np.size(br0, axis=1)
 
