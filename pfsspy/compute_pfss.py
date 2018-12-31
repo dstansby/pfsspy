@@ -35,7 +35,7 @@ ph0 = np.linspace(0, 2 * np.pi, np0)
 dphi = 2 * np.pi / nphi
 ds = 2 / ns
 
-pc = np.linspace(0.5 * dp, 2 * np.pi - 0.5 * dp, np)
+pc = np.linspace(0.5 * dphi, 2 * np.pi - 0.5 * dphi, nphi)
 sc = np.linspace(-1 + 0.5 * ds, 1 - 0.5 * ds, ns)
 thc = np.flip(np.arccos(sc), 0)
 
@@ -46,7 +46,7 @@ pc1 = (pc - clon + 2 * np.pi) % (2 * np.pi)
 bri = interp2d(ph0, th0, br0, kind='cubic', copy=True,
                bounds_error=False, fill_value=0)
 br = np.zeros((ns, nphi))
-for i in range(np):
+for i in range(nphi):
     br[:, i] = bri(pc1[i], thc).flatten()
 
 # - correct flux balance (otherwise PFSS solver won't work):
@@ -64,12 +64,10 @@ br[ipos] = br[ipos] * fluxmn / fluxp
 bmax = 10
 
 plt.figure()
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
 
 ax = plt.subplot(211)
 lat0 = 0.5 * np.pi - th0
-pm = ax.pcolormesh(ph0*d, lat0 * d, br0, cmap='bwr')
+pm = ax.pcolormesh(ph0 * d, lat0 * d, br0, cmap='bwr')
 pm.set_clim(vmin=-bmax, vmax=bmax)
 cb1 = plt.colorbar(pm)
 # cb1.set_clim(vmin=-bmax, vmax=bmax)
@@ -95,4 +93,4 @@ plt.show()
 # (note that output='bg' gives the output B averaged to grid points)
 print('Computing PFSS...')
 br = br[::-1, :]
-pfss(br, nr, ns, np, rss, filename='./bPF.nc', output='bg', testQ=False)
+pfss(br, nr, ns, nphi, rss, filename='./bPF.nc', output='bg', testQ=False)
