@@ -40,7 +40,7 @@ def a(filename, r, th, ph, apr, aps, app):
 
 def bc(filename, r, th, ph, rc, thc, phc, br, bs, bp):
     """
-        Magnetic field components on cell faces, including ghost cells.
+    Magnetic field components on cell faces, including ghost cells.
     """
 
     nr = n.size(r) - 1
@@ -78,7 +78,7 @@ def bc(filename, r, th, ph, rc, thc, phc, br, bs, bp):
 
 def bg(filename, r, th, ph, brg, bsg, bpg):
     """
-        Magnetic field components co-located at grid points.
+    Magnetic field components co-located at grid points.
     """
 
     nr = n.size(r) - 1

@@ -73,7 +73,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     # Prepare tridiagonal matrix:
     # - create off-diagonal part of the matrix:
     A = n.zeros((ns, ns))
-    for j in range(ns-1):
+    for j in range(ns - 1):
         A[j, j+1] = -Vg[j+1]
         A[j+1, j] = A[j, j+1]
     # - term required for m-dependent part of matrix:
@@ -94,44 +94,44 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     for m in range(np // 2 + 1):
         # - set diagonal terms of matrix:
         for j in range(ns):
-            A[j,j] = Vg[j] + Vg[j+1] + Uc[j]*mu[m]
+            A[j, j] = Vg[j] + Vg[j + 1] + Uc[j] * mu[m]
         # - compute eigenvectors Q_{lm} and eigenvalues lam_{lm}:
         #   (note that A is symmetric so use special solver)
         lam, Q = la.eigh(A)
         # - solve quadratic:
-        Flm = 0.5*(1 + e1 + lam*fact)
+        Flm = 0.5 * (1 + e1 + lam * fact)
         ffp = Flm + n.sqrt(Flm**2 - e1)
-        ffm = e1/ffp
+        ffm = e1 / ffp
         # - compute radial term for each l (for this m):
         for l in range(ns):
             # - sum c_{lm} + d_{lm}
             cdlm = n.dot(Q[:,l], brt[:,m])/lam[l]
             # - ratio c_{lm}/d_{lm} [numerically safer this way up]
-            ratio = (ffm[l]**(nr-1) - ffm[l]**nr)/(ffp[l]**nr - ffp[l]**(nr-1))
-            dlm = cdlm/(1.0 + ratio)
-            clm = ratio*dlm
-            psir[:,l] = clm*ffp[l]**k + dlm*ffm[l]**k
+            ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
+            dlm = cdlm / (1.0 + ratio)
+            clm = ratio * dlm
+            psir[:, l] = clm * ffp[l]**k + dlm * ffm[l]**k
         # - compute entry for this m in psit = Sum_l c_{lm}Q_{lm}**j
-        psi[:,:,m] = n.dot(psir, Q.T)
+        psi[:, :, m] = n.dot(psir, Q.T)
         if (m > 0):
-            psi[:,:,np-m] = n.conj(psi[:,:,m])
+            psi[:, :, np - m] = n.conj(psi[:, :, m])
 
-        if (testQ & (m==6)):
-            isrt = n.argsort(lam, axis=0) # sort eigenvalues
+        if (testQ & (m == 6)):
+            isrt = n.argsort(lam, axis=0)  # sort eigenvalues
             lam = lam[isrt]
             istat = n.indices((ns, ns))
-            Q = Q[istat[0],isrt]
+            Q = Q[istat[0], isrt]
             plt.clf()
             for l in range(5):
-                plm = sp.lpmv(m, m+l, sc)
-                Ql = Q[:,l]*Q[1,l]/n.abs(Q[1,l]) # normalise and match sign
-                plt.plot(sc, Ql/n.max(n.abs(Ql)), 'ko')
-                plm = plm*plm[1]/n.abs(plm[1])
-                plt.plot(sc, plm/n.max(n.abs(plm)), label='l=%i'%l)
+                plm = sp.lpmv(m, m + l, sc)
+                Ql = Q[:, l] * Q[1, l]/n.abs(Q[1, l])  # normalise and match sign
+                plt.plot(sc, Ql / n.max(n.abs(Ql)), 'ko')
+                plm = plm * plm[1] / n.abs(plm[1])
+                plt.plot(sc, plm / n.max(n.abs(plm)), label='l=%i' % l)
                 plt.xlabel(r'$\cos(\theta)$')
             plt.title('m = %i' % m)
             plt.legend()
-            plt.savefig('Q.png',bbox_inches='tight')
+            plt.savefig('Q.png', bbox_inches='tight')
             plt.show()
 
     del(psir, mu, A)
@@ -140,13 +140,13 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     psi = n.real(n.fft.ifft(psi, axis=2))
 
     # Hence compute vector potential [note index order, for netcdf]:
-    alr = n.zeros((np+1, ns+1, nr))
-    als = n.zeros((np+1, ns, nr+1))
-    alp = n.zeros((np, ns+1, nr+1))
+    alr = n.zeros((np + 1, ns + 1, nr))
+    als = n.zeros((np + 1, ns, nr + 1))
+    alp = n.zeros((np, ns + 1, nr + 1))
 
-    for j in range(nr+1):
-        for i in range(np+1):
-            als[i,:,j] = Fs*(psi[j,:,((i-1)%np)] - psi[j,:,((i)%np)])
+    for j in range(nr + 1):
+        for i in range(np + 1):
+            als[i, :, j] = Fs * (psi[j, :, ((i - 1) % np)] - psi[j, :, ((i) % np)])
         for i in range(np):
             alp[i,1:-1,j] = Fp[1:-1]*(psi[j,1:,i] - psi[j,:-1,i])
 
