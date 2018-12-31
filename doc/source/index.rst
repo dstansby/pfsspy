@@ -1,5 +1,8 @@
-Welcome to pfsspy's documentation!
-==================================
+pfsspy
+======
+
+pfsspy is a python package for carrying out Potential Field Source Surface
+modelling.
 
 .. toctree::
    :maxdepth: 2
