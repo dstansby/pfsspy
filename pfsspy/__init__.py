@@ -23,15 +23,20 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
 
     Paramters
     ---------
-    br0
+    br0 : array
+        Boundary condition of radial magnetic field at the inner surface.
 
-    nr
+    nr : int
+        Number of steps in the radial direction.
 
-    ns
+    ns : int
+        Number of steps in the polar direction.
 
-    np
+    np : int
+        Number of steps in the azimuthal direction.
 
-    rss
+    rss : float
+        Radius of the source surface, as a fraction of the solar radius.
 
     filename : str
         Output filename.
