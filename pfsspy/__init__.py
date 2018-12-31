@@ -3,6 +3,35 @@ import scipy.linalg as la
 import pfsspy.output
 
 
+class Input:
+    """
+    Input to PFSS modelling.
+
+    Parameters
+    ----------
+    br0 : array
+        Boundary condition of radial magnetic field at the inner surface.
+
+    nr : int
+        Number of steps in the radial direction.
+
+    ns : int
+        Number of steps in the polar direction.
+
+    np : int
+        Number of steps in the azimuthal direction.
+
+    rss : float
+        Radius of the source surface, as a fraction of the solar radius.
+    """
+    def __init__(self, br, nr, ns, np, rss):
+        self.br = br
+        self.nr = nr
+        self.ns = ns
+        self.np = np
+        self.rss = rss
+
+
 class Output:
     '''
     Output of PFSS modelling.
@@ -25,7 +54,7 @@ class Output:
         self.alp = alp
 
 
-def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
+def pfss(input, filename='', output='a', testQ=False):
     r"""
     Compute PFSS model.
 
@@ -45,20 +74,8 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
 
     Parameters
     ----------
-    br0 : array
-        Boundary condition of radial magnetic field at the inner surface.
-
-    nr : int
-        Number of steps in the radial direction.
-
-    ns : int
-        Number of steps in the polar direction.
-
-    np : int
-        Number of steps in the azimuthal direction.
-
-    rss : float
-        Radius of the source surface, as a fraction of the solar radius.
+    input : Input
+        Input parameters.
 
     filename : str, optional
         Output filename. If empty don't save to file. Defaults to empty.
@@ -70,6 +87,11 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
         If ``True``, compare the discrete eigenfunctions Qj_{lm} to
         Plm(cos(th)).
     """
+    br0 = input.br
+    nr = input.nr
+    ns = input.ns
+    np = input.np
+    rss = input.rss
 
     # Coordinates:
     ds = 2.0 / ns
@@ -284,7 +306,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
                 brg[i,:,:] /= 2*(Sbr[:-1,:] + Sbr[1:,:])
                 bsg[i,:,:] /= 2*(Sbs[:,:-1] + Sbs[:,1:])
             for i in range(np+1):
-                bpg[i,:,:] /= Sbp[:-1,:-1] + Sbp[1:,:-1] + Sbp[1:,1:] + Sbp[:-1,1:]
+                bpg[i, :, :] /= Sbp[:-1, :-1] + Sbp[1:, :-1] + Sbp[1:, 1:] + Sbp[:-1, 1:]
 
             if len(filename):
                 pfsspy.output.bg(filename, r, th, ph, brg, bsg, bpg)
