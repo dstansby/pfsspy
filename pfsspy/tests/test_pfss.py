@@ -9,9 +9,9 @@ def test_zeros():
     nr = 10
     rss = 2.5
     br = np.zeros((ns, nphi))
-    output = 'none'
 
-    out = pfsspy.pfss(br, nr, ns, nphi, rss, output='a')
+    input = pfsspy.Input(br, nr, ns, nphi, rss)
+    out = pfsspy.pfss(input, output='a')
     for comp in (out.alr, out.als, out.alp):
         assert np.all(comp == 0)
 

@@ -100,4 +100,5 @@ plt.show()
 # (note that output='bg' gives the output B averaged to grid points)
 print('Computing PFSS...')
 br = br[::-1, :]
-pfsspy.pfss(br, nr, ns, nphi, rss, filename='./bPF.nc', output='bg', testQ=False)
+input = pfsspy.Input(br, nr, ns, nphi, rss)
+pfsspy.pfss(input, filename='./bPF.nc', output='bg', testQ=False)
