@@ -28,20 +28,19 @@ def plot_2d(fname):
     # SPECIFY FIELD LINE START POINTS:
     # - these should be 1d arrays in theta, phi and r (usual spherical coordinates):
     nth = 32
-    th00 = n.linspace(0.02*n.pi, 0.98*n.pi, nth)
+    th00 = n.linspace(0.02 * n.pi, 0.98 * n.pi, nth)
     th0 = n.concatenate((th00, th00), axis=0)
-    ph0 = n.concatenate((th00*0 + (lon0 + 0.5*n.pi), th00*0 + (lon0 - 0.5*n.pi)), axis=0)
-    r0 = th0*0 + 2.5
+    ph0 = n.concatenate((th00 * 0 + (lon0 + 0.5 * n.pi), th00 * 0 + (lon0 - 0.5 * n.pi)), axis=0)
+    r0 = th0 * 0 + 2.5
 
-    #-----------------------------------------------------------------------
     def bTrace(t, x):
         """
         Return B/|B| for use by the field line tracer.
         """
         # (ph,s,rh) coordinates of current point:
-        ph = (n.arctan2(x[1], x[0]) + 2*n.pi) % (2*n.pi)
+        ph = (n.arctan2(x[1], x[0]) + 2 * n.pi) % (2 * n.pi)
         r = n.sqrt(n.sum(x**2))
-        s = x[2]/r
+        s = x[2] / r
         rh = n.log(r)
         b1 = brgi( n.stack((ph, s, rh)) )
         return b1/n.linalg.norm(b1)
@@ -62,13 +61,14 @@ def plot_2d(fname):
         t = 0.0
         dt = dtf
         for j in range(nrefine):
-            solver = ode(bTrace).set_integrator('vode', method='adams', atol=tol*dt)
-            solver.set_initial_value(xl[:,0:1], t)
+            solver = ode(bTrace).set_integrator(
+                'vode', method='adams', atol=tol * dt)
+            solver.set_initial_value(xl[:, 0:1], t)
             while True:
                 try:
                     solver.integrate(solver.t - dt)
                     xl = n.insert(xl, [0], solver.y, axis=1)
-                except ValueError: # reached boundary
+                except ValueError:  # reached boundary
                     break
             t = solver.t
             dt /= 10.0
@@ -83,11 +83,11 @@ def plot_2d(fname):
                 try:
                     solver.integrate(solver.t + dt)
                     xl = n.append(xl, solver.y, axis=1)
-                except ValueError: # reached boundary
+                except ValueError:  # reached boundary
                     break
             t = solver.t
             dt /= 10.0
-        return xl[0,:], xl[1,:], xl[2,:]
+        return xl[0, :], xl[1, :], xl[2, :]
 
     #-----------------------------------------------------------------------
     # COMPUTE FIELD LINES:
