@@ -6,8 +6,8 @@ doc-run: &doc-build
     pip install --quiet --user -r requirements/docs.txt
     pip install --user .
     PATH=$PATH:/home/circleci/.local/bin
+    cd doc
     make html SPHINXOPTS='-W -q'
-  working_directory: doc
 
 version: 2
 jobs:
