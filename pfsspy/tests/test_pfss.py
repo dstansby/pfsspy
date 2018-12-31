@@ -11,7 +11,7 @@ def test_zeros():
     br = np.zeros((ns, nphi))
     output = 'none'
 
-    out = pfsspy.pfss(br, nr, ns, nphi, rss, output='none')
+    out = pfsspy.pfss(br, nr, ns, nphi, rss, output='a')
     for comp in (out.alr, out.als, out.alp):
         assert np.all(comp == 0)
 
