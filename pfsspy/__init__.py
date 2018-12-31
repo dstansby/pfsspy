@@ -21,8 +21,8 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     - output='bc': br, bs, bp on the centres of the cell faces.
     - output='bg': br, bs, bp (weighted) averaged to grid points.
 
-    Paramters
-    ---------
+    Parameters
+    ----------
     br0 : array
         Boundary condition of radial magnetic field at the inner surface.
 

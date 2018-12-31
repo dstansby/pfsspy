@@ -53,6 +53,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx_automodapi.automodapi',
+    'numpydoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
