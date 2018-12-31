@@ -2,4 +2,5 @@
 sphinx-automodapi
 numpydoc
 sunpy_sphinx_theme
+sphinx-gallery
 sphinx

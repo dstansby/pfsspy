@@ -9,6 +9,7 @@ modelling.
    :caption: Contents:
 
    ref
+   auto_examples/index
 
 
 
