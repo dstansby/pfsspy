@@ -1,36 +1,47 @@
 import numpy as n
 import scipy.linalg as la
-import output_netcdf
+import pfsspy.output
 
 
 def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     """
-    Extrapolate 3D PFSS using eigenfunction method in r,s,p coordinates, on the
-    dumfric grid (equally spaced in rho=ln(r/rsun), s=cos(theta0), and p=phi).
+    Compute PFSS model.
+
+    Extrapolates a 3D PFSS using an eigenfunction method in r,s,p coordinates,
+    on the dumfric grid
+    (equally spaced in rho=ln(r/rsun), s=cos(theta0), and p=phi).
 
     The output should have zero current to machine precision,
     when computed with the DuMFriC staggered discretization.
 
+    Output depends on the flag 'output':
+
+    - output='none': as it says
+    - output='a': ar*Lr, as*Ls, ap*Lp on cell edges.
+    - output='bc': br, bs, bp on the centres of the cell faces.
+    - output='bg': br, bs, bp (weighted) averaged to grid points.
+
     Paramters
     ---------
     br0
+
     nr
+
     ns
+
     np
+
     rss
-    filename
+
+    filename : str
+        Output filename.
+
     ouput : str
         String from ``('none', 'a', 'bc', 'bg')``.
 
     testQ : bool
         If ``True``, compare the discrete eigenfunctions Qj_{lm} to
         Plm(cos(th)).
-
-    Output depends on the flag 'output':
-     output='none': as it says
-     output='a': ar*Lr, as*Ls, ap*Lp on cell edges.
-     output='bc': br, bs, bp on the centres of the cell faces.
-     output='bg': br, bs, bp (weighted) averaged to grid points.
     """
 
     # Coordinates:
@@ -142,7 +153,7 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
          return alr, als, alp
 
     if (output=='a'):
-        output_netcdf.a(filename, r, th, ph, alr, als, alp)
+        pfsspy.output.a(filename, r, th, ph, alr, als, alp)
 
     if ((output=='bc') | (output=='bg')):
         rc = n.linspace(-0.5*dr, n.log(rss)+0.5*dr, nr+2)
@@ -232,17 +243,17 @@ def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
             for i in range(np + 1):
                 bp[i, :, :] = bp[i, :, :] / Sbp
 
-            output_netcdf.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
+            pfsspy.output.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
 
         if (output == 'bg'):
             # Weighted average to grid points:
-            brg = br[:-1,:-1,:] + br[1:,:-1,:] + br[1:,1:,:] + br[:-1,1:,:]
-            bsg = bs[:-1,:,:-1] + bs[1:,:,:-1] + bs[1:,:,1:] + bs[:-1,:,1:]
-            bpg = bp[:,:-1,:-1] + bp[:,1:,:-1] + bp[:,1:,1:] + bp[:,:-1,1:]
+            brg = br[:-1, :-1, :] + br[1:,:-1,:] + br[1:,1:,:] + br[:-1,1:,:]
+            bsg = bs[:-1, :, :-1] + bs[1:,:,:-1] + bs[1:,:,1:] + bs[:-1,:,1:]
+            bpg = bp[:, :-1, :-1] + bp[:,1:,:-1] + bp[:,1:,1:] + bp[:,:-1,1:]
             for i in range(np+1):
                 brg[i,:,:] /= 2*(Sbr[:-1,:] + Sbr[1:,:])
                 bsg[i,:,:] /= 2*(Sbs[:,:-1] + Sbs[:,1:])
             for i in range(np+1):
                 bpg[i,:,:] /= Sbp[:-1,:-1] + Sbp[1:,:-1] + Sbp[1:,1:] + Sbp[:-1,1:]
 
-            output_netcdf.bg(filename, r, th, ph, brg, bsg, bpg)
+            pfsspy.output.bg(filename, r, th, ph, brg, bsg, bpg)
