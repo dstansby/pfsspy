@@ -4,12 +4,13 @@ import pfsspy.output
 
 
 def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
-    """
+    r"""
     Compute PFSS model.
 
-    Extrapolates a 3D PFSS using an eigenfunction method in r,s,p coordinates,
-    on the dumfric grid
-    (equally spaced in rho=ln(r/rsun), s=cos(theta0), and p=phi).
+    Extrapolates a 3D PFSS using an eigenfunction method in :math:`r,s,p`
+    coordinates, on the dumfric grid
+    (equally spaced in :math:`\rho = \ln(r/r_{sun})`,
+    :math:`s= \cos(\theta)`, and :math:`p=\phi`).
 
     The output should have zero current to machine precision,
     when computed with the DuMFriC staggered discretization.
