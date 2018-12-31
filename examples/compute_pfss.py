@@ -2,7 +2,6 @@
 Script for reading in map of Br(theta, phi) on the solar surface, computing a
 PFSS extrapolation, and outputting to a netcdf file.
 """
-import sys
 import numpy as np
 from scipy.interpolate import interp2d
 import matplotlib.pyplot as plt
