@@ -6,7 +6,7 @@ import sys
 import numpy as np
 from scipy.interpolate import interp2d
 import matplotlib.pyplot as plt
-from pfss import pfss
+import pfsspy
 
 # DEFINE GRID FOR PFSS COMPUTATION
 # - equally spaced in rho=log(r/Rsun), s=cos(theta) and phi.
@@ -23,7 +23,7 @@ rss = 2.5
 # INPUT MAP OF br(theta,phi)
 d = 180.0 / np.pi
 # - read in map from SFT simulation:
-br0 = np.loadtxt('test.dat')    # DEMO -- replace this with your own map
+br0 = np.loadtxt('pfsspy/test.dat')    # DEMO -- replace this with your own map
 ns0 = np.size(br0, axis=0)
 np0 = np.size(br0, axis=1)
 
@@ -93,4 +93,4 @@ plt.show()
 # (note that output='bg' gives the output B averaged to grid points)
 print('Computing PFSS...')
 br = br[::-1, :]
-pfss(br, nr, ns, nphi, rss, filename='./bPF.nc', output='bg', testQ=False)
+pfsspy.pfss(br, nr, ns, nphi, rss, filename='./bPF.nc', output='bg', testQ=False)
