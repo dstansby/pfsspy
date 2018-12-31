@@ -4,14 +4,12 @@ deps-run: &deps-install
   command: |
     python3 -m venv venv
     . venv/bin/activate
-    pip install --user -r requirements/docs.txt
-    pip install --user .
+    pip install --user -r requirements/docs.txt | cat
+    pip install --user . | cat
 
 doc-run: &doc-build
   name: Build documentation
-  command: |
-    PATH=$PATH:/home/circleci/.local/bin
-    make html SPHINXOPTS='-W -q'
+  command: make html SPHINXOPTS='-W -q'
   working_directory: doc
 
 version: 2
@@ -28,7 +26,3 @@ jobs:
       - run:
           name: "Built documentation is available at:"
           command: echo "${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/doc/build/html/index.html"
-
-notify:
-  webhooks:
-    - url: https://giles.cadair.com/circleci
