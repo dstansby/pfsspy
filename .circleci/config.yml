@@ -4,8 +4,8 @@ deps-run: &deps-install
   command: |
     python3 -m venv venv
     . venv/bin/activate
-    pip install --user --quiet -r requirements/docs.txt
-    pip install --user .
+    pip install --user -r requirements/docs.txt | cat
+    pip install --user . | cat
 
 doc-test: &doc-test
   name: Run doctets
