@@ -2,39 +2,53 @@ import numpy as n
 import scipy.linalg as la
 import output_netcdf
 
+
 def pfss(br0, nr, ns, np, rss, filename='', output='a', testQ=False):
     """
-        Extrapolate 3D PFSS using eigenfunction method in r,s,p coordinates, on the dumfric grid (equally spaced in
-        rho=ln(r/rsun), s=cos(theta0), and p=phi).
+    Extrapolate 3D PFSS using eigenfunction method in r,s,p coordinates, on the
+    dumfric grid (equally spaced in rho=ln(r/rsun), s=cos(theta0), and p=phi).
 
-        The output should have zero current to machine precision,
-        when computed with the DuMFriC staggered discretization.
+    The output should have zero current to machine precision,
+    when computed with the DuMFriC staggered discretization.
 
-        Output depends on the flag 'output':
-         output='none': as it says
-         output='a': ar*Lr, as*Ls, ap*Lp on cell edges.
-         output='bc': br, bs, bp on the centres of the cell faces.
-         output='bg': br, bs, bp (weighted) averaged to grid points.
+    Paramters
+    ---------
+    br0
+    nr
+    ns
+    np
+    rss
+    filename
+    ouput : str
+        String from ``('none', 'a', 'bc', 'bg')``.
 
-        Set testQ=True to compare the discrete eigenfunctions Qj_{lm}  to Plm(cos(th)).
+    testQ : bool
+        If ``True``, compare the discrete eigenfunctions Qj_{lm} to
+        Plm(cos(th)).
+
+    Output depends on the flag 'output':
+     output='none': as it says
+     output='a': ar*Lr, as*Ls, ap*Lp on cell edges.
+     output='bc': br, bs, bp on the centres of the cell faces.
+     output='bg': br, bs, bp (weighted) averaged to grid points.
     """
 
     # Coordinates:
-    ds = 2.0/ns
-    dp = 2*n.pi/np
-    dr = n.log(rss)/nr
-    rg = n.linspace(0, n.log(rss), nr+1)
-    rc = n.linspace(0.5*dr, n.log(rss)-0.5*dr, nr)
-    sg = n.linspace(-1, 1, ns+1)
-    sc = n.linspace(-1 + 0.5*ds, 1 - 0.5*ds, ns)
+    ds = 2.0 / ns
+    dp = 2 * n.pi / np
+    dr = n.log(rss) / nr
+    rg = n.linspace(0, n.log(rss), nr + 1)
+    rc = n.linspace(0.5 * dr, n.log(rss) - 0.5 * dr, nr)
+    sg = n.linspace(-1, 1, ns + 1)
+    sc = n.linspace(-1 + 0.5 * ds, 1 - 0.5 * ds, ns)
 
-    k = n.linspace(0, nr, nr+1)
+    k = n.linspace(0, nr, nr + 1)
 
-    Fp = sg*0 # Lp/Ls on p-ribs
-    Fp[1:-1] = n.sqrt(1 - sg[1:-1]**2)/(n.arcsin(sc[1:]) - n.arcsin(sc[:-1]))*dp
-    Vg = Fp/ds/dp
-    Fs = (n.arcsin(sg[1:]) - n.arcsin(sg[:-1]))/n.sqrt(1 - sc**2)/dp # Ls/Lp on s-ribs
-    Uc = Fs/ds/dp
+    Fp = sg * 0  # Lp/Ls on p-ribs
+    Fp[1:-1] = n.sqrt(1 - sg[1:-1]**2) / (n.arcsin(sc[1:]) - n.arcsin(sc[:-1])) * dp
+    Vg = Fp / ds / dp
+    Fs = (n.arcsin(sg[1:]) - n.arcsin(sg[:-1]))/n.sqrt(1 - sc**2) / dp  # Ls/Lp on s-ribs
+    Uc = Fs / ds / dp
 
     # FFT in phi of photospheric distribution at each latitude:
     brt = n.fft.rfft(br0, axis=1)
