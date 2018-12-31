@@ -1,4 +1,7 @@
 """
+PFSS example
+============
+
 Script for reading in map of Br(theta, phi) on the solar surface, computing a
 PFSS extrapolation, and outputting to a netcdf file.
 
@@ -10,7 +13,9 @@ from scipy.interpolate import interp2d
 import matplotlib.pyplot as plt
 import pfsspy
 
-# DEFINE GRID FOR PFSS COMPUTATION
+###############################################################################
+# Define grid for computation
+#
 # - equally spaced in rho=log(r/Rsun), s=cos(theta) and phi.
 # - specify number of grid points:
 nr = 60     # Radial
