@@ -227,7 +227,7 @@ def pfss(input, filename='', output='a', testQ=False):
             pfsspy.output.a(filename, r, th, ph, alr, als, alp)
         return Output(r, th, ph, alr, als, alp, input)
 
-    if ((output == 'bc') | (output == 'bg')):
+    def _common_bc_bg():
         rc = n.linspace(-0.5 * dr, n.log(rss) + 0.5 * dr, nr + 2)
         rrc = n.exp(rc)
         thc = n.zeros(ns + 2) - 1
@@ -279,7 +279,6 @@ def pfss(input, filename='', output='a', testQ=False):
         bs[1:-1,:,1:-1] = alp[:,:,1:] - alp[:,:,:-1]
         bp[:,1:-1,1:-1] = als[:,:,:-1] - als[:,:,1:]
 
-        del(alr, als, alp)
 
         # Fill ghost values with boundary conditions:
         # - zero-gradient at outer boundary:
@@ -307,29 +306,33 @@ def pfss(input, filename='', output='a', testQ=False):
             bp[i,-1,:] = -bp[i1,-2,:]
             bp[i,0,:] = -bp[i1,1,:]
 
-        if (output == 'bc'):
-            # Remove area factors:
-            for i in range(np + 2):
-                br[i, :, :] = br[i, :, :] / Sbr
-                bs[i, :, :] = bs[i, :, :] / Sbs
-            for i in range(np + 1):
-                bp[i, :, :] = bp[i, :, :] / Sbp
+        return br, bs, bp, Sbr, Sbs, Sbp
 
-            if len(filename):
-                pfsspy.output.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
-            return br, bs, bp
+    if (output == 'bc'):
+        br, bs, bp, Sbr, Sbs, Sbp = _common_bc_bg()
+        # Remove area factors:
+        for i in range(np + 2):
+            br[i, :, :] = br[i, :, :] / Sbr
+            bs[i, :, :] = bs[i, :, :] / Sbs
+        for i in range(np + 1):
+            bp[i, :, :] = bp[i, :, :] / Sbp
 
-        if (output == 'bg'):
-            # Weighted average to grid points:
-            brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1: ,1:, :] + br[:-1, 1:, :]
-            bsg = bs[:-1, :, :-1] + bs[1:, :, :-1] + bs[1:, :, 1:] + bs[:-1, :, 1:]
-            bpg = bp[:, :-1, :-1] + bp[:, 1:, :-1] + bp[:, 1:, 1:] + bp[:, :-1, 1:]
-            for i in range(np + 1):
-                brg[i, :, :] /= 2 * (Sbr[:-1, :] + Sbr[1:, :])
-                bsg[i, :, :] /= 2 * (Sbs[:, :-1] + Sbs[:, 1:])
-            for i in range(np + 1):
-                bpg[i, :, :] /= Sbp[:-1, :-1] + Sbp[1:, :-1] + Sbp[1:, 1:] + Sbp[:-1, 1:]
+        if len(filename):
+            pfsspy.output.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
+        return br, bs, bp
 
-            if len(filename):
-                pfsspy.output.bg(filename, r, th, ph, brg, bsg, bpg)
-            return brg, bsg, bpg
+    if (output == 'bg'):
+        br, bs, bp, Sbr, Sbs, Sbp = _common_bc_bg()
+        # Weighted average to grid points:
+        brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1: ,1:, :] + br[:-1, 1:, :]
+        bsg = bs[:-1, :, :-1] + bs[1:, :, :-1] + bs[1:, :, 1:] + bs[:-1, :, 1:]
+        bpg = bp[:, :-1, :-1] + bp[:, 1:, :-1] + bp[:, 1:, 1:] + bp[:, :-1, 1:]
+        for i in range(np + 1):
+            brg[i, :, :] /= 2 * (Sbr[:-1, :] + Sbr[1:, :])
+            bsg[i, :, :] /= 2 * (Sbs[:, :-1] + Sbs[:, 1:])
+        for i in range(np + 1):
+            bpg[i, :, :] /= Sbp[:-1, :-1] + Sbp[1:, :-1] + Sbp[1:, 1:] + Sbp[:-1, 1:]
+
+        if len(filename):
+            pfsspy.output.bg(filename, r, th, ph, brg, bsg, bpg)
+        return brg, bsg, bpg
