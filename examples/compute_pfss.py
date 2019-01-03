@@ -101,4 +101,4 @@ plt.show()
 print('Computing PFSS...')
 br = br[::-1, :]
 input = pfsspy.Input(br, nr, ns, nphi, rss)
-pfsspy.pfss(input, filename='./bPF.nc', output='bg', testQ=False)
+output = pfsspy.pfss(input, testQ=False)
