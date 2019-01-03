@@ -253,14 +253,14 @@ def pfss(input, filename='', output='a', testQ=False):
         dnr[-1] = -dnr[-1]
 
         # Required area factors:
-        Sbr = n.zeros((ns+2, nr+1))
+        Sbr = n.zeros((ns + 2, nr + 1))
         for k in range(nr + 1):
-            Sbr[1:-1, k] = n.exp(2 * rg[k])*ds*dp
-            Sbr[0,k] = Sbr[1,k]
-            Sbr[-1,k] = Sbr[-2,k]
-        Sbs = n.zeros((ns+1,nr+2))
-        for k in range(nr+2):
-            for j in range(1,ns):
+            Sbr[1:-1, k] = n.exp(2 * rg[k]) * ds * dp
+            Sbr[0, k] = Sbr[1, k]
+            Sbr[-1, k] = Sbr[-2, k]
+        Sbs = n.zeros((ns + 1, nr + 2))
+        for k in range(nr + 2):
+            for j in range(1, ns):
                 Sbs[j,k] = 0.5*n.exp(2*rc[k] - dr)*dp*(n.exp(2*dr)-1)*n.sqrt(1 - sg[j]**2)
             Sbs[0,k] = Sbs[1,k]
             Sbs[-1,k] = Sbs[-2,k]
