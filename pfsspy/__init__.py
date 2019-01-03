@@ -66,13 +66,14 @@ class Output:
     als :
     alp :
     '''
-    def __init__(self, r, th, ph, alr, als, alp):
+    def __init__(self, r, th, ph, alr, als, alp, input):
         self.r = r
         self.th = th
         self.ph = ph
         self.alr = alr
         self.als = als
         self.alp = alp
+        self.input = input
 
 
 def pfss(input, filename='', output='a', testQ=False):
@@ -224,7 +225,7 @@ def pfss(input, filename='', output='a', testQ=False):
     if (output == 'a'):
         if len(filename):
             pfsspy.output.a(filename, r, th, ph, alr, als, alp)
-        return Output(r, th, ph, alr, als, alp)
+        return Output(r, th, ph, alr, als, alp, input)
 
     if ((output == 'bc') | (output == 'bg')):
         rc = n.linspace(-0.5 * dr, n.log(rss) + 0.5 * dr, nr + 2)
