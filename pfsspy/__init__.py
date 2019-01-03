@@ -103,6 +103,137 @@ class Output:
         self.alp = alp
         self.input = input
 
+    @property
+    def bc(self):
+        br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
+        # Remove area factors:
+        for i in range(self.input.np + 2):
+            br[i, :, :] = br[i, :, :] / Sbr
+            bs[i, :, :] = bs[i, :, :] / Sbs
+        for i in range(self.input.np + 1):
+            bp[i, :, :] = bp[i, :, :] / Sbp
+
+        return br, bs, bp
+
+    @property
+    def bg(self):
+        br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
+        # Weighted average to grid points:
+        brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1: ,1:, :] + br[:-1, 1:, :]
+        bsg = bs[:-1, :, :-1] + bs[1:, :, :-1] + bs[1:, :, 1:] + bs[:-1, :, 1:]
+        bpg = bp[:, :-1, :-1] + bp[:, 1:, :-1] + bp[:, 1:, 1:] + bp[:, :-1, 1:]
+        for i in range(self.input.np + 1):
+            brg[i, :, :] /= 2 * (Sbr[:-1, :] + Sbr[1:, :])
+            bsg[i, :, :] /= 2 * (Sbs[:, :-1] + Sbs[:, 1:])
+        for i in range(self.input.np + 1):
+            bpg[i, :, :] /= Sbp[:-1, :-1] + Sbp[1:, :-1] + Sbp[1:, 1:] + Sbp[:-1, 1:]
+
+        return brg, bsg, bpg
+
+    def _common_b(self):
+        """
+        Common code needed to calculate magnetic field from vector potential.
+        """
+        dr = self.input.dr
+        ds = self.input.ds
+        dp = self.input.dp
+
+        nr = self.input.nr
+        ns = self.input.ns
+        np = self.input.np
+
+        rss = self.input.rss
+
+        rc = self.input.rc
+        sc = self.input.sc
+
+        rg = self.input.rg
+        sg = self.input.sg
+
+        alr = self.alr
+        als = self.als
+        alp = self.alp
+
+        rc = n.linspace(-0.5 * dr, n.log(rss) + 0.5 * dr, nr + 2)
+        rrc = n.exp(rc)
+        thc = n.zeros(ns + 2) - 1
+        thc[1:-1] = n.arccos(sc)
+        pc = n.linspace(-0.5 * dp, 2 * n.pi + 0.5 * dp, np + 2)
+
+        # Required face normals:
+        dnp = n.zeros((ns + 2, 2))
+        dns = n.zeros((ns + 1, 2))
+        dnr = n.zeros(ns + 2)
+        for k in range(2):
+            for j in range(1, ns + 1):
+                dnp[j, k] = rrc[k] * n.sqrt(1 - sc[j - 1]**2) * dp
+            dnp[0, k] = dnp[1, k]
+            dnp[-1, k] = dnp[-2, k]
+            for j in range(1, ns):
+                dns[j, k] = rrc[k] * (n.arcsin(sc[j]) - n.arcsin(sc[j - 1]))
+            dns[0, k] = dns[1, k]
+            dns[-1, k] = dns[-2, k]
+        for j in range(ns + 2):
+            dnr[j] = rrc[0] * (n.exp(dr) - 1)
+        dnr[0] = -dnr[0]
+        dnr[-1] = -dnr[-1]
+
+        # Required area factors:
+        Sbr = n.zeros((ns + 2, nr + 1))
+        for k in range(nr + 1):
+            Sbr[1:-1, k] = n.exp(2 * rg[k]) * ds * dp
+            Sbr[0, k] = Sbr[1, k]
+            Sbr[-1, k] = Sbr[-2, k]
+        Sbs = n.zeros((ns + 1, nr + 2))
+        for k in range(nr + 2):
+            for j in range(1, ns):
+                Sbs[j,k] = 0.5*n.exp(2*rc[k] - dr)*dp*(n.exp(2*dr)-1)*n.sqrt(1 - sg[j]**2)
+            Sbs[0,k] = Sbs[1,k]
+            Sbs[-1,k] = Sbs[-2,k]
+        Sbp = n.zeros((ns+2,nr+2))
+        for k in range(nr+2):
+            for j in range(1,ns+1):
+                Sbp[j,k] = 0.5*n.exp(2*rc[k] - dr)*(n.exp(2*dr) - 1)*(n.arcsin(sg[j]) - n.arcsin(sg[j-1]))
+            Sbp[0,k] = Sbp[1,k]
+            Sbp[-1,k] = Sbp[-2,k]
+
+        # Compute br*Sbr, bs*Sbs, bp*Sbp at cell centres by Stokes theorem:
+        br = n.zeros((np+2,ns+2,nr+1))
+        bs = n.zeros((np+2,ns+1,nr+2))
+        bp = n.zeros((np+1,ns+2,nr+2))
+        br[1:-1,1:-1,:] = als[1:,:,:] - als[:-1,:,:] + alp[:,:-1,:] - alp[:,1:,:]
+        bs[1:-1,:,1:-1] = alp[:,:,1:] - alp[:,:,:-1]
+        bp[:,1:-1,1:-1] = als[:,:,:-1] - als[:,:,1:]
+
+
+        # Fill ghost values with boundary conditions:
+        # - zero-gradient at outer boundary:
+        bs[1:-1,:,-1] = 2*bs[1:-1,:,-2] - bs[1:-1,:,-3]
+        bp[:,1:-1,-1] = 2*bp[:,1:-1,-2] - bp[:,1:-1,-3]
+        # - periodic in phi:
+        bs[0,:,:] = bs[-2,:,:]
+        bs[-1,:,:] = bs[1,:,:]
+        br[0,:,:] = br[-2,:,:]
+        br[-1,:,:] = br[1,:,:]
+        # js = jp = 0 at photosphere:
+        for i in range(np+1):
+            bp[i,:,0] = Sbp[:,0]/dnp[:,0]*(bp[i,:,1]*dnp[:,1]/Sbp[:,1] + br[i,:,0]*dnr[:]/Sbr[:,0] - br[i+1,:,0]*dnr[:]/Sbr[:,0])
+        for i in range(np+2):
+            bs[i,:,0] = Sbs[:,0]/dns[:,0]*(bs[i,:,1]*dns[:,1]/Sbs[:,1] + br[i,:-1,0]*dnr[:-1]/Sbr[:-1,0] - br[i,1:,0]*dnr[1:]/Sbr[1:,0])
+        # - polar boundaries as in dumfric:
+        for i in range(np+2):
+            i1 = (i + np//2) % np
+            br[i,-1,:] = br[i1,-2,:]
+            br[i,0,:] = br[i1,1,:]
+            bs[i,-1,:] = 0.5*(bs[i,-2,:] - bs[i1,-2,:])
+            bs[i,0,:] = 0.5*(bs[i,1,:] - bs[i1,1,:])
+        for i in range(np+1):
+            i1 = (i + np//2) % np
+            bp[i,-1,:] = -bp[i1,-2,:]
+            bp[i,0,:] = -bp[i1,1,:]
+
+        return br, bs, bp, Sbr, Sbs, Sbp
+
 
 def pfss(input, filename='', output='a', testQ=False):
     r"""
@@ -250,117 +381,4 @@ def pfss(input, filename='', output='a', testQ=False):
     th = n.arccos(sg)
     ph = n.linspace(0, 2 * n.pi, np + 1)
 
-    if (output == 'a'):
-        if len(filename):
-            pfsspy.output.a(filename, r, th, ph, alr, als, alp)
-        return Output(r, th, ph, alr, als, alp, input)
-
-    def _common_bc_bg():
-        rc = n.linspace(-0.5 * dr, n.log(rss) + 0.5 * dr, nr + 2)
-        rrc = n.exp(rc)
-        thc = n.zeros(ns + 2) - 1
-        thc[1:-1] = n.arccos(sc)
-        pc = n.linspace(-0.5 * dp, 2 * n.pi + 0.5 * dp, np + 2)
-
-        # Required face normals:
-        dnp = n.zeros((ns + 2, 2))
-        dns = n.zeros((ns + 1, 2))
-        dnr = n.zeros(ns + 2)
-        for k in range(2):
-            for j in range(1, ns + 1):
-                dnp[j, k] = rrc[k] * n.sqrt(1 - sc[j - 1]**2) * dp
-            dnp[0, k] = dnp[1, k]
-            dnp[-1, k] = dnp[-2, k]
-            for j in range(1, ns):
-                dns[j, k] = rrc[k] * (n.arcsin(sc[j]) - n.arcsin(sc[j - 1]))
-            dns[0, k] = dns[1, k]
-            dns[-1, k] = dns[-2, k]
-        for j in range(ns + 2):
-            dnr[j] = rrc[0] * (n.exp(dr) - 1)
-        dnr[0] = -dnr[0]
-        dnr[-1] = -dnr[-1]
-
-        # Required area factors:
-        Sbr = n.zeros((ns + 2, nr + 1))
-        for k in range(nr + 1):
-            Sbr[1:-1, k] = n.exp(2 * rg[k]) * ds * dp
-            Sbr[0, k] = Sbr[1, k]
-            Sbr[-1, k] = Sbr[-2, k]
-        Sbs = n.zeros((ns + 1, nr + 2))
-        for k in range(nr + 2):
-            for j in range(1, ns):
-                Sbs[j,k] = 0.5*n.exp(2*rc[k] - dr)*dp*(n.exp(2*dr)-1)*n.sqrt(1 - sg[j]**2)
-            Sbs[0,k] = Sbs[1,k]
-            Sbs[-1,k] = Sbs[-2,k]
-        Sbp = n.zeros((ns+2,nr+2))
-        for k in range(nr+2):
-            for j in range(1,ns+1):
-                Sbp[j,k] = 0.5*n.exp(2*rc[k] - dr)*(n.exp(2*dr) - 1)*(n.arcsin(sg[j]) - n.arcsin(sg[j-1]))
-            Sbp[0,k] = Sbp[1,k]
-            Sbp[-1,k] = Sbp[-2,k]
-
-        # Compute br*Sbr, bs*Sbs, bp*Sbp at cell centres by Stokes theorem:
-        br = n.zeros((np+2,ns+2,nr+1))
-        bs = n.zeros((np+2,ns+1,nr+2))
-        bp = n.zeros((np+1,ns+2,nr+2))
-        br[1:-1,1:-1,:] = als[1:,:,:] - als[:-1,:,:] + alp[:,:-1,:] - alp[:,1:,:]
-        bs[1:-1,:,1:-1] = alp[:,:,1:] - alp[:,:,:-1]
-        bp[:,1:-1,1:-1] = als[:,:,:-1] - als[:,:,1:]
-
-
-        # Fill ghost values with boundary conditions:
-        # - zero-gradient at outer boundary:
-        bs[1:-1,:,-1] = 2*bs[1:-1,:,-2] - bs[1:-1,:,-3]
-        bp[:,1:-1,-1] = 2*bp[:,1:-1,-2] - bp[:,1:-1,-3]
-        # - periodic in phi:
-        bs[0,:,:] = bs[-2,:,:]
-        bs[-1,:,:] = bs[1,:,:]
-        br[0,:,:] = br[-2,:,:]
-        br[-1,:,:] = br[1,:,:]
-        # js = jp = 0 at photosphere:
-        for i in range(np+1):
-            bp[i,:,0] = Sbp[:,0]/dnp[:,0]*(bp[i,:,1]*dnp[:,1]/Sbp[:,1] + br[i,:,0]*dnr[:]/Sbr[:,0] - br[i+1,:,0]*dnr[:]/Sbr[:,0])
-        for i in range(np+2):
-            bs[i,:,0] = Sbs[:,0]/dns[:,0]*(bs[i,:,1]*dns[:,1]/Sbs[:,1] + br[i,:-1,0]*dnr[:-1]/Sbr[:-1,0] - br[i,1:,0]*dnr[1:]/Sbr[1:,0])
-        # - polar boundaries as in dumfric:
-        for i in range(np+2):
-            i1 = (i + np//2) % np
-            br[i,-1,:] = br[i1,-2,:]
-            br[i,0,:] = br[i1,1,:]
-            bs[i,-1,:] = 0.5*(bs[i,-2,:] - bs[i1,-2,:])
-            bs[i,0,:] = 0.5*(bs[i,1,:] - bs[i1,1,:])
-        for i in range(np+1):
-            i1 = (i + np//2) % np
-            bp[i,-1,:] = -bp[i1,-2,:]
-            bp[i,0,:] = -bp[i1,1,:]
-
-        return br, bs, bp, Sbr, Sbs, Sbp
-
-    if (output == 'bc'):
-        br, bs, bp, Sbr, Sbs, Sbp = _common_bc_bg()
-        # Remove area factors:
-        for i in range(np + 2):
-            br[i, :, :] = br[i, :, :] / Sbr
-            bs[i, :, :] = bs[i, :, :] / Sbs
-        for i in range(np + 1):
-            bp[i, :, :] = bp[i, :, :] / Sbp
-
-        if len(filename):
-            pfsspy.output.bc(filename, r, th, ph, rrc, thc, pc, br, bs, bp)
-        return br, bs, bp
-
-    if (output == 'bg'):
-        br, bs, bp, Sbr, Sbs, Sbp = _common_bc_bg()
-        # Weighted average to grid points:
-        brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1: ,1:, :] + br[:-1, 1:, :]
-        bsg = bs[:-1, :, :-1] + bs[1:, :, :-1] + bs[1:, :, 1:] + bs[:-1, :, 1:]
-        bpg = bp[:, :-1, :-1] + bp[:, 1:, :-1] + bp[:, 1:, 1:] + bp[:, :-1, 1:]
-        for i in range(np + 1):
-            brg[i, :, :] /= 2 * (Sbr[:-1, :] + Sbr[1:, :])
-            bsg[i, :, :] /= 2 * (Sbs[:, :-1] + Sbs[:, 1:])
-        for i in range(np + 1):
-            bpg[i, :, :] /= Sbp[:-1, :-1] + Sbp[1:, :-1] + Sbp[1:, 1:] + Sbp[:-1, 1:]
-
-        if len(filename):
-            pfsspy.output.bg(filename, r, th, ph, brg, bsg, bpg)
-        return brg, bsg, bpg
+    return Output(r, th, ph, alr, als, alp, input)

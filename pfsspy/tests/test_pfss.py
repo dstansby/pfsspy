@@ -20,7 +20,7 @@ def test_zeros():
     assert out.als.shape == (nphi + 1, ns, nr + 1)
     assert out.alp.shape == (nphi, ns + 1, nr + 1)
 
-    br, bs, bp = pfsspy.pfss(input, output='bc')
+    br, bs, bp = out.bc
     for comp in (br, bs, bp):
         assert np.all(comp == 0)
 
@@ -28,7 +28,7 @@ def test_zeros():
     assert bs.shape == (nphi + 2, ns + 1, nr + 2)
     assert bp.shape == (nphi + 1, ns + 2, nr + 2)
 
-    br, bs, bp = pfsspy.pfss(input, output='bg')
+    br, bs, bp = out.bg
     for comp in (br, bs, bp):
         assert np.all(comp == 0)
 
