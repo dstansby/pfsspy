@@ -12,7 +12,7 @@ def test_zeros():
 
     input = pfsspy.Input(br, nr, ns, nphi, rss)
 
-    out = pfsspy.pfss(input, output='a')
+    out = pfsspy.pfss(input)
     alr, als, alp = out.al
     for comp in (alr, als, alp):
         assert np.all(comp == 0)
