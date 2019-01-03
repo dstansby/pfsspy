@@ -52,6 +52,30 @@ class Input:
         """
         return 2 * n.pi / self.np
 
+    @property
+    def rc(self):
+        """
+        """
+        return n.linspace(0.5 * self.dr, n.log(self.rss) - 0.5 * self.dr, self.nr)
+
+    @property
+    def sc(self):
+        """
+        """
+        return n.linspace(-1 + 0.5 * self.ds, 1 - 0.5 * self.ds, self.ns)
+
+    @property
+    def rg(self):
+        """
+        """
+        return n.linspace(0, n.log(self.rss), self.nr + 1)
+
+    @property
+    def sg(self):
+        """
+        """
+        return n.linspace(-1, 1, self.ns + 1)
+
 
 class Output:
     '''
@@ -120,11 +144,11 @@ def pfss(input, filename='', output='a', testQ=False):
     dp = input.dp
     dr = input.dr
 
-    rg = n.linspace(0, n.log(rss), nr + 1)
-    rc = n.linspace(0.5 * dr, n.log(rss) - 0.5 * dr, nr)
+    rg = input.rg
+    rc = input.rc
 
-    sg = n.linspace(-1, 1, ns + 1)
-    sc = n.linspace(-1 + 0.5 * ds, 1 - 0.5 * ds, ns)
+    sg = input.sg
+    sc = input.sc
 
     k = n.linspace(0, nr, nr + 1)
 
