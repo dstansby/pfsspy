@@ -13,12 +13,13 @@ def test_zeros():
     input = pfsspy.Input(br, nr, ns, nphi, rss)
 
     out = pfsspy.pfss(input, output='a')
-    for comp in (out.alr, out.als, out.alp):
+    alr, als, alp = out.al
+    for comp in (alr, als, alp):
         assert np.all(comp == 0)
 
-    assert out.alr.shape == (nphi + 1, ns + 1, nr)
-    assert out.als.shape == (nphi + 1, ns, nr + 1)
-    assert out.alp.shape == (nphi, ns + 1, nr + 1)
+    assert alr.shape == (nphi + 1, ns + 1, nr)
+    assert als.shape == (nphi + 1, ns, nr + 1)
+    assert alp.shape == (nphi, ns + 1, nr + 1)
 
     br, bs, bp = out.bc
     for comp in (br, bs, bp):

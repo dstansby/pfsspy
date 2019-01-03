@@ -98,11 +98,15 @@ class Output:
         self.r = r
         self.th = th
         self.ph = ph
-        self.alr = alr
-        self.als = als
-        self.alp = alp
+        self._alr = alr
+        self._als = als
+        self._alp = alp
         self.input = input
         self._B_calculated = False
+
+    @property
+    def al(self):
+        return self._alr, self._als, self._alp
 
     @property
     def bc(self):
@@ -155,9 +159,7 @@ class Output:
         rg = self.input.rg
         sg = self.input.sg
 
-        alr = self.alr
-        als = self.als
-        alp = self.alp
+        alr, als, alp = self.al
 
         rc = n.linspace(-0.5 * dr, n.log(rss) + 0.5 * dr, nr + 2)
         rrc = n.exp(rc)
