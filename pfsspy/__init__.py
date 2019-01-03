@@ -102,6 +102,7 @@ class Output:
         self.als = als
         self.alp = alp
         self.input = input
+        self._B_calculated = False
 
     @property
     def bc(self):
@@ -134,6 +135,10 @@ class Output:
         """
         Common code needed to calculate magnetic field from vector potential.
         """
+        if self._B_calculated:
+            return (self._br, self._bs, self._bp,
+                    self._Sbr, self._Sbs, self._Sbp)
+
         dr = self.input.dr
         ds = self.input.ds
         dp = self.input.dp
@@ -231,6 +236,10 @@ class Output:
             i1 = (i + np//2) % np
             bp[i,-1,:] = -bp[i1,-2,:]
             bp[i,0,:] = -bp[i1,1,:]
+
+        self._br, self._bs, self._bp, self._Sbr, self._Sbs, self._Sbp = \
+            br, bs, bp, Sbr, Sbs, Sbp
+        self._B_calculated = True
 
         return br, bs, bp, Sbr, Sbs, Sbp
 
