@@ -106,10 +106,18 @@ class Output:
 
     @property
     def al(self):
+        """
+        Vector potential times cell edge lenghts.
+
+        Returns ar*Lr, as*Ls, ap*Lp on cell edges.
+        """
         return self._alr, self._als, self._alp
 
     @property
     def bc(self):
+        """
+        B on the centres of the cell faces.
+        """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Remove area factors:
         for i in range(self.input.np + 2):
@@ -122,6 +130,9 @@ class Output:
 
     @property
     def bg(self):
+        """
+        B as a (weighted) averaged on grid points.
+        """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Weighted average to grid points:
         brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1: ,1:, :] + br[:-1, 1:, :]
@@ -246,7 +257,7 @@ class Output:
         return br, bs, bp, Sbr, Sbs, Sbp
 
 
-def pfss(input, filename='', output='a', testQ=False):
+def pfss(input, testQ=False):
     r"""
     Compute PFSS model.
 
@@ -258,26 +269,18 @@ def pfss(input, filename='', output='a', testQ=False):
     The output should have zero current to machine precision,
     when computed with the DuMFriC staggered discretization.
 
-    Output depends on the flag 'output':
-
-    - output='a': ar*Lr, as*Ls, ap*Lp on cell edges.
-    - output='bc': br, bs, bp on the centres of the cell faces.
-    - output='bg': br, bs, bp (weighted) averaged to grid points.
 
     Parameters
     ----------
-    input : Input
+    input : :class:`Input`
         Input parameters.
 
     filename : str, optional
         Output filename. If empty don't save to file. Defaults to empty.
 
-    ouput : str, optional
-        String from ``('a', 'bc', 'bg')``.
-
-    testQ : bool
-        If ``True``, compare the discrete eigenfunctions Qj_{lm} to
-        Plm(cos(th)).
+    Returns
+    -------
+    :class:`Output`
     """
     br0 = input.br
     nr = input.nr
