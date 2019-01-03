@@ -55,24 +55,28 @@ class Input:
     @property
     def rc(self):
         """
+        Location of the centre of cells in log(r).
         """
         return n.linspace(0.5 * self.dr, n.log(self.rss) - 0.5 * self.dr, self.nr)
 
     @property
     def sc(self):
         """
+        Location of the centre of cells in cos(theta).
         """
         return n.linspace(-1 + 0.5 * self.ds, 1 - 0.5 * self.ds, self.ns)
 
     @property
     def rg(self):
         """
+        Location of the edges of grid cells in log(r).
         """
         return n.linspace(0, n.log(self.rss), self.nr + 1)
 
     @property
     def sg(self):
         """
+        Location of the edges of grid cells in cos(theta).
         """
         return n.linspace(-1, 1, self.ns + 1)
 
