@@ -175,6 +175,42 @@ class Output:
 
         return brg, bsg, bpg
 
+    def save_a(self, fname):
+        """
+        Save vector potential * edge lengths to a file.
+        """
+        from scipy.io import netcdf
+        r = self.r
+        th = self.th
+        ph = self.ph
+        apr, aps, app = self.al
+
+        nr = n.size(r) - 1
+        ns = n.size(th) - 1
+        np = n.size(ph) - 1
+
+        fid = netcdf.netcdf_file(fname, 'w')
+        fid.createDimension('rc', nr)
+        fid.createDimension('r', nr + 1)
+        fid.createDimension('thc', ns)
+        fid.createDimension('th', ns + 1)
+        fid.createDimension('phc', np)
+        fid.createDimension('ph', np + 1)
+        vid = fid.createVariable('r', 'd', ('r',))
+        vid[:] = r
+        vid = fid.createVariable('th', 'd', ('th',))
+        vid[:] = th
+        vid = fid.createVariable('ph', 'd', ('ph',))
+        vid[:] = ph
+        vid = fid.createVariable('ar', 'd', ('ph', 'th', 'rc'))
+        vid[:] = apr
+        vid = fid.createVariable('as', 'd', ('ph', 'thc', 'r'))
+        vid[:] = aps
+        vid = fid.createVariable('ap', 'd', ('phc', 'th', 'r'))
+        vid[:] = app
+        fid.close()
+        print('Wrote A*L to file ' + fname)
+
     def _common_b(self):
         """
         Common code needed to calculate magnetic field from vector potential.

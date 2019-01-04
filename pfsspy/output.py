@@ -6,38 +6,6 @@ from scipy.io import netcdf
 import numpy as n
 
 
-def a(filename, r, th, ph, apr, aps, app):
-    """
-    Vector potential * edge lengths on cell edges.
-    """
-
-    nr = n.size(r) - 1
-    ns = n.size(th) - 1
-    np = n.size(ph) - 1
-
-    fid = netcdf.netcdf_file(filename, 'w')
-    fid.createDimension('rc', nr)
-    fid.createDimension('r', nr + 1)
-    fid.createDimension('thc', ns)
-    fid.createDimension('th', ns + 1)
-    fid.createDimension('phc', np)
-    fid.createDimension('ph', np + 1)
-    vid = fid.createVariable('r', 'd', ('r',))
-    vid[:] = r
-    vid = fid.createVariable('th', 'd', ('th',))
-    vid[:] = th
-    vid = fid.createVariable('ph', 'd', ('ph',))
-    vid[:] = ph
-    vid = fid.createVariable('ar', 'd', ('ph', 'th', 'rc'))
-    vid[:] = apr
-    vid = fid.createVariable('as', 'd', ('ph', 'thc', 'r'))
-    vid[:] = aps
-    vid = fid.createVariable('ap', 'd', ('phc', 'th', 'r'))
-    vid[:] = app
-    fid.close()
-    print('Wrote A*L to file ' + filename)
-
-
 def bc(filename, r, th, ph, rc, thc, phc, br, bs, bp):
     """
     Magnetic field components on cell faces, including ghost cells.

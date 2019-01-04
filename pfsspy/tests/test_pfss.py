@@ -1,8 +1,10 @@
 import numpy as np
 import pfsspy
+import pytest
 
 
-def test_zeros():
+@pytest.fixture
+def zero_map():
     # Test a completely zero input
     ns = 30
     nphi = 20
@@ -11,6 +13,16 @@ def test_zeros():
     br = np.zeros((ns, nphi))
 
     input = pfsspy.Input(br, nr, ns, nphi, rss)
+    output = pfsspy.pfss(input)
+    return input, output
+
+
+def test_shape(zero_map):
+    # Test output map shapes
+    input, out = zero_map
+    nr = input.nr
+    nphi = input.np
+    ns = input.ns
 
     out = pfsspy.pfss(input)
     alr, als, alp = out.al
@@ -36,3 +48,9 @@ def test_zeros():
     assert br.shape == (nphi + 1, ns + 1, nr + 1)
     assert bs.shape == (nphi + 1, ns + 1, nr + 1)
     assert bp.shape == (nphi + 1, ns + 1, nr + 1)
+
+
+def test_write_al(zero_map):
+    _, output = zero_map
+    # Test writing of vector potential
+    output.save_a('a.netcdf')
