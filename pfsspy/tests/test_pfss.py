@@ -54,3 +54,9 @@ def test_write_al(zero_map):
     _, output = zero_map
     # Test writing of vector potential
     output.save_a('a.netcdf')
+
+
+def test_write_bg(zero_map):
+    _, output = zero_map
+    # Test writing of magnetic field
+    output.save_bg('bg.netcdf')
