@@ -51,6 +51,7 @@ extensions = [
     'numpydoc',
     'sphinx_gallery.gen_gallery',
 ]
+numpydoc_show_class_members = False
 
 
 sphinx_gallery_conf = {
