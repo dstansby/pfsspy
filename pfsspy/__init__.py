@@ -93,7 +93,7 @@ class Input:
 
         Parameters
         ----------
-        ax : :class:`Axes`
+        ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
         import matplotlib.pyplot as plt
@@ -103,6 +103,8 @@ class Input:
         ax.pcolormesh(n.rad2deg(self.sp), self.sc, self.br, cmap='RdBu')
         ax.set_xlabel(r'$\phi$')
         ax.set_ylabel(r'$\cos (\theta)$')
+        ax.set_xlim(0, 360)
+        ax.set_ylim(-1, 1)
 
         if ax is None:
             return fig, ax
