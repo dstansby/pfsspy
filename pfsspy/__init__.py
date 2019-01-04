@@ -87,6 +87,13 @@ class Input:
         """
         return n.linspace(-1, 1, self.ns + 1)
 
+    @property
+    def pg(self):
+        """
+        Location of the edges of grid cells in phi.
+        """
+        return n.linspace(0, 2 * n.pi, self.np + 1)
+
     def plot_input(self, ax=None):
         """
         Plot a 2D image of the magnetic field boundary condition.
