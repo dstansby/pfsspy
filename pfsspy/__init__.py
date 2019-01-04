@@ -164,16 +164,86 @@ class Output:
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Weighted average to grid points:
-        brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1: ,1:, :] + br[:-1, 1:, :]
+        brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1:, 1:, :] + br[:-1, 1:, :]
         bsg = bs[:-1, :, :-1] + bs[1:, :, :-1] + bs[1:, :, 1:] + bs[:-1, :, 1:]
         bpg = bp[:, :-1, :-1] + bp[:, 1:, :-1] + bp[:, 1:, 1:] + bp[:, :-1, 1:]
         for i in range(self.input.np + 1):
             brg[i, :, :] /= 2 * (Sbr[:-1, :] + Sbr[1:, :])
             bsg[i, :, :] /= 2 * (Sbs[:, :-1] + Sbs[:, 1:])
         for i in range(self.input.np + 1):
-            bpg[i, :, :] /= Sbp[:-1, :-1] + Sbp[1:, :-1] + Sbp[1:, 1:] + Sbp[:-1, 1:]
+            bpg[i, :, :] /= (Sbp[:-1, :-1] + Sbp[1:, :-1] +
+                             Sbp[1:, 1:] + Sbp[:-1, 1:])
 
         return brg, bsg, bpg
+
+    def save_a(self, fname):
+        """
+        Save vector potential * edge lengths to a file.
+        """
+        from scipy.io import netcdf
+        r = self.r
+        th = self.th
+        ph = self.ph
+        apr, aps, app = self.al
+
+        nr = n.size(r) - 1
+        ns = n.size(th) - 1
+        np = n.size(ph) - 1
+
+        fid = netcdf.netcdf_file(fname, 'w')
+        fid.createDimension('rc', nr)
+        fid.createDimension('r', nr + 1)
+        fid.createDimension('thc', ns)
+        fid.createDimension('th', ns + 1)
+        fid.createDimension('phc', np)
+        fid.createDimension('ph', np + 1)
+        vid = fid.createVariable('r', 'd', ('r',))
+        vid[:] = r
+        vid = fid.createVariable('th', 'd', ('th',))
+        vid[:] = th
+        vid = fid.createVariable('ph', 'd', ('ph',))
+        vid[:] = ph
+        vid = fid.createVariable('ar', 'd', ('ph', 'th', 'rc'))
+        vid[:] = apr
+        vid = fid.createVariable('as', 'd', ('ph', 'thc', 'r'))
+        vid[:] = aps
+        vid = fid.createVariable('ap', 'd', ('phc', 'th', 'r'))
+        vid[:] = app
+        fid.close()
+        print('Wrote A*L to file ' + fname)
+
+    def save_bg(self, fname):
+        """
+        Save magnetic field components co-located at grid points.
+        """
+        from scipy.io import netcdf
+        r = self.r
+        th = self.th
+        ph = self.ph
+        brg, bsg, bpg = self.bg
+
+        nr = n.size(r) - 1
+        ns = n.size(th) - 1
+        np = n.size(ph) - 1
+
+        fid = netcdf.netcdf_file(fname, 'w')
+        fid.createDimension('r', nr + 1)
+        fid.createDimension('th', ns + 1)
+        fid.createDimension('ph', np + 1)
+        vid = fid.createVariable('r', 'd', ('r',))
+        vid[:] = r
+        vid = fid.createVariable('th', 'd', ('th',))
+        vid[:] = th
+        vid = fid.createVariable('ph', 'd', ('ph',))
+        vid[:] = ph
+        vid = fid.createVariable('br', 'd', ('ph', 'th', 'r'))
+        vid[:] = brg
+        vid = fid.createVariable('bth', 'd', ('ph', 'th', 'r'))
+        vid[:] = -bsg
+        vid = fid.createVariable('bph', 'd', ('ph', 'th', 'r'))
+        vid[:] = bpg
+        fid.close()
+        print('Wrote B at grid points to file ' + fname)
 
     def _common_b(self):
         """
@@ -276,8 +346,8 @@ class Output:
             bs[i,0,:] = 0.5*(bs[i,1,:] - bs[i1,1,:])
         for i in range(np+1):
             i1 = (i + np//2) % np
-            bp[i,-1,:] = -bp[i1,-2,:]
-            bp[i,0,:] = -bp[i1,1,:]
+            bp[i, -1, :] = -bp[i1, -2, :]
+            bp[i, 0, :] = -bp[i1, 1, :]
 
         self._br, self._bs, self._bp, self._Sbr, self._Sbs, self._Sbp = \
             br, bs, bp, Sbr, Sbs, Sbp
