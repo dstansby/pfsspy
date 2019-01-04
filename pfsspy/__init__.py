@@ -164,14 +164,15 @@ class Output:
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Weighted average to grid points:
-        brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1: ,1:, :] + br[:-1, 1:, :]
+        brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1:, 1:, :] + br[:-1, 1:, :]
         bsg = bs[:-1, :, :-1] + bs[1:, :, :-1] + bs[1:, :, 1:] + bs[:-1, :, 1:]
         bpg = bp[:, :-1, :-1] + bp[:, 1:, :-1] + bp[:, 1:, 1:] + bp[:, :-1, 1:]
         for i in range(self.input.np + 1):
             brg[i, :, :] /= 2 * (Sbr[:-1, :] + Sbr[1:, :])
             bsg[i, :, :] /= 2 * (Sbs[:, :-1] + Sbs[:, 1:])
         for i in range(self.input.np + 1):
-            bpg[i, :, :] /= Sbp[:-1, :-1] + Sbp[1:, :-1] + Sbp[1:, 1:] + Sbp[:-1, 1:]
+            bpg[i, :, :] /= (Sbp[:-1, :-1] + Sbp[1:, :-1] +
+                             Sbp[1:, 1:] + Sbp[:-1, 1:])
 
         return brg, bsg, bpg
 

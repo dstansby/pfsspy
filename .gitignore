@@ -106,6 +106,7 @@ venv.bak/
 # Binary files
 *.dat
 *.nc
+*.netcdf
 
 # Doc files
 doc/source/api/*
