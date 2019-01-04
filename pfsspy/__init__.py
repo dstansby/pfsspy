@@ -67,6 +67,13 @@ class Input:
         return n.linspace(-1 + 0.5 * self.ds, 1 - 0.5 * self.ds, self.ns)
 
     @property
+    def sp(self):
+        """
+        Location of the centre of cells in phi.
+        """
+        return n.linspace(0.5 * self.dp, 2 * n.pi - 0.5 * self.dp, self.np)
+
+    @property
     def rg(self):
         """
         Location of the edges of grid cells in log(r).
@@ -79,6 +86,26 @@ class Input:
         Location of the edges of grid cells in cos(theta).
         """
         return n.linspace(-1, 1, self.ns + 1)
+
+    def plot_input(self, ax=None):
+        """
+        Plot a 2D image of the magnetic field boundary condition.
+
+        Parameters
+        ----------
+        ax : :class:`Axes`
+            Axes to plot to. If ``None``, creates a new figure.
+        """
+        import matplotlib.pyplot as plt
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        ax.pcolormesh(n.rad2deg(self.sp), self.sc, self.br, cmap='RdBu')
+        ax.set_xlabel(r'$\phi$')
+        ax.set_ylabel(r'$\cos (\theta)$')
+
+        if ax is None:
+            return fig, ax
 
 
 class Output:
