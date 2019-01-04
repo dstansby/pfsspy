@@ -21,7 +21,7 @@ def test_shape(zero_map):
     # Test output map shapes
     input, out = zero_map
     nr = input.nr
-    nphi = input.np
+    nphi = input.nphi
     ns = input.ns
 
     out = pfsspy.pfss(input)
