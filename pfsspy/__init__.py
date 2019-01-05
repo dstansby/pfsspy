@@ -253,7 +253,7 @@ class Output:
         for i in range(self.input.nphi + 1):
             bp[i, :, :] = bp[i, :, :] / Sbp
 
-        return br, bs, bp
+        return br, -bs, bp
 
     @property
     def bg(self):
@@ -272,7 +272,7 @@ class Output:
             bpg[i, :, :] /= (Sbp[:-1, :-1] + Sbp[1:, :-1] +
                              Sbp[1:, 1:] + Sbp[:-1, 1:])
 
-        return brg, bsg, bpg
+        return brg, -bsg, bpg
 
     def save_a(self, fname):
         """
@@ -442,8 +442,8 @@ class Output:
             br[i,0,:] = br[i1,1,:]
             bs[i,-1,:] = 0.5*(bs[i,-2,:] - bs[i1,-2,:])
             bs[i,0,:] = 0.5*(bs[i,1,:] - bs[i1,1,:])
-        for i in range(nphi+1):
-            i1 = (i + nphi//2) % nphi
+        for i in range(nphi + 1):
+            i1 = (i + nphi // 2) % nphi
             bp[i, -1, :] = -bp[i1, -2, :]
             bp[i, 0, :] = -bp[i1, 1, :]
 
@@ -454,7 +454,7 @@ class Output:
         return br, bs, bp, Sbr, Sbs, Sbp
 
 
-def pfss(input, testQ=False):
+def pfss(input):
     r"""
     Compute PFSS model.
 
@@ -472,12 +472,9 @@ def pfss(input, testQ=False):
     input : :class:`Input`
         Input parameters.
 
-    filename : str, optional
-        Output filename. If empty don't save to file. Defaults to empty.
-
     Returns
     -------
-    :class:`Output`
+    out : :class:`Output`
     """
     br0 = input.br
     nr = input.nr
@@ -522,11 +519,6 @@ def pfss(input, testQ=False):
     e1 = np.exp(dr)
     fact = np.sinh(dr) * (e1 - 1)
 
-    if (testQ):
-        import scipy.special as sp
-        import matplotlib.pyplot as plt
-        plt.figure()
-
     # Loop over azimuthal modes (positive m):
     for m in range(nphi // 2 + 1):
         # - set diagonal terms of matrix:
@@ -552,26 +544,6 @@ def pfss(input, testQ=False):
         psi[:, :, m] = np.dot(psir, Q.T)
         if (m > 0):
             psi[:, :, nphi - m] = np.conj(psi[:, :, m])
-
-        if (testQ & (m == 6)):
-            isrt = np.argsort(lam, axis=0)  # sort eigenvalues
-            lam = lam[isrt]
-            istat = np.indices((ns, ns))
-            Q = Q[istat[0], isrt]
-            plt.clf()
-            for l in range(5):
-                plm = sp.lpmv(m, m + l, sc)
-                Ql = Q[:, l] * Q[1, l]/np.abs(Q[1, l])  # normalise and match sign
-                plt.plot(sc, Ql / np.max(np.abs(Ql)), 'ko')
-                plm = plm * plm[1] / np.abs(plm[1])
-                plt.plot(sc, plm / np.max(np.abs(plm)), label='l=%i' % l)
-                plt.xlabel(r'$\cos(\theta)$')
-            plt.title('m = %i' % m)
-            plt.legend()
-            plt.savefig('Q.png', bbox_inches='tight')
-            plt.show()
-
-    del(psir, mu, A)
 
     # Compute psi by inverse fft:
     psi = np.real(np.fft.ifft(psi, axis=2))
