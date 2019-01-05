@@ -202,6 +202,10 @@ class Output:
         tol : float, optional
             Relative of the tracing.
             Absolute tolerance is calculated as ``tol * dtf``.
+
+        Returns
+        -------
+        fl : :class:`FieldLine`
         """
         from scipy.integrate import ode
         x0 = x0.copy()
@@ -229,7 +233,7 @@ class Output:
         xback = integrate(-dtf)
         xforw = integrate(dtf)
         xout = np.row_stack((xback, xforw))
-        return xout[:, 0], xout[:, 1], xout[:, 2]
+        return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2])
 
     @property
     def al(self):
@@ -565,3 +569,49 @@ def pfss(input):
     ph = np.linspace(0, 2 * np.pi, nphi + 1)
 
     return Output(r, th, ph, alr, als, alp, input)
+
+
+class FieldLine:
+    """
+    A single magnetic field line.
+    """
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    @property
+    def r(self):
+        return np.sqrt(self.x**2 + self.y**2 + self.z**2)
+
+    @property
+    def is_open(self):
+        """
+        Returns ``True`` if one of the field line is connected to the solar
+        surface and one to the outer boundary, ``False`` otherwise.
+        """
+        r = self.r
+        rtol = 0.1
+        if np.abs(r[0] - r[-1]) < r[0] * rtol:
+            return False
+        return True
+
+    @property
+    def polarity(self):
+        """
+        Magnetic field line polarity.
+
+        Returns
+        -------
+        pol : int
+            0 if the field line is closed, otherwise sign(Br) of the magnetic
+            field on the solar surface.
+        """
+        if not self.is_open:
+            return 0
+        # Because the field lines are integrated forwards, if the end point
+        # is on the outer boundary the field is outwards
+        elif self.r[-1] - self.r[0] > 0:
+            return 1
+        else:
+            return -1
