@@ -63,7 +63,8 @@ r = 1.01
 for theta in np.linspace(0, np.pi, 33):
     x0 = np.array([0, r * np.sin(theta), r * np.cos(theta)])
     field_line = output.trace(x0)
-    ax.plot(field_line[1], field_line[2])
+    color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
+    ax.plot(field_line.y, field_line.z, color=color)
 
 # Add inner and outer boundary circles
 ax.add_patch(mpatch.Circle((0, 0), 1, color='k', fill=False))
