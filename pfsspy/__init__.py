@@ -253,7 +253,7 @@ class Output:
         for i in range(self.input.nphi + 1):
             bp[i, :, :] = bp[i, :, :] / Sbp
 
-        return br, bs, bp
+        return br, -bs, bp
 
     @property
     def bg(self):
@@ -272,7 +272,7 @@ class Output:
             bpg[i, :, :] /= (Sbp[:-1, :-1] + Sbp[1:, :-1] +
                              Sbp[1:, 1:] + Sbp[:-1, 1:])
 
-        return brg, bsg, bpg
+        return brg, -bsg, bpg
 
     def save_a(self, fname):
         """
