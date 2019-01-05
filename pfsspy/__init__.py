@@ -139,6 +139,97 @@ class Output:
         self._alp = alp
         self.input = input
         self._B_calculated = False
+        self._rgi = None
+
+    @property
+    def _brgi(self):
+        """
+        Regular grid interpolator for B.
+        """
+        from scipy.interpolate import RegularGridInterpolator as rgi
+        if self._rgi is not None:
+            return self._rgi
+
+        # - (rho,s,phi) coordinates:
+        rho = np.log(self.r)
+        s = np.cos(self.th)
+        phi = self.ph
+        br, bth, bph = self.bg
+
+        # - convert to Cartesian components and make interpolator on
+        # (rho,s,phi) grid:
+        ph3, s3, rh3 = np.meshgrid(phi, s, rho, indexing='ij')
+        sin_th = np.sqrt(1 - s3**2)
+        cos_th = s3
+        sin_ph = np.sin(ph3)
+        cos_ph = np.cos(ph3)
+
+        bx = (sin_th * cos_ph * br) + (cos_th * cos_ph * bth) - (sin_ph * bph)
+        by = (sin_th * sin_ph * br) + (cos_th * sin_ph * bth) + (cos_ph * bph)
+        bz = (cos_th * br) - (sin_th * bth)
+        bstack = np.stack((bx, by, bz), axis=3)
+
+        self._rgi = rgi((phi, s, rho), bstack)
+        return self._rgi
+
+    def _bTrace(self, t, x):
+        """
+        Return B/|B| for use by the field line tracer.
+        """
+        Bx, By, Bz = x
+        # (ph, s, rh) coordinates of current point:
+        phi = (np.arctan2(By, Bx) + 2 * np.pi) % (2 * np.pi)
+        r = np.linalg.norm(x)
+        s = Bz / r  # = cos(theta)
+        rh = np.log(r)
+        b1 = self._brgi(np.stack((phi, s, rh)))
+        return b1 / np.linalg.norm(b1)
+
+    def trace(self, x0, dtf=1e-2, tol=1e-2):
+        """
+        Traces a field-line from x0.
+
+        Uses sing scipy.integrate.ode, with an implicit Adams method
+        (up to order 12).
+
+        Parameters
+        ----------
+        x0 : array
+            Starting coordinate, in cartesian coordinates.
+        dtf : float, optional
+            The maximum step-size, which will be the output resolution of the
+            field line in most of the domain.
+        tol : float, optional
+            Relative of the tracing.
+            Absolute tolerance is calculated as ``tol * dtf``.
+        """
+        from scipy.integrate import ode
+        x0 = x0.copy()
+
+        def integrate(dt):
+            t = 0.0
+            xout = np.atleast_2d(x0.copy())
+            solver = ode(self._bTrace).set_integrator(
+                'vode', method='adams', atol=tol * np.abs(dt))
+            solver.set_initial_value(x0, t)
+            while True:
+                try:
+                    solver.integrate(solver.t + dt)
+                    # print(solver.y)
+                    if dt < 0:
+                        xout = np.row_stack((solver.y, xout))
+                    else:
+                        xout = np.row_stack((xout, solver.y))
+                except ValueError as e:  # reached boundary
+                    if 'One of the requested xi is out of bounds' in str(e):
+                        break
+                    raise e
+            return xout
+
+        xback = integrate(-dtf)
+        xforw = integrate(dtf)
+        xout = np.row_stack((xback, xforw))
+        return xout[:, 0], xout[:, 1], xout[:, 2]
 
     @property
     def al(self):

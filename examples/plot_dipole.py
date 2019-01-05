@@ -9,6 +9,7 @@ source field.
 ###############################################################################
 # First, import required modules
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatch
 import numpy as np
 import pfsspy
 
@@ -24,7 +25,7 @@ theta, phi = np.meshgrid(theta, phi)
 
 ###############################################################################
 # Define the number of radial grid points and the source surface radius
-nr = 20
+nr = 50
 rss = 2.5
 
 
@@ -45,8 +46,28 @@ input = pfsspy.Input(br, nr, ntheta, nphi, rss)
 fig, ax = plt.subplots()
 input.plot_input(ax)
 ax.set_title('Input dipole field')
-plt.show()
 
 ###############################################################################
 # Calculate PFSS solution
-# output = pfsspy.pfss(input)
+output = pfsspy.pfss(input)
+
+###############################################################################
+# Trace some field lines
+br, btheta, bphi = output.bg
+
+fig, ax = plt.subplots()
+ax.set_aspect('equal')
+
+# Take 32 start points spaced equally in theta
+r = 1.01
+for theta in np.linspace(0, np.pi, 33):
+    x0 = np.array([0, r * np.sin(theta), r * np.cos(theta)])
+    field_line = output.trace(x0)
+    ax.plot(field_line[1], field_line[2])
+
+# Add inner and outer boundary circles
+ax.add_patch(mpatch.Circle((0, 0), 1, color='k', fill=False))
+ax.add_patch(mpatch.Circle((0, 0), input.rss, color='k', linestyle='--',
+                           fill=False))
+ax.set_title('PFSS solution for a dipole source field')
+plt.show()
