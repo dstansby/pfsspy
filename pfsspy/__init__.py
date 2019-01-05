@@ -442,8 +442,8 @@ class Output:
             br[i,0,:] = br[i1,1,:]
             bs[i,-1,:] = 0.5*(bs[i,-2,:] - bs[i1,-2,:])
             bs[i,0,:] = 0.5*(bs[i,1,:] - bs[i1,1,:])
-        for i in range(nphi+1):
-            i1 = (i + nphi//2) % nphi
+        for i in range(nphi + 1):
+            i1 = (i + nphi // 2) % nphi
             bp[i, -1, :] = -bp[i1, -2, :]
             bp[i, 0, :] = -bp[i1, 1, :]
 
