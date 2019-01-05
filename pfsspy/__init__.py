@@ -454,7 +454,7 @@ class Output:
         return br, bs, bp, Sbr, Sbs, Sbp
 
 
-def pfss(input, testQ=False):
+def pfss(input):
     r"""
     Compute PFSS model.
 
@@ -472,12 +472,9 @@ def pfss(input, testQ=False):
     input : :class:`Input`
         Input parameters.
 
-    filename : str, optional
-        Output filename. If empty don't save to file. Defaults to empty.
-
     Returns
     -------
-    :class:`Output`
+    out : :class:`Output`
     """
     br0 = input.br
     nr = input.nr
