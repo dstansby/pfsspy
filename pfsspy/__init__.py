@@ -239,7 +239,7 @@ class Output:
 
         xback = integrate(-dtf, x0)
         xforw = integrate(dtf, x0)
-        for i in range(nrefine - 1):
+        for i in range(nrefine):
             dtf /= 10
             xback = np.row_stack((integrate(-dtf, xback[0, :]), xback))
             xforw = np.row_stack((xforw, integrate(dtf, xforw[-1, :])))
