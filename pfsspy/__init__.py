@@ -189,7 +189,7 @@ class Output:
         b1 = self._brgi(np.stack((phi, s, rh)))
         return b1 / np.linalg.norm(b1)
 
-    def trace(self, x0, dtf=1e-2, tol=1e-2):
+    def trace(self, x0, dtf=1e-2, tol=1e-2, nrefine=1):
         """
         Traces a field-line from x0.
 
@@ -204,22 +204,25 @@ class Output:
             The maximum step-size, which will be the output resolution of the
             field line in most of the domain.
         tol : float, optional
-            Relative of the tracing.
+            Relative tolerance of the tracing.
             Absolute tolerance is calculated as ``tol * dtf``.
+        nrefine : int, optional
+            Number of times to refine the step size near the boundary. Each
+            refinement adds extra points to the ends field line to try and
+            get close to the inner and outer boundaries.
 
         Returns
         -------
         fl : :class:`FieldLine`
         """
         from scipy.integrate import ode
-        x0 = x0.copy()
 
-        def integrate(dt):
+        def integrate(dt, start_point):
             t = 0.0
-            xout = np.atleast_2d(x0.copy())
+            xout = np.atleast_2d(start_point.copy())
             solver = ode(self._bTrace).set_integrator(
                 'vode', method='adams', atol=tol * np.abs(dt))
-            solver.set_initial_value(x0, t)
+            solver.set_initial_value(start_point, t)
             while True:
                 try:
                     solver.integrate(solver.t + dt)
@@ -234,8 +237,13 @@ class Output:
                     raise e
             return xout
 
-        xback = integrate(-dtf)
-        xforw = integrate(dtf)
+        xback = integrate(-dtf, x0)
+        xforw = integrate(dtf, x0)
+        for i in range(nrefine - 1):
+            dtf /= 10
+            xback = np.row_stack((integrate(-dtf, xback[0, :]), xback))
+            xforw = np.row_stack((xforw, integrate(dtf, xforw[-1, :])))
+
         xout = np.row_stack((xback, xforw))
         return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2])
 
