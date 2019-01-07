@@ -1,3 +1,7 @@
+import astropy.coordinates as coord
+import astropy.constants as const
+from sunpy.coordinates import frames
+
 import numpy as np
 import scipy.linalg as la
 import pfsspy.output
@@ -571,14 +575,16 @@ def pfss(input):
     return Output(r, th, ph, alr, als, alp, input)
 
 
-class FieldLine:
+class FieldLine(coord.SkyCoord):
     """
     A single magnetic field line.
     """
     def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
+        super().__init__(x=x * const.R_sun,
+                         y=y * const.R_sun,
+                         z=z * const.R_sun,
+                         frame=frames.HeliographicCarrington,
+                         representation='cartesian')
 
     @property
     def r(self):
