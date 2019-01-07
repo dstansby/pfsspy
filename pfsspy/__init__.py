@@ -584,7 +584,7 @@ class FieldLine(coord.SkyCoord):
                          y=y * const.R_sun,
                          z=z * const.R_sun,
                          frame=frames.HeliographicCarrington,
-                         representation='cartesian')
+                         representation_type='cartesian')
 
     @property
     def r(self):
