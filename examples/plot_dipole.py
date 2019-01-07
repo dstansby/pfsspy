@@ -45,12 +45,20 @@ input = pfsspy.Input(br, nr, ntheta, nphi, rss)
 ###############################################################################
 # Plot input magnetic field
 fig, ax = plt.subplots()
-input.plot_input(ax)
+mesh = input.plot_input(ax)
+fig.colorbar(mesh)
 ax.set_title('Input dipole field')
 
 ###############################################################################
 # Calculate PFSS solution
 output = pfsspy.pfss(input)
+
+###############################################################################
+# Plot output field
+fig, ax = plt.subplots()
+mesh = output.plot_source_surface(ax)
+fig.colorbar(mesh)
+ax.set_title('Source surface magnetic field')
 
 ###############################################################################
 # Trace some field lines

@@ -4,7 +4,7 @@ from sunpy.coordinates import frames
 
 import numpy as np
 import scipy.linalg as la
-import pfsspy.output
+import pfsspy.plot
 
 
 class Input:
@@ -107,18 +107,8 @@ class Input:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        import matplotlib.pyplot as plt
-        if ax is None:
-            fig, ax = plt.subplots()
-
-        ax.pcolormesh(np.rad2deg(self.sp), self.sc, self.br, cmap='RdBu')
-        ax.set_xlabel(r'$\phi$')
-        ax.set_ylabel(r'$\cos (\theta)$')
-        ax.set_xlim(0, 360)
-        ax.set_ylim(-1, 1)
-
-        if ax is None:
-            return fig, ax
+        mesh = pfsspy.plot.radial_cut(self.sp, self.sc, self.br, ax)
+        return mesh
 
 
 class Output:
@@ -144,6 +134,20 @@ class Output:
         self.input = input
         self._B_calculated = False
         self._rgi = None
+
+    def plot_source_surface(self, ax=None):
+        """
+        Plot a 2D image of the magnetic field at the source surface.
+
+        Parameters
+        ----------
+        ax : Axes
+            Axes to plot to. If ``None``, creates a new figure.
+        """
+        br, _, _ = self.bg
+        mesh = pfsspy.plot.radial_cut(
+            self.ph, np.cos(self.th), br[:, :, -1].T, ax)
+        return mesh
 
     @property
     def _brgi(self):
