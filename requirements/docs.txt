@@ -1,7 +1,7 @@
 -r base.txt
 
 pillow
-sphinx-automodapi
+sphinx-automodapi>=0.10
 numpydoc
 sunpy_sphinx_theme
 sphinx-gallery
