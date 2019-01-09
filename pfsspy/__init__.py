@@ -118,11 +118,23 @@ class Output:
     Parameters
     ----------
     r :
+        Radial cell edges
+
     th :
+        Elevation cell edges
+
     ph :
+        Azimuthal cell edges
+
     alr :
+        Vector potential * grid spacing in radial direction.
+
     als :
+        Vector potential * grid spacing in elevation direction.
+
     alp :
+        Vector potential * grid spacing in azimuth direction.
+
     '''
     def __init__(self, r, th, ph, alr, als, alp, input):
         self.r = r
