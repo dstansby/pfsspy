@@ -17,7 +17,7 @@ import sunpy.map
 
 ###############################################################################
 # If a gong magnetic field map isn't present, download one
-if not os.path.exists('gong.fits.gz'):
+if not os.path.exists('gong.fits') and not os.path.exists('gong.fits.gz'):
     import urllib.request
     urllib.request.urlretrieve(
         'https://gong2.nso.edu/oQR/zqs/201901/mrzqs190108/mrzqs190108t1114c2212_050.fits.gz',
