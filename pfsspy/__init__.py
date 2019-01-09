@@ -132,8 +132,11 @@ class Output:
         self._als = als
         self._alp = alp
         self.input = input
-        self._B_calculated = False
+
+        # Cache attributes
+        self._common_b_cache = None
         self._rgi = None
+        self._bg = None
 
     def plot_source_surface(self, ax=None):
         """
@@ -172,10 +175,14 @@ class Output:
         sin_ph = np.sin(ph3)
         cos_ph = np.cos(ph3)
 
-        bx = (sin_th * cos_ph * br) + (cos_th * cos_ph * bth) - (sin_ph * bph)
-        by = (sin_th * sin_ph * br) + (cos_th * sin_ph * bth) + (cos_ph * bph)
-        bz = (cos_th * br) - (sin_th * bth)
-        bstack = np.stack((bx, by, bz), axis=3)
+        # Directly stack the expressions below, to save a bit of memory
+        # bx = (sin_th * cos_ph * br) + (cos_th * cos_ph * bth) - (sin_ph * bph)
+        # by = (sin_th * sin_ph * br) + (cos_th * sin_ph * bth) + (cos_ph * bph)
+        # bz = (cos_th * br) - (sin_th * bth)
+        bstack = np.stack(((sin_th * cos_ph * br) + (cos_th * cos_ph * bth) - (sin_ph * bph),
+                           (sin_th * sin_ph * br) + (cos_th * sin_ph * bth) + (cos_ph * bph),
+                           (cos_th * br) - (sin_th * bth)),
+                          axis=-1)
 
         self._rgi = rgi((phi, s, rho), bstack)
         return self._rgi
@@ -230,7 +237,6 @@ class Output:
             while True:
                 try:
                     solver.integrate(solver.t + dt)
-                    # print(solver.y)
                     if dt < 0:
                         xout = np.row_stack((solver.y, xout))
                     else:
@@ -280,6 +286,9 @@ class Output:
         """
         B as a (weighted) averaged on grid points.
         """
+        if self._bg is not None:
+            return self._bg
+
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Weighted average to grid points:
         brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1:, 1:, :] + br[:-1, 1:, :]
@@ -291,8 +300,10 @@ class Output:
         for i in range(self.input.nphi + 1):
             bpg[i, :, :] /= (Sbp[:-1, :-1] + Sbp[1:, :-1] +
                              Sbp[1:, 1:] + Sbp[:-1, 1:])
+        bsg *= -1
 
-        return brg, -bsg, bpg
+        self._bg = brg, bsg, bpg
+        return self._bg
 
     def save_a(self, fname):
         """
@@ -367,9 +378,8 @@ class Output:
         """
         Common code needed to calculate magnetic field from vector potential.
         """
-        if self._B_calculated:
-            return (self._br, self._bs, self._bp,
-                    self._Sbr, self._Sbs, self._Sbp)
+        if self._common_b_cache is not None:
+            return self._common_b_cache
 
         dr = self.input.dr
         ds = self.input.ds
@@ -467,11 +477,8 @@ class Output:
             bp[i, -1, :] = -bp[i1, -2, :]
             bp[i, 0, :] = -bp[i1, 1, :]
 
-        self._br, self._bs, self._bp, self._Sbr, self._Sbs, self._Sbp = \
-            br, bs, bp, Sbr, Sbs, Sbp
-        self._B_calculated = True
-
-        return br, bs, bp, Sbr, Sbs, Sbp
+        self._common_b_cache = br, bs, bp, Sbr, Sbs, Sbp
+        return self._common_b_cache
 
 
 def pfss(input):
