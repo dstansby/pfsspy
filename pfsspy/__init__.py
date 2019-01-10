@@ -1,5 +1,6 @@
 import astropy.coordinates as coord
 import astropy.constants as const
+import astropy.units as u
 from sunpy.coordinates import frames
 
 import numpy as np
@@ -282,7 +283,7 @@ class Output:
             xforw = np.row_stack((xforw, integrate(dtf, xforw[-1, :])))
 
         xout = np.row_stack((xback, xforw))
-        return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2])
+        return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], self)
 
     @property
     def al(self):
@@ -624,8 +625,16 @@ def pfss(input):
 class FieldLine(coord.SkyCoord):
     """
     A single magnetic field line.
+
+    Parameters
+    ----------
+    x :
+    y :
+    z :
+    output : :class:`Output`
     """
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, output):
+        self._output = output
         super().__init__(x=x * const.R_sun,
                          y=y * const.R_sun,
                          z=z * const.R_sun,
@@ -665,3 +674,40 @@ class FieldLine(coord.SkyCoord):
             return 1
         else:
             return -1
+
+    @property
+    def expansion_factor(self):
+        r"""
+        Magnetic field expansion factor.
+
+        The expansion factor is defnied as
+        :math:`(r_{\odot} B_{\odot} / (r_{ss} B_{ss}))^{2}`
+
+        Returns
+        -------
+        exp_fact : float
+            Field line expansion factor.
+            If field line is closed, returns ``None``.
+        """
+        if not self.is_open:
+            return
+        # Extract ends of magnetic field line, and get them in spherical coords
+        foot1 = coord.SkyCoord(self[0], representation_type='spherical')
+        foot2 = coord.SkyCoord(self[-1], representation_type='spherical')
+        if foot1.radius > foot2.radius:
+            solar_foot = foot2
+            source_foot = foot1
+        else:
+            solar_foot = foot1
+            source_foot = foot2
+
+        def b_at_coord(coord):
+            interp_coords = [coord.lon / u.rad,
+                             np.sin(coord.lat),
+                             np.log(coord.radius / const.R_sun)]
+            b = self._output._brgi(interp_coords)
+            return np.linalg.norm(b)
+
+        b_solar = b_at_coord(solar_foot)
+        b_source = b_at_coord(source_foot)
+        return ((solar_foot.radius * b_solar) / (source_foot.radius * b_source))**2

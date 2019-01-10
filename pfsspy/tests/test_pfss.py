@@ -38,6 +38,16 @@ def dipole_map():
     return input, output
 
 
+def test_expansion_factor(dipole_map):
+    inp, out = dipole_map
+
+    field_line = out.trace(np.array([0, 0, 1.01]))
+    assert field_line.expansion_factor > 1
+
+    field_line = out.trace(np.array([0, 0, -1.01]))
+    assert field_line.expansion_factor > 1
+
+
 def test_field_line_polarity(dipole_map):
     input, out = dipole_map
 
