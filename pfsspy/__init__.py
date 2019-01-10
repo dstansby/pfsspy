@@ -633,16 +633,12 @@ class FieldLine(coord.SkyCoord):
                          representation_type='cartesian')
 
     @property
-    def r(self):
-        return np.sqrt(self.x**2 + self.y**2 + self.z**2)
-
-    @property
     def is_open(self):
         """
         Returns ``True`` if one of the field line is connected to the solar
         surface and one to the outer boundary, ``False`` otherwise.
         """
-        r = self.r
+        r = coord.SkyCoord(self, representation_type='spherical').radius
         rtol = 0.1
         if np.abs(r[0] - r[-1]) < r[0] * rtol:
             return False
@@ -663,7 +659,9 @@ class FieldLine(coord.SkyCoord):
             return 0
         # Because the field lines are integrated forwards, if the end point
         # is on the outer boundary the field is outwards
-        elif self.r[-1] - self.r[0] > 0:
+        foot1 = coord.SkyCoord(self[0], representation_type='spherical')
+        foot2 = coord.SkyCoord(self[-1], representation_type='spherical')
+        if foot2.radius - foot1.radius > 0:
             return 1
         else:
             return -1
