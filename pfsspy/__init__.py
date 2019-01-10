@@ -681,7 +681,7 @@ class FieldLine(coord.SkyCoord):
         Magnetic field expansion factor.
 
         The expansion factor is defnied as
-        :math:`(r_{\odot} / r_{ss})^{2} (B_{ss} / B_{\odot})^{2}`
+        :math:`(r_{\odot} B_{\odot} / (r_{ss} B_{ss}))^{2}`
 
         Returns
         -------
