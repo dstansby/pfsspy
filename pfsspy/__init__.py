@@ -164,6 +164,21 @@ class Output:
             self.ph, np.cos(self.th), br[:, :, -1].T, ax)
         return mesh
 
+    def plot_pil(self, ax=None):
+        """
+        Plot the polarity inversion line on the source surface.
+
+        The PIL is where Br = 0.
+
+        Parameters
+        ----------
+        ax : Axes
+            Axes to plot to. If ``None``, creates a new figure.
+        """
+        br, _, _ = self.bg
+        phi, theta = np.meshgrid(self.ph, np.cos(self.th))
+        ax.contour(np.rad2deg(phi), theta, br[:, :, -1].T, levels=[0])
+
     @property
     def _brgi(self):
         """

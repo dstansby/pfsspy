@@ -57,12 +57,14 @@ ax.set_title('Input dipole field')
 ###############################################################################
 # Calculate PFSS solution
 output = pfsspy.pfss(input)
+output.plot_pil(ax)
 
 ###############################################################################
 # Plot output field
 fig, ax = plt.subplots()
 mesh = output.plot_source_surface(ax)
 fig.colorbar(mesh)
+output.plot_pil(ax)
 ax.set_title('Source surface magnetic field')
 
 

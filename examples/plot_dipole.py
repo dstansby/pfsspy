@@ -58,6 +58,7 @@ output = pfsspy.pfss(input)
 fig, ax = plt.subplots()
 mesh = output.plot_source_surface(ax)
 fig.colorbar(mesh)
+output.plot_pil(ax)
 ax.set_title('Source surface magnetic field')
 
 ###############################################################################
