@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 
 
 def radial_cut(phi, costheta, field, ax=None):
@@ -14,5 +15,8 @@ def radial_cut(phi, costheta, field, ax=None):
     ax.set_xlim(0, 360)
     ax.set_ylim(-1, 1)
     ax.set_aspect(0.5 * 360 / 2)
+
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(base=60))
+    ax.xaxis.set_minor_locator(mticker.MultipleLocator(base=30))
 
     return mesh
