@@ -91,7 +91,7 @@ class Input:
 
     Parameters
     ----------
-    br : 2D array, :class:`sunpy.map.Map`
+    br : 2D array, :class:`sunpy.map.GenericMap`
         Boundary condition of radial magnetic field at the inner surface. If
         a SunPy map is automatically extracted as map.data with *no*
         processing.
