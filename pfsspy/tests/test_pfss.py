@@ -12,7 +12,7 @@ def zero_map():
     rss = 2.5
     br = np.zeros((ns, nphi))
 
-    input = pfsspy.Input(br, nr, ns, nphi, rss)
+    input = pfsspy.Input(br, nr, rss)
     output = pfsspy.pfss(input)
     return input, output
 
@@ -33,7 +33,7 @@ def dipole_map():
         return 2 * np.sin(theta) / r**3
 
     br = dipole_Br(1, theta).T
-    input = pfsspy.Input(br, nr, ntheta, nphi, rss)
+    input = pfsspy.Input(br, nr, rss)
     output = pfsspy.pfss(input)
     return input, output
 

@@ -33,8 +33,6 @@ if not os.path.exists('gong.fits'):
 # Use SunPy to read the .fits file with the data
 map = sunpy.map.Map('gong.fits')
 nr = 60
-ns = 180
-nphi = 360
 rss = 2.5
 
 ###############################################################################
@@ -45,7 +43,7 @@ br = br - np.mean(br)
 
 ###############################################################################
 # Create PFSS input object
-input = pfsspy.Input(br, nr, ns, nphi, rss)
+input = pfsspy.Input(br, nr, rss)
 
 ###############################################################################
 # Plot input magnetic field

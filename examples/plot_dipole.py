@@ -40,7 +40,7 @@ br = dipole_Br(1, theta).T
 
 ###############################################################################
 # Create PFSS input object
-input = pfsspy.Input(br, nr, ntheta, nphi, rss)
+input = pfsspy.Input(br, nr, rss)
 
 ###############################################################################
 # Plot input magnetic field
