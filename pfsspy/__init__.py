@@ -57,7 +57,7 @@ class Grid:
         return np.linspace(-1 + 0.5 * self.ds, 1 - 0.5 * self.ds, self.ns)
 
     @property
-    def sp(self):
+    def pc(self):
         """
         Location of the centre of cells in phi.
         """
@@ -99,12 +99,6 @@ class Input:
     nr : int
         Number of cells in the radial direction.
 
-    ns : int
-        Number of cells in the polar direction.
-
-    np : int
-        Number of cells in the azimuthal direction.
-
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
     """
@@ -125,7 +119,7 @@ class Input:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        mesh = pfsspy.plot.radial_cut(self.grid.sp, self.grid.sc, self.br, ax)
+        mesh = pfsspy.plot.radial_cut(self.grid.pc, self.grid.sc, self.br, ax)
         return mesh
 
 
@@ -144,6 +138,8 @@ class Output:
     alp :
         Vector potential * grid spacing in azimuth direction.
 
+    grid : Grid
+        Grid that the output was caclulated on.
     '''
     def __init__(self, alr, als, alp, grid):
         self._alr = alr
