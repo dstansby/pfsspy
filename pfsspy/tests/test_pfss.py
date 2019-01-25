@@ -61,9 +61,9 @@ def test_field_line_polarity(dipole_map):
 def test_shape(zero_map):
     # Test output map shapes
     input, out = zero_map
-    nr = input.nr
-    nphi = input.nphi
-    ns = input.ns
+    nr = input.grid.nr
+    nphi = input.grid.nphi
+    ns = input.grid.ns
 
     out = pfsspy.pfss(input)
     alr, als, alp = out.al

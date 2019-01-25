@@ -8,52 +8,34 @@ import scipy.linalg as la
 import pfsspy.plot
 
 
-class Input:
+class Grid:
     """
-    Input to PFSS modelling.
-
-    Parameters
-    ----------
-    br0 : array
-        Boundary condition of radial magnetic field at the inner surface.
-
-    nr : int
-        Number of steps in the radial direction.
-
-    ns : int
-        Number of steps in the polar direction.
-
-    np : int
-        Number of steps in the azimuthal direction.
-
-    rss : float
-        Radius of the source surface, as a fraction of the solar radius.
+    Grid on which the solution is calculated.
     """
-    def __init__(self, br, nr, rss):
-        self.br = br
+    def __init__(self, ns, nphi, nr, rss):
+        self.ns = ns
+        self.nphi = nphi
         self.nr = nr
-        self.ns = self.br.shape[0]
-        self.nphi = self.br.shape[1]
         self.rss = rss
 
     @property
     def ds(self):
         """
-        Spacing in cos(theta).
+        Cell size in cos(theta).
         """
         return 2.0 / self.ns
 
     @property
     def dr(self):
         """
-        Spacing in log(r).
+        Cell size in log(r).
         """
         return np.log(self.rss) / self.nr
 
     @property
     def dp(self):
         """
-        Spacing in phi.
+        Cell size in phi.
         """
         return 2 * np.pi / self.nphi
 
@@ -99,6 +81,34 @@ class Input:
         """
         return np.linspace(0, 2 * np.pi, self.nphi + 1)
 
+
+class Input:
+    """
+    Input to PFSS modelling.
+
+    Parameters
+    ----------
+    br0 : array
+        Boundary condition of radial magnetic field at the inner surface.
+
+    nr : int
+        Number of cells in the radial direction.
+
+    ns : int
+        Number of cells in the polar direction.
+
+    np : int
+        Number of cells in the azimuthal direction.
+
+    rss : float
+        Radius of the source surface, as a fraction of the solar radius.
+    """
+    def __init__(self, br, nr, rss):
+        self.br = br
+        ns = self.br.shape[0]
+        nphi = self.br.shape[1]
+        self.grid = Grid(ns, nphi, nr, rss)
+
     def plot_input(self, ax=None):
         """
         Plot a 2D image of the magnetic field boundary condition.
@@ -108,7 +118,7 @@ class Input:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        mesh = pfsspy.plot.radial_cut(self.sp, self.sc, self.br, ax)
+        mesh = pfsspy.plot.radial_cut(self.grid.sp, self.grid.sc, self.br, ax)
         return mesh
 
 
@@ -144,6 +154,7 @@ class Output:
         self._alr = alr
         self._als = als
         self._alp = alp
+        self.grid = input.grid
         self.input = input
 
         # Cache attributes
@@ -301,10 +312,10 @@ class Output:
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Remove area factors:
-        for i in range(self.input.nphi + 2):
+        for i in range(self.grid.nphi + 2):
             br[i, :, :] = br[i, :, :] / Sbr
             bs[i, :, :] = bs[i, :, :] / Sbs
-        for i in range(self.input.nphi + 1):
+        for i in range(self.grid.nphi + 1):
             bp[i, :, :] = bp[i, :, :] / Sbp
 
         return br, -bs, bp
@@ -322,10 +333,10 @@ class Output:
         brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1:, 1:, :] + br[:-1, 1:, :]
         bsg = bs[:-1, :, :-1] + bs[1:, :, :-1] + bs[1:, :, 1:] + bs[:-1, :, 1:]
         bpg = bp[:, :-1, :-1] + bp[:, 1:, :-1] + bp[:, 1:, 1:] + bp[:, :-1, 1:]
-        for i in range(self.input.nphi + 1):
+        for i in range(self.grid.nphi + 1):
             brg[i, :, :] /= 2 * (Sbr[:-1, :] + Sbr[1:, :])
             bsg[i, :, :] /= 2 * (Sbs[:, :-1] + Sbs[:, 1:])
-        for i in range(self.input.nphi + 1):
+        for i in range(self.grid.nphi + 1):
             bpg[i, :, :] /= (Sbp[:-1, :-1] + Sbp[1:, :-1] +
                              Sbp[1:, 1:] + Sbp[:-1, 1:])
         bsg *= -1
@@ -409,21 +420,21 @@ class Output:
         if self._common_b_cache is not None:
             return self._common_b_cache
 
-        dr = self.input.dr
-        ds = self.input.ds
-        dp = self.input.dp
+        dr = self.grid.dr
+        ds = self.grid.ds
+        dp = self.grid.dp
 
-        nr = self.input.nr
-        ns = self.input.ns
-        nphi = self.input.nphi
+        nr = self.grid.nr
+        ns = self.grid.ns
+        nphi = self.grid.nphi
 
-        rss = self.input.rss
+        rss = self.grid.rss
 
-        rc = self.input.rc
-        sc = self.input.sc
+        rc = self.grid.rc
+        sc = self.grid.sc
 
-        rg = self.input.rg
-        sg = self.input.sg
+        rg = self.grid.rg
+        sg = self.grid.sg
 
         alr, als, alp = self.al
 
@@ -532,21 +543,21 @@ def pfss(input):
     out : :class:`Output`
     """
     br0 = input.br
-    nr = input.nr
-    ns = input.ns
-    nphi = input.nphi
-    rss = input.rss
+    nr = input.grid.nr
+    ns = input.grid.ns
+    nphi = input.grid.nphi
+    rss = input.grid.rss
 
     # Coordinates:
-    ds = input.ds
-    dp = input.dp
-    dr = input.dr
+    ds = input.grid.ds
+    dp = input.grid.dp
+    dr = input.grid.dr
 
-    rg = input.rg
-    rc = input.rc
+    rg = input.grid.rg
+    rc = input.grid.rc
 
-    sg = input.sg
-    sc = input.sc
+    sg = input.grid.sg
+    sc = input.grid.sc
 
     k = np.linspace(0, nr, nr + 1)
 
