@@ -2,6 +2,7 @@ import astropy.coordinates as coord
 import astropy.constants as const
 import astropy.units as u
 from sunpy.coordinates import frames
+import sunpy.map
 
 import numpy as np
 import scipy.linalg as la
@@ -90,8 +91,10 @@ class Input:
 
     Parameters
     ----------
-    br0 : array
-        Boundary condition of radial magnetic field at the inner surface.
+    br : 2D array, :class:`sunpy.map.Map`
+        Boundary condition of radial magnetic field at the inner surface. If
+        a SunPy map is automatically extracted as map.data with *no*
+        processing.
 
     nr : int
         Number of cells in the radial direction.
@@ -106,6 +109,8 @@ class Input:
         Radius of the source surface, as a fraction of the solar radius.
     """
     def __init__(self, br, nr, rss):
+        if isinstance(br, sunpy.map.GenericMap):
+            br = br.data
         self.br = br
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
@@ -429,8 +434,8 @@ class Output:
             i1 = (i + nphi//2) % nphi
             br[i,-1,:] = br[i1,-2,:]
             br[i,0,:] = br[i1,1,:]
-            bs[i,-1,:] = 0.5*(bs[i,-2,:] - bs[i1,-2,:])
-            bs[i,0,:] = 0.5*(bs[i,1,:] - bs[i1,1,:])
+            bs[i, -1, :] = 0.5 * (bs[i, -2, :] - bs[i1, -2, :])
+            bs[i, 0, :] = 0.5 * (bs[i, 1, :] - bs[i1, 1, :])
         for i in range(nphi + 1):
             i1 = (i + nphi // 2) % nphi
             bp[i, -1, :] = -bp[i1, -2, :]

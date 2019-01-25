@@ -1,6 +1,7 @@
 import numpy as np
 import pfsspy
 import pytest
+import sunpy.map
 
 
 @pytest.fixture
@@ -89,3 +90,11 @@ def test_shape(zero_map):
     assert br.shape == (nphi + 1, ns + 1, nr + 1)
     assert bs.shape == (nphi + 1, ns + 1, nr + 1)
     assert bp.shape == (nphi + 1, ns + 1, nr + 1)
+
+
+def test_sunpy_map_input(zero_map):
+    zero_in, _ = zero_map
+    # Check that loading an input map works
+    map = sunpy.map.Map((zero_in.br, {}))
+    input = pfsspy.Input(map, zero_in.grid.nr, zero_in.grid.rss)
+    assert (input.br == zero_in.br).all()
