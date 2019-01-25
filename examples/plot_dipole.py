@@ -79,7 +79,7 @@ for theta in np.linspace(0, np.pi, 33):
 
 # Add inner and outer boundary circles
 ax.add_patch(mpatch.Circle((0, 0), 1, color='k', fill=False))
-ax.add_patch(mpatch.Circle((0, 0), input.rss, color='k', linestyle='--',
+ax.add_patch(mpatch.Circle((0, 0), input.grid.rss, color='k', linestyle='--',
                            fill=False))
 ax.set_title('PFSS solution for a dipole source field')
 plt.show()
