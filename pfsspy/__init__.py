@@ -130,15 +130,6 @@ class Output:
 
     Parameters
     ----------
-    r :
-        Radial cell edges
-
-    th :
-        Elevation cell edges
-
-    ph :
-        Azimuthal cell edges
-
     alr :
         Vector potential * grid spacing in radial direction.
 
@@ -149,15 +140,11 @@ class Output:
         Vector potential * grid spacing in azimuth direction.
 
     '''
-    def __init__(self, r, th, ph, alr, als, alp, input):
-        self.r = r
-        self.th = th
-        self.ph = ph
+    def __init__(self, alr, als, alp, grid):
         self._alr = alr
         self._als = als
         self._alp = alp
-        self.grid = input.grid
-        self.input = input
+        self.grid = grid
 
         # Cache attributes
         self._common_b_cache = None
@@ -175,7 +162,7 @@ class Output:
         """
         br, _, _ = self.bg
         mesh = pfsspy.plot.radial_cut(
-            self.ph, np.cos(self.th), br[:, :, -1].T, ax)
+            self.grid.pg, self.grid.sg, br[:, :, -1].T, ax)
         return mesh
 
     def plot_pil(self, ax=None):
@@ -190,7 +177,7 @@ class Output:
             Axes to plot to. If ``None``, creates a new figure.
         """
         br, _, _ = self.bg
-        phi, theta = np.meshgrid(self.ph, np.cos(self.th))
+        phi, theta = np.meshgrid(self.grid.pg, self.grid.sg)
         ax.contour(np.rad2deg(phi), theta, br[:, :, -1].T, levels=[0])
 
     @property
@@ -203,9 +190,9 @@ class Output:
             return self._rgi
 
         # - (rho,s,phi) coordinates:
-        rho = np.log(self.r)
-        s = np.cos(self.th)
-        phi = self.ph
+        rho = self.grid.rg
+        s = self.grid.sg
+        phi = self.grid.pg
         br, bth, bph = self.bg
 
         # - convert to Cartesian components and make interpolator on
@@ -345,75 +332,6 @@ class Output:
 
         self._bg = brg, bsg, bpg
         return self._bg
-
-    def save_a(self, fname):
-        """
-        Save vector potential * edge lengths to a file.
-        """
-        from scipy.io import netcdf
-        r = self.r
-        th = self.th
-        ph = self.ph
-        apr, aps, app = self.al
-
-        nr = np.size(r) - 1
-        ns = np.size(th) - 1
-        nphi = np.size(ph) - 1
-
-        fid = netcdf.netcdf_file(fname, 'w')
-        fid.createDimension('rc', nr)
-        fid.createDimension('r', nr + 1)
-        fid.createDimension('thc', ns)
-        fid.createDimension('th', ns + 1)
-        fid.createDimension('phc', nphi)
-        fid.createDimension('ph', nphi + 1)
-        vid = fid.createVariable('r', 'd', ('r',))
-        vid[:] = r
-        vid = fid.createVariable('th', 'd', ('th',))
-        vid[:] = th
-        vid = fid.createVariable('ph', 'd', ('ph',))
-        vid[:] = ph
-        vid = fid.createVariable('ar', 'd', ('ph', 'th', 'rc'))
-        vid[:] = apr
-        vid = fid.createVariable('as', 'd', ('ph', 'thc', 'r'))
-        vid[:] = aps
-        vid = fid.createVariable('ap', 'd', ('phc', 'th', 'r'))
-        vid[:] = app
-        fid.close()
-        print('Wrote A*L to file ' + fname)
-
-    def save_bg(self, fname):
-        """
-        Save magnetic field components co-located at grid points.
-        """
-        from scipy.io import netcdf
-        r = self.r
-        th = self.th
-        ph = self.ph
-        brg, bsg, bpg = self.bg
-
-        nr = np.size(r) - 1
-        ns = np.size(th) - 1
-        nphi = np.size(ph) - 1
-
-        fid = netcdf.netcdf_file(fname, 'w')
-        fid.createDimension('r', nr + 1)
-        fid.createDimension('th', ns + 1)
-        fid.createDimension('ph', nphi + 1)
-        vid = fid.createVariable('r', 'd', ('r',))
-        vid[:] = r
-        vid = fid.createVariable('th', 'd', ('th',))
-        vid[:] = th
-        vid = fid.createVariable('ph', 'd', ('ph',))
-        vid[:] = ph
-        vid = fid.createVariable('br', 'd', ('ph', 'th', 'r'))
-        vid[:] = brg
-        vid = fid.createVariable('bth', 'd', ('ph', 'th', 'r'))
-        vid[:] = -bsg
-        vid = fid.createVariable('bph', 'd', ('ph', 'th', 'r'))
-        vid[:] = bpg
-        fid.close()
-        print('Wrote B at grid points to file ' + fname)
 
     def _common_b(self):
         """
@@ -627,12 +545,11 @@ def pfss(input):
         for i in range(nphi):
             alp[i, 1:-1, j] = Fp[1:-1] * (psi[j, 1:, i] - psi[j, :-1, i])
 
-    # Output to netcdf file:
     r = np.exp(rg)
     th = np.arccos(sg)
     ph = np.linspace(0, 2 * np.pi, nphi + 1)
 
-    return Output(r, th, ph, alr, als, alp, input)
+    return Output(alr, als, alp, input.grid)
 
 
 class FieldLine(coord.SkyCoord):
