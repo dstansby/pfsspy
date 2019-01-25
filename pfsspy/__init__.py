@@ -133,6 +133,8 @@ class Output:
     alp :
         Vector potential * grid spacing in azimuth direction.
 
+    grid : Grid
+        Grid that the output was caclulated on.
     '''
     def __init__(self, alr, als, alp, grid):
         self._alr = alr
