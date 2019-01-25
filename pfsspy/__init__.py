@@ -11,6 +11,8 @@ import pfsspy.plot
 class Grid:
     """
     Grid on which the solution is calculated.
+
+    The grid is evenly spaced in (cos(theta), phi, log(r)).
     """
     def __init__(self, ns, nphi, nr, rss):
         self.ns = ns
