@@ -29,11 +29,11 @@ class Input:
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
     """
-    def __init__(self, br, nr, ns, nphi, rss):
+    def __init__(self, br, nr, rss):
         self.br = br
         self.nr = nr
-        self.ns = ns
-        self.nphi = nphi
+        self.ns = self.br.shape[0]
+        self.nphi = self.br.shape[1]
         self.rss = rss
 
     @property
