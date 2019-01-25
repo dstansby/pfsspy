@@ -98,3 +98,16 @@ def test_sunpy_map_input(zero_map):
     map = sunpy.map.Map((zero_in.br, {}))
     input = pfsspy.Input(map, zero_in.grid.nr, zero_in.grid.rss)
     assert (input.br == zero_in.br).all()
+
+
+def test_non_zero_mean():
+    # Test a completely zero input
+    ns = 30
+    nphi = 20
+    nr = 10
+    rss = 2.5
+    br = np.zeros((ns, nphi))
+    br[0, 0] += 1
+
+    with pytest.raises(ValueError):
+        input = pfsspy.Input(br, nr, rss)

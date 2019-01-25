@@ -111,6 +111,9 @@ class Input:
     def __init__(self, br, nr, rss):
         if isinstance(br, sunpy.map.GenericMap):
             br = br.data
+        if not np.allclose(np.sum(br), 0):
+            raise ValueError('Sum of values in "br" must equal zero so '
+                             'divB = 0 on the solar surface.')
         self.br = br
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
