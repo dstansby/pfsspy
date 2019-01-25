@@ -89,15 +89,3 @@ def test_shape(zero_map):
     assert br.shape == (nphi + 1, ns + 1, nr + 1)
     assert bs.shape == (nphi + 1, ns + 1, nr + 1)
     assert bp.shape == (nphi + 1, ns + 1, nr + 1)
-
-
-def test_write_al(zero_map):
-    _, output = zero_map
-    # Test writing of vector potential
-    output.save_a('a.netcdf')
-
-
-def test_write_bg(zero_map):
-    _, output = zero_map
-    # Test writing of magnetic field
-    output.save_bg('bg.netcdf')
