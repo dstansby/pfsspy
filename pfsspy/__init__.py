@@ -1,8 +1,9 @@
 import astropy.coordinates as coord
 import astropy.constants as const
 import astropy.units as u
+
 from sunpy.coordinates import frames
-import sunpy.map
+import sunpy.map.mapbase
 
 import numpy as np
 import scipy.linalg as la
@@ -103,7 +104,7 @@ class Input:
         Radius of the source surface, as a fraction of the solar radius.
     """
     def __init__(self, br, nr, rss):
-        if isinstance(br, sunpy.map.GenericMap):
+        if isinstance(br, sunpy.map.mapbase.GenericMap):
             br = br.data
         self.br = br
         ns = self.br.shape[0]
