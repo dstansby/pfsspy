@@ -98,3 +98,10 @@ def test_sunpy_map_input(zero_map):
     map = sunpy.map.Map((zero_in.br, {}))
     input = pfsspy.Input(map, zero_in.grid.nr, zero_in.grid.rss)
     assert (input.br == zero_in.br).all()
+
+
+def test_input_output(dipole_map):
+    _, out = dipole_map
+    out.save('test.npz')
+    new_out = pfsspy.load_output('test.npz')
+    assert (new_out.al[0] == out.al[0]).all()
