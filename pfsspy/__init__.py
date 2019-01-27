@@ -124,6 +124,34 @@ class Input:
         return mesh
 
 
+def load_output(file):
+    """
+    Load a saved output file.
+
+    Loads a file saved using :meth:`Output.save`.
+
+    Parameters
+    ----------
+    file : str, file, :class:`~pathlib.Path`
+        File to load.
+
+    Returns
+    -------
+    :class:`Output`
+    """
+    with np.load(file) as f:
+        alr = f['alr']
+        als = f['als']
+        alp = f['alp']
+        rss = f['rss']
+    ns = als.shape[1]
+    nphi = alp.shape[0]
+    nr = alr.shape[2]
+    rss = rss[0]
+    grid = Grid(ns, nphi, nr, rss)
+    return Output(alr, als, alp, grid)
+
+
 class Output:
     '''
     Output of PFSS modelling.
@@ -152,6 +180,25 @@ class Output:
         self._common_b_cache = None
         self._rgi = None
         self._bg = None
+
+    def save(self, file):
+        """
+        Save the output to file.
+
+        This saves the required information to reconstruct an Output object
+        in a compressed binary numpy file (see :func:`numpy.savez_compressed`
+        for more information). The file extension is ``.npz``, and is
+        automatically added if not present.
+
+        Parameters
+        ----------
+        file : str, file, :class:`~pathlib.Path`
+            File to save to. If ``.npz`` extension isn't present it is added
+            when saving the file.
+        """
+        np.savez_compressed(
+            file, alr=self._alr, als=self._als, alp=self._alp,
+            rss=np.array([self.grid.rss]))
 
     def plot_source_surface(self, ax=None):
         """
