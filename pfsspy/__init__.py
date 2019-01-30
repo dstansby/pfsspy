@@ -278,7 +278,7 @@ class Output:
         r = np.linalg.norm(x)
 
         # Check if position vector is outside the data limits
-        if r < np.min(self.r) or r > np.max(self.r):
+        if r < 1 or r > self.grid.rss:
             raise _OutOfBoundsError
 
         s = Bz / r  # = cos(theta)
