@@ -274,23 +274,20 @@ class Output:
         """
         Bx, By, Bz = x
         # (ph, s, rh) coordinates of current point:
-        phi = (np.arctan2(By, Bx) + 2 * np.pi) % (2 * np.pi)
-        r = np.linalg.norm(x)
+        rho, s, phi = coords.cart2strum(Bx, By, Bz)
 
         # Check if position vector is outside the data limits
-        if r < 1 or r > self.grid.rss:
+        if rho < 0 or rho > np.log(self.grid.rss):
             raise _OutOfBoundsError
 
-        s = Bz / r  # = cos(theta)
-        rh = np.log(r)
-        b1 = self._brgi(np.stack((phi, s, rh)))
+        b1 = self._brgi(np.stack((phi, s, rho)))
         return b1 / np.linalg.norm(b1)
 
     def trace(self, x0, dtf=1e-2, tol=1e-2, nrefine=1):
         """
-        Traces a field-line from x0.
+        Traces a field-line from *x0*.
 
-        Uses sing scipy.integrate.ode, with an implicit Adams method
+        Uses `scipy.integrate.ode`, with an implicit Adams method
         (up to order 12).
 
         Parameters

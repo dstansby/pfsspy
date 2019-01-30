@@ -6,3 +6,6 @@ Code reference
 
 .. automodapi:: pfsspy.plot
    :no-inheritance-diagram:
+
+.. automodapi:: pfsspy.coords
+   :no-inheritance-diagram:
