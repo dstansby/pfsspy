@@ -2,7 +2,8 @@ pfsspy
 ======
 
 pfsspy is a python package for carrying out Potential Field Source Surface
-modelling.
+modelling. For more information on the actually PFSS calculation see
+`this document <https://github.com/antyeates1983/pfss/blob/master/pfss-manual.pdf>`_.
 
 For the main user-facing code see
 
