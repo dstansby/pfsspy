@@ -124,6 +124,10 @@ class Input:
         return mesh
 
 
+class _OutOfBoundsError(RuntimeError):
+    pass
+
+
 def load_output(file):
     """
     Load a saved output file.
@@ -272,6 +276,11 @@ class Output:
         # (ph, s, rh) coordinates of current point:
         phi = (np.arctan2(By, Bx) + 2 * np.pi) % (2 * np.pi)
         r = np.linalg.norm(x)
+
+        # Check if position vector is outside the data limits
+        if r < 1 or r > self.grid.rss:
+            raise _OutOfBoundsError
+
         s = Bz / r  # = cos(theta)
         rh = np.log(r)
         b1 = self._brgi(np.stack((phi, s, rh)))
@@ -314,14 +323,14 @@ class Output:
             while True:
                 try:
                     solver.integrate(solver.t + dt)
-                    if dt < 0:
-                        xout = np.row_stack((solver.y, xout))
-                    else:
-                        xout = np.row_stack((xout, solver.y))
-                except ValueError as e:  # reached boundary
-                    if 'One of the requested xi is out of bounds' in str(e):
-                        break
-                    raise e
+                except _OutOfBoundsError:  # reached boundary
+                    break
+
+                # Append new point to field line
+                if dt < 0:
+                    xout = np.row_stack((solver.y, xout))
+                else:
+                    xout = np.row_stack((xout, solver.y))
             return xout
 
         xback = integrate(-dtf, x0)
