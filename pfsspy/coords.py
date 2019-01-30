@@ -10,15 +10,15 @@ The PFSS solution is calculated on a "strumfric" grid defined by
 where :math:`r, \theta, \phi` are spherical cooridnates that have ranges
 
 - :math:`1 < r < r_{ss}`
-- :math:`-\pi / 2 < \theta < \pi / 2`
+- :math:`0 < \theta < \pi`
 - :math:`0 < \phi < 2\pi`
 
 The transformation between cartesian coordinates used by the tracer and the
 above coordinates is given by
 
-- :math:`x = r\cos (\theta) \cos (\phi)`
-- :math:`y = r\cos (\theta) \sin (\phi)`
-- :math:`z = r \sin (\theta)`
+- :math:`x = r\sin (\theta) \cos (\phi)`
+- :math:`y = r\sin (\theta) \sin (\phi)`
+- :math:`z = r \cos (\theta)`
 """
 
 import numpy as np
@@ -31,9 +31,9 @@ def strum2cart(rho, s, phi):
     r = np.exp(rho)
     theta = np.arccos(s)
 
-    x = r * np.cos(theta) * np.cos(phi)
-    y = r * np.cos(theta) * np.sin(phi)
-    z = r * np.sin(theta)
+    x = r * np.sin(theta) * np.cos(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(theta)
     return x, y, z
 
 
