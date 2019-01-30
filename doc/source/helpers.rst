@@ -1,8 +1,8 @@
-Code reference
+Helper modules
 ==============
 
-.. automodapi:: pfsspy
+.. automodapi:: pfsspy.plot
    :no-inheritance-diagram:
 
-.. automodapi:: pfsspy.plot
+.. automodapi:: pfsspy.coords
    :no-inheritance-diagram:
