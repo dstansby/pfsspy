@@ -8,6 +8,7 @@ import sunpy.map.mapbase
 import numpy as np
 import scipy.linalg as la
 import pfsspy.plot
+import pfsspy.coords
 
 
 class Grid:
@@ -274,7 +275,7 @@ class Output:
         """
         Bx, By, Bz = x
         # (ph, s, rh) coordinates of current point:
-        rho, s, phi = coords.cart2strum(Bx, By, Bz)
+        rho, s, phi = pfsspy.coords.cart2strum(Bx, By, Bz)
 
         # Check if position vector is outside the data limits
         if rho < 0 or rho > np.log(self.grid.rss):
