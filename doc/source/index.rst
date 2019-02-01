@@ -1,5 +1,4 @@
-pfsspy
-======
+.. image:: ../../logo/logo_rectangle.svg
 
 pfsspy is a python package for carrying out Potential Field Source Surface
 modelling. For more information on the actually PFSS calculation see

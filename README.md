@@ -1,4 +1,4 @@
-# pfsspy
+![pfsspy](https://github.com/dstansby/pfsspy/raw/master/logos/logo_rectangle.png "pfsspy")
 
 [![Documentation Status](https://readthedocs.org/projects/pfsspy/badge/?version=latest)](https://pfsspy.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/dstansby/pfsspy.svg?branch=master)](https://travis-ci.org/dstansby/pfsspy)
