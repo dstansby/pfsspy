@@ -205,6 +205,14 @@ class Output:
             file, alr=self._alr, als=self._als, alp=self._alp,
             rss=np.array([self.grid.rss]))
 
+    @property
+    def source_surface_br(self):
+        """
+        Br on the source surface.
+        """
+        br, _, _ = self.bg
+        return br[:, :, -1].T
+
     def plot_source_surface(self, ax=None):
         """
         Plot a 2D image of the magnetic field at the source surface.
@@ -214,9 +222,8 @@ class Output:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        br, _, _ = self.bg
         mesh = pfsspy.plot.radial_cut(
-            self.grid.pg, self.grid.sg, br[:, :, -1].T, ax)
+            self.grid.pg, self.grid.sg, self.source_surface_br, ax)
         return mesh
 
     def plot_pil(self, ax=None):
@@ -230,9 +237,8 @@ class Output:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        br, _, _ = self.bg
         phi, theta = np.meshgrid(self.grid.pg, self.grid.sg)
-        ax.contour(np.rad2deg(phi), theta, br[:, :, -1].T, levels=[0])
+        ax.contour(np.rad2deg(phi), theta, self.source_surface_br, levels=[0])
 
     @property
     def _brgi(self):

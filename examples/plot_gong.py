@@ -50,7 +50,7 @@ input = pfsspy.Input(br, nr, rss)
 fig, ax = plt.subplots()
 mesh = input.plot_input(ax)
 fig.colorbar(mesh)
-ax.set_title('Input dipole field')
+ax.set_title('Input field')
 
 ###############################################################################
 # Calculate PFSS solution
@@ -92,4 +92,4 @@ for theta in np.linspace(0, np.pi, 17):
 ax.set_title('PFSS solution')
 plt.show()
 
-# sphinx_gallery_thumbnail_number = 2
+# sphinx_gallery_thumbnail_number = 3

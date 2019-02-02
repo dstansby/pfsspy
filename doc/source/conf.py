@@ -93,7 +93,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 # html_theme = 'sunpy'
 # html_sidebars = {'**': ['docsidebar.html']}
 
@@ -199,4 +199,5 @@ epub_exclude_files = ['search.html']
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/3/': None}
+intersphinx_mapping = {'https://docs.python.org/3/': None,
+                       'http://docs.astropy.org/en/stable': None}

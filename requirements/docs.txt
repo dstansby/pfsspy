@@ -4,5 +4,6 @@ pillow
 sphinx-automodapi>=0.10
 numpydoc
 sunpy_sphinx_theme
+sphinx_rtd_theme
 sphinx-gallery
 sphinx
