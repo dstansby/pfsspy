@@ -689,7 +689,7 @@ class FieldLine(coord.SkyCoord):
 
         def b_at_coord(coord):
             interp_coords = [coord.lon / u.rad,
-                             np.sin(coord.lat),
+                             np.cos(coord.lat),
                              np.log(coord.radius / const.R_sun)]
             b = self._output._brgi(interp_coords)
             return np.linalg.norm(b)
