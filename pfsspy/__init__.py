@@ -673,7 +673,7 @@ class FieldLine(coord.SkyCoord):
         Magnetic field expansion factor.
 
         The expansion factor is defnied as
-        :math:`(r_{\odot} B_{\odot} / (r_{ss} B_{ss}))^{2}`
+        :math:`(r_{\odot}^{2} B_{\odot}) / (r_{ss}^{2} B_{ss}))`
 
         Returns
         -------
@@ -702,4 +702,5 @@ class FieldLine(coord.SkyCoord):
 
         b_solar = b_at_coord(solar_foot)
         b_source = b_at_coord(source_foot)
-        return ((solar_foot.radius * b_solar) / (source_foot.radius * b_source))**2
+        return ((solar_foot.radius**2 * b_solar) /
+                (source_foot.radius**2 * b_source))
