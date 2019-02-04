@@ -109,6 +109,7 @@ venv.bak/
 *.netcdf
 *.fits
 *.fits.gz
+*.npz
 
 # Doc files
 doc/source/api/*
