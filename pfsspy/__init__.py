@@ -255,6 +255,14 @@ class Output:
         phi = self.grid.pg
         br, bth, bph = self.bg
 
+        # Because we need the cartesian grid to stretch just beyond r=rss,
+        # add an extra dummy layer of magnetic field pointing radially outwards
+        rho = np.append(rho, rho[-1] + 0.01)
+        extras = np.ones(br.shape[0:2] + (1, ))
+        br = np.concatenate((br, extras), axis=2)
+        bth = np.concatenate((bth, 0 * extras), axis=2)
+        bph = np.concatenate((bph, 0 * extras), axis=2)
+
         # - convert to Cartesian components and make interpolator on
         # (rho,s,phi) grid:
         ph3, s3, rh3 = np.meshgrid(phi, s, rho, indexing='ij')
