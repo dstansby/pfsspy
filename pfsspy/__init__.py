@@ -275,76 +275,75 @@ class Output:
         self._rgi = rgi((phi, s, rho), bstack)
         return self._rgi
 
-    def _bTrace(self, t, x):
+    def _bTrace(self, t, coord, direction):
         """
         Return B/|B| for use by the field line tracer.
         """
-        Bx, By, Bz = x
+        x, y, z = coord
         # (ph, s, rh) coordinates of current point:
-        rho, s, phi = pfsspy.coords.cart2strum(Bx, By, Bz)
+        rho, s, phi = pfsspy.coords.cart2strum(x, y, z)
 
         # Check if position vector is outside the data limits
         if rho < 0 or rho > np.log(self.grid.rss):
-            raise _OutOfBoundsError
+            return np.array([0, 0, 0])
+            # raise _OutOfBoundsError
 
-        b1 = self._brgi(np.stack((phi, s, rho)))
-        return b1 / np.linalg.norm(b1)
+        b1 = self._brgi(np.stack((phi, s, rho)))[0]
+        return direction * b1 / np.linalg.norm(b1)
 
-    def trace(self, x0, dtf=1e-2, tol=1e-2, nrefine=1):
+    def trace(self, x0, atol=1e-4, rtol=1e-4):
         """
         Traces a field-line from *x0*.
 
-        Uses `scipy.integrate.ode`, with an implicit Adams method
-        (up to order 12).
+        Uses `scipy.integrate.solve_ivp`, with an LSODA method.
 
         Parameters
         ----------
         x0 : array
             Starting coordinate, in cartesian coordinates.
         dtf : float, optional
-            The maximum step-size, which will be the output resolution of the
-            field line in most of the domain.
-        tol : float, optional
+            Absolute tolerance of the tracing.
+        rtol : float, optional
             Relative tolerance of the tracing.
-            Absolute tolerance is calculated as ``tol * dtf``.
-        nrefine : int, optional
-            Number of times to refine the step size near the boundary. Each
-            refinement adds extra points to the ends field line to try and
-            get close to the inner and outer boundaries.
 
         Returns
         -------
         fl : :class:`FieldLine`
         """
-        from scipy.integrate import ode
+        import scipy.integrate
 
         def integrate(dt, start_point):
+            direction = np.sign(dt)
+            dt = np.abs(dt)
             t = 0.0
             xout = np.atleast_2d(start_point.copy())
-            solver = ode(self._bTrace).set_integrator(
-                'vode', method='adams', atol=tol * np.abs(dt))
-            solver.set_initial_value(start_point, t)
-            while True:
-                try:
-                    solver.integrate(solver.t + dt)
-                except _OutOfBoundsError:  # reached boundary
-                    break
 
-                # Append new point to field line
-                if dt < 0:
-                    xout = np.row_stack((solver.y, xout))
-                else:
-                    xout = np.row_stack((xout, solver.y))
+            def finish_integration(t, coord):
+                r = np.linalg.norm(coord)
+                ret = (r - 1) * (r - self.grid.rss)
+                return ret
+
+            finish_integration.terminal = True
+            # The integration domain is deliberately huge, because the
+            # the interation automatically stops when an out of bounds error
+            # is thrown
+            t_span = (0, 1e4)
+
+            def fun(t, y):
+                return self._bTrace(t, y, direction)
+
+            res = scipy.integrate.solve_ivp(
+                fun, t_span, start_point, method='LSODA',
+                rtol=rtol, atol=atol, events=finish_integration)
+
+            xout = res.y
             return xout
 
-        xback = integrate(-dtf, x0)
-        xforw = integrate(dtf, x0)
-        for i in range(nrefine):
-            dtf /= 10
-            xback = np.row_stack((integrate(-dtf, xback[0, :]), xback))
-            xforw = np.row_stack((xforw, integrate(dtf, xforw[-1, :])))
+        xforw = integrate(1, x0)
+        xback = integrate(-1, x0)
+        xback = np.flip(xback, axis=1)
 
-        xout = np.row_stack((xback, xforw))
+        xout = np.row_stack((xback.T, xforw.T))
         return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], self)
 
     @property
