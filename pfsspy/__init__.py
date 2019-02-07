@@ -237,8 +237,8 @@ class Output:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        phi, theta = np.meshgrid(self.grid.pg, self.grid.sg)
-        ax.contour(np.rad2deg(phi), theta, self.source_surface_br, levels=[0])
+        pfsspy.plot.contour(
+            self.grid.pg, self.grid.sg, self.source_surface_br, [0], ax)
 
     @property
     def _brgi(self):

@@ -20,3 +20,10 @@ def radial_cut(phi, costheta, field, ax=None):
     ax.xaxis.set_minor_locator(mticker.MultipleLocator(base=30))
 
     return mesh
+
+
+def contour(phi, costheta, field, levels, ax=None):
+    if ax is None:
+        fig, ax = plt.subplots()
+    phi, theta = np.meshgrid(phi, costheta)
+    ax.contour(np.rad2deg(phi), theta, field, levels=levels)
