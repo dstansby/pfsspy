@@ -6,7 +6,6 @@ if sys.version_info < (3, 5):
     sys.exit('Python versions older than 3.5 are not supported.')
 
 setup(name='pfsspy',
-      version='0.1',
       description='Potential Field Source Surface model package',
       author='David Stansby',
       license='GPL3',
@@ -18,6 +17,8 @@ setup(name='pfsspy',
                    'Programming Language :: Python :: 3',
                    'Topic :: Scientific/Engineering :: Physics'],
       url='https://github.com/dstansby/pfsspy',
+      use_scm_version=True,
+      setup_requires=['setuptools_scm'],
       install_requires=['numpy', 'scipy', 'matplotlib', 'sunpy', 'astropy'],
       python_requires='>=3.5',
       packages=['pfsspy'],

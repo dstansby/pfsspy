@@ -10,6 +10,13 @@ import scipy.linalg as la
 import pfsspy.plot
 import pfsspy.coords
 
+from pkg_resources import get_distribution, DistributionNotFound
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass
+
 
 class Grid:
     """
