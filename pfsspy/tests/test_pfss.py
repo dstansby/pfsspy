@@ -115,3 +115,18 @@ def test_input_output(dipole_map):
     out.save('test.npz')
     new_out = pfsspy.load_output('test.npz')
     assert (new_out.al[0] == out.al[0]).all()
+
+
+def test_plot_input(dipole_map):
+    inp, out = dipole_map
+    inp.plot_input()
+
+
+def test_plot_source_surface(dipole_map):
+    inp, out = dipole_map
+    out.plot_source_surface()
+
+
+def test_plot_pil(dipole_map):
+    inp, out = dipole_map
+    out.plot_pil()
