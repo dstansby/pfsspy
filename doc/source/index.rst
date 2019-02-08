@@ -11,6 +11,17 @@ modelling. For more information on the actually PFSS calculation see
   If you find any bugs or have any suggestions for improvement, please raise
   an issue here: https://github.com/dstansby/pfsspy/issues
 
+Installing
+----------
+
+pfsspy can be installed from PyPi using
+
+.. code::
+
+    pip install pfsspy
+
+Code reference
+--------------
 
 For the main user-facing code see
 
