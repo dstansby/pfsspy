@@ -1,12 +1,14 @@
 from setuptools import setup
 import os
 import sys
+import versioneer
 
 if sys.version_info < (3, 5):
     sys.exit('Python versions older than 3.5 are not supported.')
 
 setup(name='pfsspy',
-      version='0.1',
+      version=versioneer.get_version(),
+      cmdclass=versioneer.get_cmdclass(),
       description='Potential Field Source Surface model package',
       author='David Stansby',
       license='GPL3',
