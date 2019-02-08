@@ -10,6 +10,10 @@ import scipy.linalg as la
 import pfsspy.plot
 import pfsspy.coords
 
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+
 
 class Grid:
     """

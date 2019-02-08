@@ -1,1 +1,5 @@
 comment: off
+
+ignore:
+  - "pfsspy/_version.py"
+  - "versioneer.py"
