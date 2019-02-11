@@ -324,7 +324,7 @@ class Output:
         """
         import scipy.integrate
 
-        def integrate(dt, start_point):
+        def integrate_one_way(dt, start_point):
             direction = np.sign(dt)
             dt = np.abs(dt)
             t = 0.0
@@ -351,12 +351,14 @@ class Output:
             xout = res.y
             return xout
 
-        xforw = integrate(1, x0)
-        xback = integrate(-1, x0)
-        xback = np.flip(xback, axis=1)
+        def integrate_both_ways(start_point):
+            xforw = integrate_one_way(1, x0)
+            xback = integrate_one_way(-1, x0)
+            xback = np.flip(xback, axis=1)
+            xout = np.row_stack((xback.T, xforw.T))
+            return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], self)
 
-        xout = np.row_stack((xback.T, xforw.T))
-        return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], self)
+        return integrate_both_ways(x0)
 
     @property
     def al(self):
