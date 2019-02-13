@@ -388,6 +388,12 @@ class Output:
     def bg(self):
         """
         B as a (weighted) averaged on grid points.
+
+        Returns
+        -------
+        br : array
+        bs : array
+        bp : array
         """
         if self._bg is not None:
             return self._bg
@@ -694,6 +700,8 @@ class FieldLine(coord.SkyCoord):
             Field line expansion factor.
             If field line is closed, returns ``None``.
         """
+        import scipy.interpolate
+
         if not self.is_open:
             return
         # Extract ends of magnetic field line, and get them in spherical coords
@@ -706,14 +714,18 @@ class FieldLine(coord.SkyCoord):
             solar_foot = foot1
             source_foot = foot2
 
-        def b_at_coord(coord):
-            interp_coords = [coord.lon / u.rad,
-                             np.sin(coord.lat),
-                             np.log(coord.radius / const.R_sun)]
-            b = self._output._brgi(interp_coords)
-            return np.linalg.norm(b)
+        def interp(map, coord):
+            phi = coord.lon
+            s = np.sin(coord.lat)
+            interpolator = scipy.interpolate.RectBivariateSpline(
+                self._output.grid.pg, self._output.grid.sg, map)
+            return interpolator(phi, s)
 
-        b_solar = b_at_coord(solar_foot)
-        b_source = b_at_coord(source_foot)
-        return ((solar_foot.radius**2 * b_solar) /
-                (source_foot.radius**2 * b_source))
+        # Get output magnetic field, and calculate |B|
+        br, bs, bphi = self._output.bg
+        modb = np.sqrt(br**2 + bs**2 + bphi**2)
+        # Interpolate at each end of field line
+        b_solar = interp(modb[:, :, 0], solar_foot)[0, 0]
+        b_source = interp(modb[:, :, -1], source_foot)[0, 0]
+        return ((1**2 * b_solar) /
+                (self._output.grid.rss**2 * b_source))
