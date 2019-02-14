@@ -125,7 +125,7 @@ class Input:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        mesh = pfsspy.plot.radial_cut(self.grid.pc, self.grid.sc, self.br, ax)
+        mesh = plot.radial_cut(self.grid.pc, self.grid.sc, self.br, ax)
         return mesh
 
 
@@ -226,7 +226,7 @@ class Output:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        mesh = pfsspy.plot.radial_cut(
+        mesh = plot.radial_cut(
             self.grid.pg, self.grid.sg, self.source_surface_br, ax)
         return mesh
 
@@ -241,7 +241,7 @@ class Output:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        pfsspy.plot.contour(
+        plot.contour(
             self.grid.pg, self.grid.sg, self.source_surface_br, [0], ax)
 
     @property
@@ -293,7 +293,7 @@ class Output:
         """
         x, y, z = coord
         # (ph, s, rh) coordinates of current point:
-        rho, s, phi = pfsspy.coords.cart2strum(x, y, z)
+        rho, s, phi = coords.cart2strum(x, y, z)
 
         # Check if position vector is outside the data limits
         if rho < 0 or rho > np.log(self.grid.rss):
