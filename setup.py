@@ -20,7 +20,7 @@ setup(name='pfsspy',
                    'Programming Language :: Python :: 3',
                    'Topic :: Scientific/Engineering :: Physics'],
       url='https://github.com/dstansby/pfsspy',
-      install_requires=['numpy', 'scipy', 'matplotlib', 'sunpy', 'astropy'],
+      install_requires=['numpy', 'scipy', 'matplotlib', 'sunpy', 'astropy>=3'],
       python_requires='>=3.5',
       packages=['pfsspy'],
       )
