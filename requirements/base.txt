@@ -1,5 +1,5 @@
 matplotlib
 numpy
 scipy
-astropy
+astropy>=3
 sunpy
