@@ -284,7 +284,7 @@ class Output:
                            (cos_th * br) - (sin_th * bth)),
                           axis=-1)
 
-        self._rgi = rgi((phi, s, rho), bstack)
+        self._rgi = rgi((phi, s, rho), bstack, bounds_error=False)
         return self._rgi
 
     def _bTrace(self, t, coord, direction):
