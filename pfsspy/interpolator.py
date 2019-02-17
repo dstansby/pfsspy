@@ -20,10 +20,6 @@ class RegularGridInterpolator(object):
         The points defining the regular grid in n dimensions.
     values : array_like, shape (m1, ..., mn, ...)
         The data on the regular grid in n dimensions.
-    bounds_error : bool, optional
-        If True, when interpolated values are requested outside of the
-        domain of the input data, a ValueError is raised.
-        If False, then `fill_value` is used.
     fill_value : number, optional
         If provided, the value to use for points outside of the
         interpolation domain. If None, values outside
@@ -80,9 +76,8 @@ class RegularGridInterpolator(object):
     # this class is based on code originally programmed by Johannes Buchner,
     # see https://github.com/JohannesBuchner/regulargrid
 
-    def __init__(self, points, values, bounds_error=True,
+    def __init__(self, points, values,
                  fill_value=np.nan):
-        self.bounds_error = bounds_error
 
         if not hasattr(values, 'ndim'):
             # allow reasonable duck-typed values
@@ -136,18 +131,11 @@ class RegularGridInterpolator(object):
         xi_shape = xi.shape
         xi = xi.reshape(-1, xi_shape[-1])
 
-        if self.bounds_error:
-            for i, p in enumerate(xi.T):
-                if not np.logical_and(np.all(self.grid[i][0] <= p),
-                                      np.all(p <= self.grid[i][-1])):
-                    raise ValueError("One of the requested xi is out of bounds "
-                                     "in dimension %d" % i)
-
         indices, norm_distances, out_of_bounds = self._find_indices(xi.T)
         result = self._evaluate_linear(indices,
                                        norm_distances,
                                        out_of_bounds)
-        if not self.bounds_error and self.fill_value is not None:
+        if self.fill_value is not None:
             result[out_of_bounds] = self.fill_value
 
         return result.reshape(xi_shape[:-1] + self.values.shape[ndim:])
@@ -182,8 +170,7 @@ class RegularGridInterpolator(object):
             indices.append(i)
             norm_distances.append((x - grid[i]) /
                                   (grid[i + 1] - grid[i]))
-            if not self.bounds_error:
-                out_of_bounds += x < grid[0]
-                out_of_bounds += x > grid[-1]
+            out_of_bounds += x < grid[0]
+            out_of_bounds += x > grid[-1]
 
         return indices, norm_distances, out_of_bounds
