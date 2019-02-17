@@ -13,19 +13,13 @@ class RegularGridInterpolator(object):
     """
     Interpolation on a regular grid in arbitrary dimensions
     The data must be defined on a regular grid; the grid spacing however may be
-    uneven.  Linear and nearest-neighbour interpolation are supported. After
-    setting up the interpolator object, the interpolation method (*linear* or
-    *nearest*) may be chosen at each evaluation.
+    uneven.  Linear interpolation is performed.
     Parameters
     ----------
     points : tuple of ndarray of float, with shapes (m1, ), ..., (mn, )
         The points defining the regular grid in n dimensions.
     values : array_like, shape (m1, ..., mn, ...)
         The data on the regular grid in n dimensions.
-    method : str, optional
-        The method of interpolation to perform. Supported are "linear" and
-        "nearest". This parameter will become the default for the object's
-        ``__call__`` method. Default is "linear".
     bounds_error : bool, optional
         If True, when interpolated values are requested outside of the
         domain of the input data, a ValueError is raised.
@@ -86,11 +80,8 @@ class RegularGridInterpolator(object):
     # this class is based on code originally programmed by Johannes Buchner,
     # see https://github.com/JohannesBuchner/regulargrid
 
-    def __init__(self, points, values, method="linear", bounds_error=True,
+    def __init__(self, points, values, bounds_error=True,
                  fill_value=np.nan):
-        if method not in ["linear", "nearest"]:
-            raise ValueError("Method '%s' is not defined" % method)
-        self.method = method
         self.bounds_error = bounds_error
 
         if not hasattr(values, 'ndim'):
@@ -127,21 +118,14 @@ class RegularGridInterpolator(object):
         self.grid = tuple([np.asarray(p) for p in points])
         self.values = values
 
-    def __call__(self, xi, method=None):
+    def __call__(self, xi):
         """
         Interpolation at coordinates
         Parameters
         ----------
         xi : ndarray of shape (..., ndim)
             The coordinates to sample the gridded data at
-        method : str
-            The method of interpolation to perform. Supported are "linear" and
-            "nearest".
         """
-        method = self.method if method is None else method
-        if method not in ["linear", "nearest"]:
-            raise ValueError("Method '%s' is not defined" % method)
-
         ndim = len(self.grid)
         xi = _ndim_coords_from_arrays(xi, ndim=ndim)
         if xi.shape[-1] != len(self.grid):
@@ -160,14 +144,9 @@ class RegularGridInterpolator(object):
                                      "in dimension %d" % i)
 
         indices, norm_distances, out_of_bounds = self._find_indices(xi.T)
-        if method == "linear":
-            result = self._evaluate_linear(indices,
-                                           norm_distances,
-                                           out_of_bounds)
-        elif method == "nearest":
-            result = self._evaluate_nearest(indices,
-                                            norm_distances,
-                                            out_of_bounds)
+        result = self._evaluate_linear(indices,
+                                       norm_distances,
+                                       out_of_bounds)
         if not self.bounds_error and self.fill_value is not None:
             result[out_of_bounds] = self.fill_value
 
@@ -187,11 +166,6 @@ class RegularGridInterpolator(object):
                 weight *= np.where(ei == i, 1 - yi, yi)
             values += np.asarray(self.values[edge_indices]) * weight[vslice]
         return values
-
-    def _evaluate_nearest(self, indices, norm_distances, out_of_bounds):
-        idx_res = [np.where(yi <= .5, i, i + 1)
-                   for i, yi in zip(indices, norm_distances)]
-        return self.values[tuple(idx_res)]
 
     def _find_indices(self, xi):
         # find relevant edges between which xi are situated
