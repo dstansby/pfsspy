@@ -651,6 +651,7 @@ class FieldLine(coord.SkyCoord):
                          z=z * const.R_sun,
                          frame=frames.HeliographicCarrington,
                          representation_type='cartesian')
+        self._expansion_factor = None
 
     @property
     def is_open(self):
@@ -700,6 +701,8 @@ class FieldLine(coord.SkyCoord):
             Field line expansion factor.
             If field line is closed, returns ``None``.
         """
+        if self._expansion_factor is not None:
+            return self._expansion_factor
         import scipy.interpolate
 
         if not self.is_open:
@@ -727,5 +730,6 @@ class FieldLine(coord.SkyCoord):
         # Interpolate at each end of field line
         b_solar = interp(modb[:, :, 0], solar_foot)[0, 0]
         b_source = interp(modb[:, :, -1], source_foot)[0, 0]
-        return ((1**2 * b_solar) /
-                (self._output.grid.rss**2 * b_source))
+        self._expansion_factor = ((1**2 * b_solar) /
+                                  (self._output.grid.rss**2 * b_source))
+        return self._expansion_factor
