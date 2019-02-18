@@ -1,3 +1,6 @@
+import distutils.version
+
+import astropy
 import astropy.coordinates as coord
 import astropy.constants as const
 import astropy.units as u
@@ -13,6 +16,12 @@ import pfsspy.coords
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
+
+# Do a version check for astropy
+if (distutils.version.LooseVersion(astropy.__version__) <
+        distutils.version.LooseVersion("3")):
+    raise RuntimeError('pfsspy requires astropy v3 to run ' +
+                       f'(found version {astropy.__version__} installed)')
 
 
 class Grid:
