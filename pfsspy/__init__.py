@@ -230,7 +230,7 @@ class Output:
             self.grid.pg, self.grid.sg, self.source_surface_br, ax)
         return mesh
 
-    def plot_pil(self, ax=None):
+    def plot_pil(self, ax=None, **kwargs):
         """
         Plot the polarity inversion line on the source surface.
 
@@ -240,9 +240,12 @@ class Output:
         ----------
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
+
+        **kwargs :
+            Keyword arguments are handed to `ax.contour`.
         """
         pfsspy.plot.contour(
-            self.grid.pg, self.grid.sg, self.source_surface_br, [0], ax)
+            self.grid.pg, self.grid.sg, self.source_surface_br, [0], ax, **kwargs)
 
     @property
     def _brgi(self):

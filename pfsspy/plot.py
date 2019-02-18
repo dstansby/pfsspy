@@ -22,8 +22,20 @@ def radial_cut(phi, costheta, field, ax=None):
     return mesh
 
 
-def contour(phi, costheta, field, levels, ax=None):
+def contour(phi, costheta, field, levels, ax=None, **kwargs):
+    """
+    Parameters
+    ----------
+    phi :
+    costheta :
+    field :
+    levels :
+    ax : Axes, optional
+        Axes to plot to. If ``None`` a new figure is created.
+    **kwargs :
+        Keyword arguments are handed to `ax.contour`.
+    """
     if ax is None:
         fig, ax = plt.subplots()
     phi, theta = np.meshgrid(phi, costheta)
-    ax.contour(np.rad2deg(phi), theta, field, levels=levels)
+    ax.contour(np.rad2deg(phi), theta, field, levels=levels, **kwargs)
