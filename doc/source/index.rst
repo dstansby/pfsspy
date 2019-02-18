@@ -35,12 +35,13 @@ right hand of each web page.
 Code reference
 --------------
 
-For the main user-facing code see
+For the main user-facing code and a changelog see
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    pfsspy
+   changes
 
 for usage examples see
 
