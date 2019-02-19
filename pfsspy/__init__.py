@@ -13,6 +13,13 @@ import scipy.linalg as la
 import pfsspy.plot
 import pfsspy.coords
 
+HAS_NUMBA = False
+try:
+    from numba import jit
+    HAS_NUMBA = True
+except Exception:
+    pass
+
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
@@ -533,6 +540,37 @@ class Output:
         return self._common_b_cache
 
 
+def _eigh(A):
+    return np.linalg.eigh(A)
+
+
+def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psir):
+    for l in range(ns):
+        # - sum c_{lm} + d_{lm}
+        cdlm = np.dot(Q[:, l], brt[:, m]) / lam[l]
+        # - ratio c_{lm}/d_{lm} [numerically safer this way up]
+        ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
+        dlm = cdlm / (1.0 + ratio)
+        clm = ratio * dlm
+        psir[:, l] = clm * ffp[l]**k + dlm * ffm[l]**k
+    return psir
+
+
+def _als_alp(nr, nphi, Fs, psi, Fp, als, alp):
+    for j in range(nr + 1):
+        for i in range(nphi + 1):
+            als[i, :, j] = Fs * (psi[j, :, ((i - 1) % nphi)] - psi[j, :, ((i) % nphi)])
+        for i in range(nphi):
+            alp[i, 1:-1, j] = Fp[1:-1] * (psi[j, 1:, i] - psi[j, :-1, i])
+    return als, alp
+
+
+if HAS_NUMBA:
+    _eigh = jit(nopython=True)(_eigh)
+    _compute_r_term = jit(nopython=True)(_compute_r_term)
+    _als_alp = jit(nopython=True)(_als_alp)
+
+
 def pfss(input):
     r"""
     Compute PFSS model.
@@ -605,25 +643,22 @@ def pfss(input):
             A[j, j] = Vg[j] + Vg[j + 1] + Uc[j] * mu[m]
         # - compute eigenvectors Q_{lm} and eigenvalues lam_{lm}:
         #   (note that A is symmetric so use special solver)
-        lam, Q = la.eigh(A)
+        lam, Q = _eigh(A)
+        Q = Q.astype(np.complex128)
         # - solve quadratic:
         Flm = 0.5 * (1 + e1 + lam * fact)
         ffp = Flm + np.sqrt(Flm**2 - e1)
         ffm = e1 / ffp
+
         # - compute radial term for each l (for this m):
-        for l in range(ns):
-            # - sum c_{lm} + d_{lm}
-            cdlm = np.dot(Q[:, l], brt[:, m]) / lam[l]
-            # - ratio c_{lm}/d_{lm} [numerically safer this way up]
-            ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
-            dlm = cdlm / (1.0 + ratio)
-            clm = ratio * dlm
-            psir[:, l] = clm * ffp[l]**k + dlm * ffm[l]**k
+        psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psir)
+
         # - compute entry for this m in psit = Sum_l c_{lm}Q_{lm}**j
         psi[:, :, m] = np.dot(psir, Q.T)
         if (m > 0):
             psi[:, :, nphi - m] = np.conj(psi[:, :, m])
 
+    # Past this point only psi, Fs, Fp are needed
     # Compute psi by inverse fft:
     psi = np.real(np.fft.ifft(psi, axis=2))
 
@@ -632,11 +667,7 @@ def pfss(input):
     als = np.zeros((nphi + 1, ns, nr + 1))
     alp = np.zeros((nphi, ns + 1, nr + 1))
 
-    for j in range(nr + 1):
-        for i in range(nphi + 1):
-            als[i, :, j] = Fs * (psi[j, :, ((i - 1) % nphi)] - psi[j, :, ((i) % nphi)])
-        for i in range(nphi):
-            alp[i, 1:-1, j] = Fp[1:-1] * (psi[j, 1:, i] - psi[j, :-1, i])
+    als, alp = _als_alp(nr, nphi, Fs, psi, Fp, als, alp)
 
     r = np.exp(rg)
     th = np.arccos(sg)
