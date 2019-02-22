@@ -165,10 +165,10 @@ def _find_indices(xi, grid):
 
 
 def _evaluate_linear(values_in, indices, norm_distances, edges):
-    values = np.zeros(3)
+    values = 0
     for j in range(edges.shape[0]):
         edge_indices = edges[j, :]
-        weight = np.ones(1)
+        weight = 1
         for ei, i, yi in zip(edge_indices, indices, norm_distances):
             if ei == i:
                 weight *= 1 - yi
