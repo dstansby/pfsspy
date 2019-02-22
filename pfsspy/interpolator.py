@@ -2,7 +2,10 @@
 Interpolator functions
 
 This module contains a version of scipy.interpolate.RegularGridInterpolator,
-which has been edited for performance
+which has been edited for performance.
+
+THE CODE HERE IS LIABLE TO CHANGE/BREAK AT ANY TIME. Do not use this code
+outside of pfsspy.
 """
 import itertools
 import numpy as np
