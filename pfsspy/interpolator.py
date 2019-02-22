@@ -135,28 +135,12 @@ class RegularGridInterpolator(object):
         xi = xi.reshape(-1, xi_shape[-1])
 
         indices, norm_distances, out_of_bounds = self._find_indices(xi.T)
-        result = self._evaluate_linear(indices,
-                                       norm_distances,
-                                       out_of_bounds)
+        edges = np.array(list(itertools.product(*[[i, i + 1] for i in indices])))[:, :, 0]
+        result = _evaluate_linear(self.values, indices, norm_distances, edges)
         if self.fill_value is not None:
             result[out_of_bounds] = self.fill_value
 
         return result.reshape(xi_shape[:-1] + self.values.shape[ndim:])
-
-    def _evaluate_linear(self, indices, norm_distances, out_of_bounds):
-        # slice for broadcasting over trailing dimensions in self.values
-        vslice = (slice(None),) + (None,)*(self.values.ndim - len(indices))
-
-        # find relevant values
-        # each i and i+1 represents a edge
-        edges = itertools.product(*[[i, i + 1] for i in indices])
-        values = 0.
-        for edge_indices in edges:
-            weight = 1.
-            for ei, i, yi in zip(edge_indices, indices, norm_distances):
-                weight *= np.where(ei == i, 1 - yi, yi)
-            values += np.asarray(self.values[edge_indices]) * weight[vslice]
-        return values
 
     def _find_indices(self, xi):
         # find relevant edges between which xi are situated
@@ -177,3 +161,17 @@ class RegularGridInterpolator(object):
             out_of_bounds += x > grid[-1]
 
         return indices, norm_distances, out_of_bounds
+
+
+def _evaluate_linear(values_in, indices, norm_distances, edges):
+    values = np.zeros(3)
+    for j in range(edges.shape[0]):
+        edge_indices = edges[j, :]
+        weight = np.ones(1)
+        for ei, i, yi in zip(edge_indices, indices, norm_distances):
+            if ei == i:
+                weight *= 1 - yi
+            else:
+                weight *= yi
+        values += values_in[edge_indices[0], edge_indices[1], edge_indices[2], :] * weight
+    return np.atleast_2d(values)
