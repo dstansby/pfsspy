@@ -142,25 +142,26 @@ class RegularGridInterpolator(object):
 
         return result.reshape(xi_shape[:-1] + self.values.shape[ndim:])
 
-    def _find_indices(self, xi):
-        # find relevant edges between which xi are situated
-        indices = []
-        # compute distance to lower edge in unity units
-        norm_distances = []
-        # check for out of bounds xi
-        out_of_bounds = np.zeros((xi.shape[1]), dtype=bool)
-        # iterate through dimensions
-        for x, grid in zip(xi, self.grid):
-            i = np.searchsorted(grid, x) - 1
-            i[i < 0] = 0
-            i[i > grid.size - 2] = grid.size - 2
-            indices.append(i)
-            norm_distances.append((x - grid[i]) /
-                                  (grid[i + 1] - grid[i]))
-            out_of_bounds += x < grid[0]
-            out_of_bounds += x > grid[-1]
 
-        return indices, norm_distances, out_of_bounds
+def _find_indices(xi, grid):
+    # find relevant edges between which xi are situated
+    indices = []
+    # compute distance to lower edge in unity units
+    norm_distances = []
+    # check for out of bounds xi
+    out_of_bounds = np.zeros((xi.shape[1]), dtype=np.bool)
+    # iterate through dimensions
+    for x, grid in zip(xi, grid):
+        i = np.searchsorted(grid, x) - 1
+        i[i < 0] = 0
+        i[i > grid.size - 2] = grid.size - 2
+        indices.append(i)
+        norm_distances.append((x - grid[i]) /
+                              (grid[i + 1] - grid[i]))
+        out_of_bounds += x < grid[0]
+        out_of_bounds += x > grid[-1]
+
+    return indices, norm_distances, out_of_bounds
 
 
 def _evaluate_linear(values_in, indices, norm_distances, edges):
