@@ -544,7 +544,7 @@ def _eigh(A):
     return np.linalg.eigh(A)
 
 
-def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psir):
+def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir):
     for l in range(ns):
         # - sum c_{lm} + d_{lm}
         cdlm = np.dot(Q[:, l], brt[:, m]) / lam[l]
@@ -553,7 +553,10 @@ def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psir):
         dlm = cdlm / (1.0 + ratio)
         clm = ratio * dlm
         psir[:, l] = clm * ffp[l]**k + dlm * ffm[l]**k
-    return psir
+
+    # - compute entry for this m in psit = Sum_l c_{lm}Q_{lm}**j
+    psi[:, :, m] = np.dot(psir, Q.T)
+    return psi, psir
 
 
 def _als_alp(nr, nphi, Fs, psi, Fp, als, alp):
@@ -565,10 +568,17 @@ def _als_alp(nr, nphi, Fs, psi, Fp, als, alp):
     return als, alp
 
 
+def _A_diag(A, ns, Vg, Uc, mu, m):
+    for j in range(ns):
+        A[j, j] = Vg[j] + Vg[j + 1] + Uc[j] * mu[m]
+    return A
+
+
 if HAS_NUMBA:
     _eigh = jit(nopython=True)(_eigh)
     _compute_r_term = jit(nopython=True)(_compute_r_term)
     _als_alp = jit(nopython=True)(_als_alp)
+    _A_diag = jit(nopython=True)(_A_diag)
 
 
 def pfss(input):
@@ -620,6 +630,7 @@ def pfss(input):
 
     # FFT in phi of photospheric distribution at each latitude:
     brt = np.fft.rfft(br0, axis=1)
+    brt = brt.astype(np.complex128)
 
     # Prepare tridiagonal matrix:
     # - create off-diagonal part of the matrix:
@@ -639,8 +650,8 @@ def pfss(input):
     # Loop over azimuthal modes (positive m):
     for m in range(nphi // 2 + 1):
         # - set diagonal terms of matrix:
-        for j in range(ns):
-            A[j, j] = Vg[j] + Vg[j + 1] + Uc[j] * mu[m]
+        A = _A_diag(A, ns, Vg, Uc, mu, m)
+
         # - compute eigenvectors Q_{lm} and eigenvalues lam_{lm}:
         #   (note that A is symmetric so use special solver)
         lam, Q = _eigh(A)
@@ -651,10 +662,8 @@ def pfss(input):
         ffm = e1 / ffp
 
         # - compute radial term for each l (for this m):
-        psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psir)
+        psi, psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir)
 
-        # - compute entry for this m in psit = Sum_l c_{lm}Q_{lm}**j
-        psi[:, :, m] = np.dot(psir, Q.T)
         if (m > 0):
             psi[:, :, nphi - m] = np.conj(psi[:, :, m])
 
