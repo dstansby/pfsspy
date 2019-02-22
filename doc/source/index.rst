@@ -20,6 +20,15 @@ pfsspy can be installed from PyPi using
 
     pip install pfsspy
 
+Improving performance
+---------------------
+
+pfsspy automatically detects an installation of
+`numba <https://numba.pydata.org/>`_, which compiles
+some of the numerical code to speed up pfss calculations. To enable this
+simply `install numba <http://numba.pydata.org/numba-doc/latest/user/installing.html>`_
+and use pfsspy as normal.
+
 Citing
 ------
 
