@@ -341,43 +341,40 @@ class Output:
         -------
         fl : :class:`FieldLine`
         """
+        xforw = self._integrate_one_way(1, x0, rtol, atol)
+        xback = self._integrate_one_way(-1, x0, rtol, atol)
+        xback = np.flip(xback, axis=1)
+        xout = np.row_stack((xback.T, xforw.T))
+        return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], self)
+
+    def _integrate_one_way(self, dt, start_point, rtol, atol):
         import scipy.integrate
 
-        def integrate_one_way(dt, start_point):
-            direction = np.sign(dt)
-            dt = np.abs(dt)
-            t = 0.0
-            xout = np.atleast_2d(start_point.copy())
+        direction = np.sign(dt)
+        dt = np.abs(dt)
+        t = 0.0
+        xout = np.atleast_2d(start_point.copy())
 
-            def finish_integration(t, coord):
-                r = np.linalg.norm(coord)
-                ret = (r - 1) * (r - self.grid.rss)
-                return ret
+        def finish_integration(t, coord):
+            r = np.linalg.norm(coord)
+            ret = (r - 1) * (r - self.grid.rss)
+            return ret
 
-            finish_integration.terminal = True
-            # The integration domain is deliberately huge, because the
-            # the interation automatically stops when an out of bounds error
-            # is thrown
-            t_span = (0, 1e4)
+        finish_integration.terminal = True
+        # The integration domain is deliberately huge, because the
+        # the interation automatically stops when an out of bounds error
+        # is thrown
+        t_span = (0, 1e4)
 
-            def fun(t, y):
-                return self._bTrace(t, y, direction)
+        def fun(t, y):
+            return self._bTrace(t, y, direction)
 
-            res = scipy.integrate.solve_ivp(
-                fun, t_span, start_point, method='LSODA',
-                rtol=rtol, atol=atol, events=finish_integration)
+        res = scipy.integrate.solve_ivp(
+            fun, t_span, start_point, method='RK23',
+            rtol=rtol, atol=atol, events=finish_integration)
 
-            xout = res.y
-            return xout
-
-        def integrate_both_ways(start_point):
-            xforw = integrate_one_way(1, x0)
-            xback = integrate_one_way(-1, x0)
-            xback = np.flip(xback, axis=1)
-            xout = np.row_stack((xback.T, xforw.T))
-            return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], self)
-
-        return integrate_both_ways(x0)
+        xout = res.y
+        return xout
 
     @property
     def al(self):
