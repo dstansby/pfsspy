@@ -134,7 +134,7 @@ class RegularGridInterpolator(object):
         xi_shape = xi.shape
         xi = xi.reshape(-1, xi_shape[-1])
 
-        indices, norm_distances, out_of_bounds = self._find_indices(xi.T)
+        indices, norm_distances, out_of_bounds = _find_indices(xi.T, self.grid)
         edges = np.array(list(itertools.product(*[[i, i + 1] for i in indices])))[:, :, 0]
         result = _evaluate_linear(self.values, indices, norm_distances, edges)
         if self.fill_value is not None:
