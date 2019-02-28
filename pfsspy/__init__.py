@@ -268,7 +268,7 @@ class Output:
         """
         Regular grid interpolator for B.
         """
-        from scipy.interpolate import RegularGridInterpolator as rgi
+        from pfsspy.interpolator import RegularGridInterpolator as rgi
         if self._rgi is not None:
             return self._rgi
 
@@ -303,7 +303,7 @@ class Output:
                            (cos_th * br) - (sin_th * bth)),
                           axis=-1)
 
-        self._rgi = rgi((phi, s, rho), bstack, bounds_error=False)
+        self._rgi = rgi((phi, s, rho), bstack)
         return self._rgi
 
     def _bTrace(self, t, coord, direction):
