@@ -9,7 +9,6 @@ outside of pfsspy.
 """
 import itertools
 import numpy as np
-from scipy.interpolate.interpnd import _ndim_coords_from_arrays
 
 
 class RegularGridInterpolator(object):
@@ -121,3 +120,29 @@ def _evaluate_linear(values_in, indices, norm_distances, edges):
                 weight *= yi
         values += values_in[edge_indices[0], edge_indices[1], edge_indices[2], :] * weight
     return np.atleast_2d(values)
+
+
+def _ndim_coords_from_arrays(points, ndim=None):
+    """
+    Convert a tuple of coordinate arrays to a (..., ndim)-shaped array.
+    """
+    if isinstance(points, tuple) and len(points) == 1:
+        # handle argument tuple
+        points = points[0]
+    if isinstance(points, tuple):
+        p = np.broadcast_arrays(*points)
+        n = len(p)
+        for j in range(1, n):
+            if p[j].shape != p[0].shape:
+                raise ValueError("coordinate arrays do not have the same shape")
+        points = np.empty(p[0].shape + (len(points),), dtype=float)
+        for j, item in enumerate(p):
+            points[...,j] = item
+    else:
+        points = np.asanyarray(points)
+        if points.ndim == 1:
+            if ndim is None:
+                points = points.reshape(-1, 1)
+            else:
+                points = points.reshape(-1, ndim)
+    return points
