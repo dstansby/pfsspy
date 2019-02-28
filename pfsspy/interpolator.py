@@ -181,8 +181,6 @@ def _ndim_coords_from_arrays(points, ndim=None):
     """
     Convert a tuple of coordinate arrays to a (..., ndim)-shaped array.
     """
-    cdef ssize_t j, n
-
     if isinstance(points, tuple) and len(points) == 1:
         # handle argument tuple
         points = points[0]
