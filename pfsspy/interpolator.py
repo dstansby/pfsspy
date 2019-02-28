@@ -27,61 +27,13 @@ class RegularGridInterpolator(object):
         If provided, the value to use for points outside of the
         interpolation domain. If None, values outside
         the domain are extrapolated.
-    Methods
-    -------
-    __call__
-    Notes
-    -----
-    Contrary to LinearNDInterpolator and NearestNDInterpolator, this class
-    avoids expensive triangulation of the input data by taking advantage of the
-    regular grid structure.
-    If any of `points` have a dimension of size 1, linear interpolation will
-    return an array of `nan` values. Nearest-neighbor interpolation will work
-    as usual in this case.
-    .. versionadded:: 0.14
-    Examples
-    --------
-    Evaluate a simple example function on the points of a 3D grid:
-    >>> from scipy.interpolate import RegularGridInterpolator
-    >>> def f(x, y, z):
-    ...     return 2 * x**3 + 3 * y**2 - z
-    >>> x = np.linspace(1, 4, 11)
-    >>> y = np.linspace(4, 7, 22)
-    >>> z = np.linspace(7, 9, 33)
-    >>> data = f(*np.meshgrid(x, y, z, indexing='ij', sparse=True))
-    ``data`` is now a 3D array with ``data[i,j,k] = f(x[i], y[j], z[k])``.
-    Next, define an interpolating function from this data:
-    >>> my_interpolating_function = RegularGridInterpolator((x, y, z), data)
-    Evaluate the interpolating function at the two points
-    ``(x,y,z) = (2.1, 6.2, 8.3)`` and ``(3.3, 5.2, 7.1)``:
-    >>> pts = np.array([[2.1, 6.2, 8.3], [3.3, 5.2, 7.1]])
-    >>> my_interpolating_function(pts)
-    array([ 125.80469388,  146.30069388])
-    which is indeed a close approximation to
-    ``[f(2.1, 6.2, 8.3), f(3.3, 5.2, 7.1)]``.
-    See also
-    --------
-    NearestNDInterpolator : Nearest neighbour interpolation on unstructured
-                            data in N dimensions
-    LinearNDInterpolator : Piecewise linear interpolant on unstructured data
-                           in N dimensions
-    References
-    ----------
-    .. [1] Python package *regulargrid* by Johannes Buchner, see
-           https://pypi.python.org/pypi/regulargrid/
-    .. [2] Wikipedia, "Trilinear interpolation",
-           https://en.wikipedia.org/wiki/Trilinear_interpolation
-    .. [3] Weiser, Alan, and Sergio E. Zarantonello. "A note on piecewise linear
-           and multilinear table interpolation in many dimensions." MATH.
-           COMPUT. 50.181 (1988): 189-196.
-           https://www.ams.org/journals/mcom/1988-50-181/S0025-5718-1988-0917826-0/S0025-5718-1988-0917826-0.pdf
     """
     # this class is based on code originally programmed by Johannes Buchner,
     # see https://github.com/JohannesBuchner/regulargrid
 
-    def __init__(self, points, values,
-                 fill_value=np.nan):
+    def __init__(self, points, values):
 
+        fill_value = np.nan
         if not hasattr(values, 'ndim'):
             # allow reasonable duck-typed values
             values = np.asarray(values)
@@ -95,13 +47,6 @@ class RegularGridInterpolator(object):
                 values = values.astype(float)
 
         self.fill_value = fill_value
-        if fill_value is not None:
-            fill_value_dtype = np.asarray(fill_value).dtype
-            if (hasattr(values, 'dtype') and not
-                    np.can_cast(fill_value_dtype, values.dtype,
-                                casting='same_kind')):
-                raise ValueError("fill_value must be either 'None' or "
-                                 "of a type compatible with values")
 
         for i, p in enumerate(points):
             if not np.all(np.diff(p) > 0.):
