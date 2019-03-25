@@ -24,17 +24,23 @@ above coordinates is given by
 import numpy as np
 
 
+def sph2cart(r, theta, phi):
+    """
+    Convert spherical coordinates to cartesian coordinates.
+    """
+    x = r * np.sin(theta) * np.cos(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(theta)
+    return x, y, z
+
+
 def strum2cart(rho, s, phi):
     """
     Convert strumfric coordinates to cartesian coordinates.
     """
     r = np.exp(rho)
     theta = np.arccos(s)
-
-    x = r * np.sin(theta) * np.cos(phi)
-    y = r * np.sin(theta) * np.sin(phi)
-    z = r * np.cos(theta)
-    return x, y, z
+    return sph2cart(r, theta, phi)
 
 
 def cart2strum(x, y, z):

@@ -36,6 +36,7 @@ class Grid:
     Grid on which the solution is calculated.
 
     The grid is evenly spaced in (cos(theta), phi, log(r)).
+    See :mod:`pfsspy.coords` for more information.
     """
     def __init__(self, ns, nphi, nr, rss):
         self.ns = ns
@@ -108,8 +109,13 @@ class Grid:
 
 
 class Input:
-    """
+    r"""
     Input to PFSS modelling.
+
+    .. warning::
+        The input must be on a regularly spaced grid in :math:`\phi` and
+        :math:`s = \cos (\theta)`. See :mod:`pfsspy.coords` for more
+        information on the coordinate system.
 
     Parameters
     ----------
@@ -119,7 +125,8 @@ class Input:
         processing.
 
     nr : int
-        Number of cells in the radial direction.
+        Number of cells in the radial direction to calculate the PFSS solution
+        on.
 
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
@@ -324,14 +331,18 @@ class Output:
 
     def trace(self, x0, atol=1e-4, rtol=1e-4):
         """
-        Traces a field-line from *x0*.
+        Traces a field-line from *x0*. *x0* **must** be a cartesian coordinate.
+        See :mod:`pfsspy.coords` for more information on coordinate transforms,
+        and helper functions for transforming between coordinate systems.
 
         Uses `scipy.integrate.solve_ivp`, with an LSODA method.
 
         Parameters
         ----------
         x0 : array
-            Starting coordinate, in cartesian coordinates.
+            Starting coordinate, in cartesian coordinates. :mod:`pfsspy.coords`
+            can be used to convert from spherical coordinates to cartesian
+            coordinates and vice versa.
         dtf : float, optional
             Absolute tolerance of the tracing.
         rtol : float, optional
@@ -686,12 +697,30 @@ class FieldLine(coord.SkyCoord):
     """
     A single magnetic field line.
 
+    This is a sub-class of `astropy.coordinates.SkyCoord`. For more details
+    on
+
     Parameters
     ----------
     x :
+        Field line x coordinates as a fraction of solar radius
     y :
+        Field line y coordinates as a fraction of solar radius
     z :
+        Field line z coordinates as a fraction of solar radius
     output : :class:`Output`
+
+    Attributes
+    ----------
+    representation_type : str
+        Coordinate system representation. By default is ``'cartesian'``, but
+        can also be manually set to ``'spherical'``.
+    x, y, z :
+        Field line cartesian coordinates.
+        Can only be accessed if *representation_type* is ``'cartesian'``.
+    r, theta, phi :
+        field line spherical coordinates.
+        Can only be accessed if *representation_type* is ``'spherical'``.
     """
     def __init__(self, x, y, z, output):
         self._output = output
