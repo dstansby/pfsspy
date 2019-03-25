@@ -1,6 +1,16 @@
 Changelog
 =========
 
+
+0.1.4
+-----
+
+- Added more explanatory comments to the examples
+- Corrected the dipole solution calculation
+- Added :func:`pfsspy.coords.sph2cart` to transform from spherical to cartesian
+  coordinates.
+
+
 0.1.3
 -----
 
