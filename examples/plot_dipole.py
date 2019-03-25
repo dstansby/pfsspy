@@ -16,45 +16,53 @@ import pfsspy
 
 
 ###############################################################################
-# Set up a 1degree by 1degree grid in theta and phi
+# To start with we need to construct an input for the PFSS model. To do this,
+# first set up a regular 2D grid in (phi, s), where s = np.sin(theta) and
+# (phi, theta) are the standard spherical coordinate system angular
+# coordinates. In this case the resolution is (360 x 180).
 nphi = 360
-ntheta = 180
+ns = 180
 
 phi = np.linspace(0, 2 * np.pi, nphi)
-theta = np.linspace(-np.pi / 2, np.pi / 2, ntheta)
-theta, phi = np.meshgrid(theta, phi)
-
-###############################################################################
-# Define the number of radial grid points and the source surface radius
-nr = 50
-rss = 2.5
+s = np.linspace(-1, 1, ntheta)
+s, phi = np.meshgrid(theta, phi)
 
 
 ###############################################################################
-# Compute radial component ofa dipole field
+# Now we can take the grid and calculate the boundary condition magnetic field.
 def dipole_Br(r, theta):
-    return 2 * np.sin(theta) / r**3
+    return 2 * s / r**3
 
 
 br = dipole_Br(1, theta).T
 
-###############################################################################
-# Create PFSS input object
-input = pfsspy.Input(br, nr, rss)
 
 ###############################################################################
-# Plot input magnetic field
+# The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
+# rho = ln(r), and r is the standard spherical radial coordinate. We need to
+# define the number of rho grid points, and the source surface radius.
+nrho = 50
+rss = 2.5
+
+###############################################################################
+# From the boundary condition, number of radial grid points, and source
+# surface, we now construct an Input object that stores this information
+input = pfsspy.Input(br, nrho, rss)
+
+###############################################################################
+# Using the Input object, plot the input field
 fig, ax = plt.subplots()
 mesh = input.plot_input(ax)
 fig.colorbar(mesh)
 ax.set_title('Input dipole field')
 
 ###############################################################################
-# Calculate PFSS solution
+# Now calculate the PFSS solution.
 output = pfsspy.pfss(input)
 
 ###############################################################################
-# Plot output field
+# Using the Output object we can plot the source surface field, and the
+# polarity inversion line.
 fig, ax = plt.subplots()
 mesh = output.plot_source_surface(ax)
 fig.colorbar(mesh)
@@ -62,9 +70,9 @@ output.plot_pil(ax)
 ax.set_title('Source surface magnetic field')
 
 ###############################################################################
-# Trace some field lines
-br, btheta, bphi = output.bg
-
+# Finally, using the 3D magnetic field solution we can trace some field lines.
+# In this case 32 points equally spaced in theta are chosen and traced from
+# the source surface outwards.
 fig, ax = plt.subplots()
 ax.set_aspect('equal')
 
