@@ -331,7 +331,9 @@ class Output:
 
     def trace(self, x0, atol=1e-4, rtol=1e-4):
         """
-        Traces a field-line from *x0*.
+        Traces a field-line from *x0*. *x0* **must** be a cartesian coordinate.
+        See :mod:`pfsspy.coords` for more information on coordinate transforms,
+        and helper functions for transforming between coordinate systems.
 
         Uses `scipy.integrate.solve_ivp`, with an LSODA method.
 
