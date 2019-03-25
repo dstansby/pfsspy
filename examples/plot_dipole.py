@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatch
 import numpy as np
 import pfsspy
+import pfsspy.coords as coords
 
 
 ###############################################################################
@@ -78,9 +79,10 @@ ax.set_aspect('equal')
 
 # Take 32 start points spaced equally in theta
 r = 1.01
+phi = np.pi / 2
 for theta in np.linspace(0, np.pi, 33):
-    x0 = np.array([0, r * np.sin(theta), r * np.cos(theta)])
-    field_line = output.trace(x0)
+    x0 = coords.sph2cart(r, theta, phi)
+    field_line = output.trace(np.array(x0))
     color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
     ax.plot(field_line.y / const.R_sun,
             field_line.z / const.R_sun, color=color)

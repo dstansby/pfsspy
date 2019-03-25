@@ -12,8 +12,11 @@ import astropy.constants as const
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-import pfsspy
 import sunpy.map
+
+import pfsspy
+import pfsspy.coords as coords
+
 
 ###############################################################################
 # Load a GONG magnetic field map. If 'gong.fits' is present in the current
@@ -89,9 +92,7 @@ ax.set_aspect('equal')
 r = 1.01
 for theta in np.linspace(0, np.pi, 17):
     for phi in np.linspace(0, 2 * np.pi, 17):
-        x0 = np.array([r * np.cos(phi),
-                       r * np.sin(theta) * np.sin(phi),
-                       r * np.cos(theta) * np.sin(phi)])
+        x0 = np.array(coords.sph2cart(r, theta, phi))
         field_line = output.trace(x0)
         color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
         ax.plot(field_line.x / const.R_sun,
