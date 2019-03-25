@@ -16,7 +16,8 @@ import pfsspy
 import sunpy.map
 
 ###############################################################################
-# If a gong magnetic field map isn't present, download one
+# Load a GONG magnetic field map. If 'gong.fits' is present in the current
+# directory, just use that, otherwise download a sample GONG map.
 if not os.path.exists('gong.fits') and not os.path.exists('gong.fits.gz'):
     import urllib.request
     urllib.request.urlretrieve(
@@ -30,35 +31,45 @@ if not os.path.exists('gong.fits'):
             g.write(f.read())
 
 ###############################################################################
-# Use SunPy to read the .fits file with the data
+# We can now use SunPy to load the .fits file, and extract the magnetic field
+# data.
+#
+# The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
+# not obvious this is the correct way to do this, so use the following lines
+# at your own risk!
 map = sunpy.map.Map('gong.fits')
-nr = 60
-rss = 2.5
-
-###############################################################################
-# Extract the data, and remove the mean to enforce div(B) = 0 on the solar
-# surface
 br = map.data
 br = br - np.mean(br)
 
+
 ###############################################################################
-# Create PFSS input object
+# The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
+# rho = ln(r), and r is the standard spherical radial coordinate. We need to
+# define the number of rho grid points, and the source surface radius.
+nrho = 60
+rss = 2.5
+
+###############################################################################
+# From the boundary condition, number of radial grid points, and source
+# surface, we now construct an Input object that stores this information
 input = pfsspy.Input(br, nr, rss)
 
 ###############################################################################
-# Plot input magnetic field
+# Using the Input object, plot the input field
 fig, ax = plt.subplots()
 mesh = input.plot_input(ax)
 fig.colorbar(mesh)
 ax.set_title('Input field')
 
 ###############################################################################
-# Calculate PFSS solution
+# Now calculate the PFSS solution, and plot the polarity inversion line.
 output = pfsspy.pfss(input)
 output.plot_pil(ax)
 
+
 ###############################################################################
-# Plot output field
+# Using the Output object we can plot the source surface field, and the
+# polarity inversion line.
 fig, ax = plt.subplots()
 mesh = output.plot_source_surface(ax)
 fig.colorbar(mesh)
@@ -67,9 +78,9 @@ ax.set_title('Source surface magnetic field')
 
 
 ###############################################################################
-# Trace some field lines
-br, btheta, bphi = output.bg
-
+# Finally, using the 3D magnetic field solution we can trace some field lines.
+# In this case 256 points equally gridded in theta and phi are chosen and
+# traced from the source surface outwards.
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.set_aspect('equal')
@@ -88,7 +99,6 @@ for theta in np.linspace(0, np.pi, 17):
                 field_line.z / const.R_sun,
                 color=color, linewidth=1)
 
-# Add inner and outer boundary circles
 ax.set_title('PFSS solution')
 plt.show()
 
