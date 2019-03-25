@@ -17,24 +17,24 @@ import pfsspy
 
 ###############################################################################
 # To start with we need to construct an input for the PFSS model. To do this,
-# first set up a regular 2D grid in (phi, s), where s = np.sin(theta) and
+# first set up a regular 2D grid in (phi, s), where s = cos(theta) and
 # (phi, theta) are the standard spherical coordinate system angular
 # coordinates. In this case the resolution is (360 x 180).
 nphi = 360
 ns = 180
 
 phi = np.linspace(0, 2 * np.pi, nphi)
-s = np.linspace(-1, 1, ntheta)
-s, phi = np.meshgrid(theta, phi)
+s = np.linspace(-1, 1, ns)
+s, phi = np.meshgrid(s, phi)
 
 
 ###############################################################################
 # Now we can take the grid and calculate the boundary condition magnetic field.
-def dipole_Br(r, theta):
+def dipole_Br(r, s):
     return 2 * s / r**3
 
 
-br = dipole_Br(1, theta).T
+br = dipole_Br(1, s).T
 
 
 ###############################################################################
