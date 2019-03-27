@@ -240,7 +240,7 @@ class Output:
         br, _, _ = self.bg
         return br[:, :, -1].T
 
-    def plot_source_surface(self, ax=None):
+    def plot_source_surface(self, ax=None, **kwargs):
         """
         Plot a 2D image of the magnetic field at the source surface.
 
@@ -248,9 +248,13 @@ class Output:
         ----------
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
+        kwargs :
+            Additional keyword arguments are handed to `pcolormesh` that
+            renders the source surface. A useful option here is handing
+            ``rasterized=True`` to rasterize the image.
         """
         mesh = pfsspy.plot.radial_cut(
-            self.grid.pg, self.grid.sg, self.source_surface_br, ax)
+            self.grid.pg, self.grid.sg, self.source_surface_br, ax, **kwargs)
         return mesh
 
     def plot_pil(self, ax=None, **kwargs):

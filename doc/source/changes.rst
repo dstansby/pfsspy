@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.5
+-----
+
+- `Output.plot_source_surface` now accepts keyword arguments that are given to
+  Matplotlib to control the plotting of the source surface.
 
 0.1.4
 -----
@@ -9,7 +14,6 @@ Changelog
 - Corrected the dipole solution calculation
 - Added :func:`pfsspy.coords.sph2cart` to transform from spherical to cartesian
   coordinates.
-
 
 0.1.3
 -----

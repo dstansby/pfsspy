@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
 
-def radial_cut(phi, costheta, field, ax=None):
+def radial_cut(phi, costheta, field, ax=None, **kwargs):
     if ax is None:
         fig, ax = plt.subplots()
 
     vlim = np.max(np.abs(field))
     mesh = ax.pcolormesh(np.rad2deg(phi), costheta, field,
-                         cmap='RdBu', vmin=-vlim, vmax=vlim)
+                         cmap='RdBu', vmin=-vlim, vmax=vlim, **kwargs)
     ax.set_xlabel(r'$\phi$')
     ax.set_ylabel(r'$\cos (\theta)$')
     ax.set_xlim(0, 360)
