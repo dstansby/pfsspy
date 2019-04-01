@@ -360,7 +360,15 @@ class Output:
         xback = self._integrate_one_way(-1, x0, rtol, atol)
         xback = np.flip(xback, axis=1)
         xout = np.row_stack((xback.T, xforw.T))
-        return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], self)
+        fline = FieldLine(x=xout[:, 0] * const.R_sun,
+                          y=xout[:, 1] * const.R_sun,
+                          z=xout[:, 2] * const.R_sun,
+                          frame=frames.HeliographicCarrington,
+                          obstime=self.dtime,
+                          representation_type='cartesian')
+        fline._output = self
+        fline._expansion_factor = None
+        return fline
 
     def _integrate_one_way(self, dt, start_point, rtol, atol):
         import scipy.integrate
@@ -704,16 +712,6 @@ class FieldLine(coord.SkyCoord):
     This is a sub-class of `astropy.coordinates.SkyCoord`. For more details
     on
 
-    Parameters
-    ----------
-    x :
-        Field line x coordinates as a fraction of solar radius
-    y :
-        Field line y coordinates as a fraction of solar radius
-    z :
-        Field line z coordinates as a fraction of solar radius
-    output : :class:`Output`
-
     Attributes
     ----------
     representation_type : str
@@ -726,15 +724,6 @@ class FieldLine(coord.SkyCoord):
         field line spherical coordinates.
         Can only be accessed if *representation_type* is ``'spherical'``.
     """
-    def __init__(self, x, y, z, output):
-        self._output = output
-        super().__init__(x=x * const.R_sun,
-                         y=y * const.R_sun,
-                         z=z * const.R_sun,
-                         frame=frames.HeliographicCarrington,
-                         representation_type='cartesian')
-        self._expansion_factor = None
-
     @property
     def is_open(self):
         """
