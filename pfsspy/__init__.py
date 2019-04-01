@@ -130,8 +130,13 @@ class Input:
 
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
+
+    dtime : datetime, optional
+        Datetime at which the input map was measured. If given it is attached
+        to the output and any field lines traced from the output.
     """
-    def __init__(self, br, nr, rss):
+    def __init__(self, br, nr, rss, dtime=None):
+        self.dtime = dtime
         if isinstance(br, sunpy.map.mapbase.GenericMap):
             br = br.data
         self.br = br
@@ -201,12 +206,16 @@ class Output:
 
     grid : Grid
         Grid that the output was caclulated on.
+
+    dtime : datetime, optional
+        Datetime at which the input was measured.
     '''
-    def __init__(self, alr, als, alp, grid):
+    def __init__(self, alr, als, alp, grid, dtime=None):
         self._alr = alr
         self._als = als
         self._alp = alp
         self.grid = grid
+        self.dtime = dtime
 
         # Cache attributes
         self._common_b_cache = None
@@ -702,7 +711,7 @@ def pfss(input):
     th = np.arccos(sg)
     ph = np.linspace(0, 2 * np.pi, nphi + 1)
 
-    return Output(alr, als, alp, input.grid)
+    return Output(alr, als, alp, input.grid, input.dtime)
 
 
 class FieldLine(coord.SkyCoord):
