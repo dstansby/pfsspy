@@ -1,33 +1,28 @@
 """
-GONG PFSS extrapolation
-=======================
+Overplotting field lines on AIA maps
+====================================
 
-Calculating PFSS solution for a GONG synoptic magnetic field map.
+This example shows how to take a PFSS solution, trace some field lines, and
+overplot the traced field lines on an AIA 193 map.
 """
 
 ###############################################################################
 # First, import required modules
-import os
 from datetime import datetime
+import os
+
 import astropy.units as u
-import astropy.constants as const
-import astropy.coordinates
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import sunpy.map
 import sunpy.io.fits
-from sunpy.coordinates import frames
 
 import pfsspy
 import pfsspy.coords as coords
 
 
 ###############################################################################
-# Load a GONG magnetic field map. If 'gong.fits' is present in the current
-# directory, just use that, otherwise download a sample GONG map.
-#
-# The map date is 06/03/2019
+# Load a GONG magnetic field map. The map date is 10/03/2019
 if not os.path.exists('gong.fits') and not os.path.exists('gong.fits.gz'):
     import urllib.request
     urllib.request.urlretrieve(
@@ -41,7 +36,7 @@ if not os.path.exists('gong.fits'):
             g.write(f.read())
 
 ###############################################################################
-# Load an AIA map
+# Load the corresponding AIA 193 map
 if not os.path.exists('aia.fits'):
     import urllib.request
     urllib.request.urlretrieve(
@@ -52,8 +47,8 @@ aia = sunpy.map.Map('aia.fits')
 dtime = aia.date
 
 ###############################################################################
-# We can now use SunPy to load the .fits file, and extract the magnetic field
-# data.
+# We can now use SunPy to load the GONG .fits file, and extract the magnetic
+# field data.
 #
 # The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
 # not obvious this is the correct way to do this, so use the following lines
@@ -83,47 +78,63 @@ mesh = input.plot_input(ax)
 fig.colorbar(mesh)
 ax.set_title('Input field')
 
+###############################################################################
+# We can also plot the AIA map to give an idea of the global picture. There
+# is a nice active region in the top right of the AIA plot, that can also
+# be seen in the photospheric field plot above.
 ax = plt.subplot(1, 1, 1, projection=aia)
 aia.plot(ax)
 
 
 ###############################################################################
-# Calculate a 10 x 10 grid of footpoitns to trace magnetic field lines from
+# Calculate a 10 x 10 grid of footpoitns to trace magnetic field lines from.
 # The figure shows a zoom in of the magnetic field map, with the footpoints
-# overplotted.
+# overplotted. The footpoints are centered around the active region metnioned
+# above.
 s, phi = np.meshgrid(np.linspace(0.1, 0.2, 10),
                      np.deg2rad(np.linspace(55, 65, 10)))
 
 fig, ax = plt.subplots()
 mesh = input.plot_input(ax)
 fig.colorbar(mesh)
-ax.set_xlim(40, 70)
+ax.set_xlim(50, 70)
 ax.set_ylim(0, 0.35)
 ax.scatter(np.rad2deg(phi), s, color='k', s=1)
 ax.set_title('Field line footpoints')
 
+###############################################################################
+# Compute the PFSS solution from the GONG magnetic field input
+output = pfsspy.pfss(input)
 
 ###############################################################################
-#
-output = pfsspy.pfss(input)
+# Trace field lines from the footpoints defined above. `pfsspy.coords` is used
+# to convert the s, phi cooridnates into the cartesian coordinates that are
+# needed by the tracer.
 flines = []
 for s, phi in zip(s.ravel(), phi.ravel()):
     x0 = np.array(pfsspy.coords.strum2cart(0.01, s, phi))
     flines.append(output.trace(x0, atol=1e-6))
 
-
+###############################################################################
+# Plot the input GONG magnetic field map, along with the traced mangetic field
+# lines.
 fig, ax = plt.subplots()
 mesh = input.plot_input(ax)
-ax.set_xlim(60, 90)
-ax.set_ylim(0, 0.35)
+ax.set_xlim(55, 65)
+ax.set_ylim(0.1, 0.25)
+ax.set_title('Photospheric field and traced field lines')
 
 for fline in flines:
     fline.representation_type = 'spherical'
     ax.plot(fline.lon / u.deg, np.sin(fline.lat), color='black', linewidth=1)
 
-
+###############################################################################
+# Plot the AIA map, along with the traced magnetic field lines. Inside the
+# loop the field lines are converted to the AIA observer coordinate frame,
+# and then plotted on top of the map.
 fig = plt.figure()
 ax = plt.subplot(1, 1, 1, projection=aia)
+transform = ax.get_transform('world')
 aia.plot(ax)
 for fline in flines:
     fline = fline.transform_to(aia.coordinate_frame)
@@ -131,7 +142,7 @@ for fline in flines:
     Ty = fline.Ty.to(u.deg)
     # trans = ax.get_transform('world')
     ax.plot(Tx, Ty, color='w', alpha=0.8,
-            transform=ax.get_transform('world'), linewidth=1)
+            transform=transform, linewidth=1)
 
 plt.show()
-# sphinx_gallery_thumbnail_number = 3
+# sphinx_gallery_thumbnail_number = 4
