@@ -49,7 +49,7 @@ if not os.path.exists('aia.fits'):
         'aia.fits')
 
 aia = sunpy.map.Map('aia.fits')
-dtime = datetime(2019, 3, 10)
+dtime = aia.date
 
 ###############################################################################
 # We can now use SunPy to load the .fits file, and extract the magnetic field
@@ -74,7 +74,7 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-input = pfsspy.Input(br, nrho, rss)
+input = pfsspy.Input(br, nrho, rss, dtime=dtime)
 
 ###############################################################################
 # Using the Input object, plot the input field
@@ -122,25 +122,11 @@ for fline in flines:
     ax.plot(fline.lon / u.deg, np.sin(fline.lat), color='black', linewidth=1)
 
 
-def transform_to_proj(fline, dtime):
-    """
-    Transform a field line into a projective frame. Assumes the observer is
-    Earth.
-    """
-    proj_frame = frames.Helioprojective(obstime=dtime, observer='earth')
-    fline.representation_type = 'spherical'
-    fline = astropy.coordinates.SkyCoord(lon=fline.lon, lat=fline.lat, radius=fline.radius,
-                                         frame=frames.HeliographicCarrington,
-                                         obstime=dtime)
-    fline = fline.transform_to(proj_frame)
-    return fline
-
-
 fig = plt.figure()
 ax = plt.subplot(1, 1, 1, projection=aia)
 aia.plot(ax)
 for fline in flines:
-    fline = transform_to_proj(fline, dtime)
+    fline = fline.transform_to(aia.coordinate_frame)
     Tx = fline.Tx.to(u.deg)
     Ty = fline.Ty.to(u.deg)
     # trans = ax.get_transform('world')
