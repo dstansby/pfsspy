@@ -49,7 +49,8 @@ if not os.path.exists('aia.fits'):
         'aia.fits')
 
 aia = sunpy.map.Map('aia.fits')
-dtime = datetime.strptime(aia.meta['DATE'], '%Y-%m-%dT%H:%M:%S')
+dtime = datetime(2019, 3, 10)
+
 ###############################################################################
 # We can now use SunPy to load the .fits file, and extract the magnetic field
 # data.
@@ -90,8 +91,8 @@ aia.plot(ax)
 # Calculate a 10 x 10 grid of footpoitns to trace magnetic field lines from
 # The figure shows a zoom in of the magnetic field map, with the footpoints
 # overplotted.
-s, phi = np.meshgrid(np.linspace(0.1, 0.2, 5),
-                     np.deg2rad(np.linspace(55, 65, 5)))
+s, phi = np.meshgrid(np.linspace(0.1, 0.2, 10),
+                     np.deg2rad(np.linspace(55, 65, 10)))
 
 fig, ax = plt.subplots()
 mesh = input.plot_input(ax)
@@ -144,7 +145,7 @@ for fline in flines:
     Ty = fline.Ty.to(u.deg)
     # trans = ax.get_transform('world')
     ax.plot(Tx, Ty, color='w', alpha=0.8,
-            transform=ax.get_transform('world'))
+            transform=ax.get_transform('world'), linewidth=1)
 
 plt.show()
 # sphinx_gallery_thumbnail_number = 3
