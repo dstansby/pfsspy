@@ -23,27 +23,27 @@ import pfsspy.coords as coords
 
 ###############################################################################
 # Load a GONG magnetic field map. The map date is 10/03/2019
-if not os.path.exists('gong.fits') and not os.path.exists('gong.fits.gz'):
+if not os.path.exists('190310t0014gong.fits') and not os.path.exists('190310t0014gong.fits.gz'):
     import urllib.request
     urllib.request.urlretrieve(
         'https://gong2.nso.edu/oQR/zqs/201903/mrzqs190310/mrzqs190310t0014c2215_333.fits.gz',
-        'gong.fits.gz')
+        '190310t0014gong.fits.gz')
 
-if not os.path.exists('gong.fits'):
+if not os.path.exists('190310t0014gong.fits'):
     import gzip
-    with gzip.open('gong.fits.gz', 'rb') as f:
-        with open('gong.fits', 'wb') as g:
+    with gzip.open('190310t0014gong.fits.gz', 'rb') as f:
+        with open('190310t0014gong.fits', 'wb') as g:
             g.write(f.read())
 
 ###############################################################################
 # Load the corresponding AIA 193 map
-if not os.path.exists('aia.fits'):
+if not os.path.exists('AIA20190310.fits'):
     import urllib.request
     urllib.request.urlretrieve(
         'http://jsoc2.stanford.edu/data/aia/synoptic/2019/03/10/H0000/AIA20190310_0000_0193.fits',
-        'aia.fits')
+        'AIA20190310.fits')
 
-aia = sunpy.map.Map('aia.fits')
+aia = sunpy.map.Map('AIA20190310.fits')
 dtime = aia.date
 
 ###############################################################################
@@ -53,7 +53,7 @@ dtime = aia.date
 # The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
 # not obvious this is the correct way to do this, so use the following lines
 # at your own risk!
-[[br, header]] = sunpy.io.fits.read('gong.fits')
+[[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
 br = br - np.mean(br)
 # GONG maps have their LH edge at -180deg, so roll to get it at 0deg
 br = np.roll(br, header['CRVAL1'] + 180, axis=1)
