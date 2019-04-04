@@ -21,28 +21,33 @@ import pfsspy.coords as coords
 ###############################################################################
 # Load a GONG magnetic field map. If 'gong.fits' is present in the current
 # directory, just use that, otherwise download a sample GONG map.
-if not os.path.exists('gong.fits') and not os.path.exists('gong.fits.gz'):
+if not os.path.exists('190310t0014gong.fits') and not os.path.exists('190310t0014gong.fits.gz'):
     import urllib.request
     urllib.request.urlretrieve(
-        'https://gong2.nso.edu/oQR/zqs/201901/mrzqs190108/mrzqs190108t1114c2212_050.fits.gz',
-        'gong.fits.gz')
+        'https://gong2.nso.edu/oQR/zqs/201903/mrzqs190310/mrzqs190310t0014c2215_333.fits.gz',
+        '190310t0014gong.fits.gz')
 
-if not os.path.exists('gong.fits'):
+if not os.path.exists('190310t0014gong.fits'):
     import gzip
-    with gzip.open('gong.fits.gz', 'rb') as f:
-        with open('gong.fits', 'wb') as g:
+    with gzip.open('190310t0014gong.fits.gz', 'rb') as f:
+        with open('190310t0014gong.fits', 'wb') as g:
             g.write(f.read())
 
 ###############################################################################
-# We can now use SunPy to load the .fits file, and extract the magnetic field
-# data.
+# We can now use SunPy to load the GONG fits file, and extract the magnetic
+# field data.
 #
 # The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
 # not obvious this is the correct way to do this, so use the following lines
 # at your own risk!
-map = sunpy.map.Map('gong.fits')
-br = map.data
+[[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
 br = br - np.mean(br)
+###############################################################################
+# GONG maps have their LH edge at -180deg in Carrington Longitude,
+# so roll to get it at 0deg. This way the input magnetic field is in a
+# Carrington frame of reference, which matters later when lining the field
+# lines up with the AIA image.
+br = np.roll(br, header['CRVAL1'] + 180, axis=1)
 
 
 ###############################################################################
@@ -86,7 +91,6 @@ ax.set_title('Source surface magnetic field')
 # traced from the source surface outwards.
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.set_aspect('equal')
 
 # Loop through 16 values in theta and 16 values in phi
 r = 1.01
