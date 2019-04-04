@@ -15,7 +15,7 @@ import pfsspy.coords
 
 HAS_NUMBA = False
 try:
-    from numba import jit
+    import numba
     HAS_NUMBA = True
 except Exception:
     pass
@@ -604,10 +604,10 @@ def _A_diag(A, ns, Vg, Uc, mu, m):
 
 
 if HAS_NUMBA:
-    _eigh = jit(nopython=True)(_eigh)
-    _compute_r_term = jit(nopython=True)(_compute_r_term)
-    _als_alp = jit(nopython=True)(_als_alp)
-    _A_diag = jit(nopython=True)(_A_diag)
+    _eigh = numba.jit(nopython=True)(_eigh)
+    _compute_r_term = numba.jit(nopython=True)(_compute_r_term)
+    _als_alp = numba.jit(nopython=True)(_als_alp)
+    _A_diag = numba.jit(nopython=True)(_A_diag)
 
 
 def pfss(input):
