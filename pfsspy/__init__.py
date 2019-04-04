@@ -15,7 +15,7 @@ import pfsspy.coords
 
 HAS_NUMBA = False
 try:
-    from numba import jit
+    import numba
     HAS_NUMBA = True
 except Exception:
     pass
@@ -130,8 +130,13 @@ class Input:
 
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
+
+    dtime : datetime, optional
+        Datetime at which the input map was measured. If given it is attached
+        to the output and any field lines traced from the output.
     """
-    def __init__(self, br, nr, rss):
+    def __init__(self, br, nr, rss, dtime=None):
+        self.dtime = dtime
         if isinstance(br, sunpy.map.mapbase.GenericMap):
             br = br.data
         self.br = br
@@ -201,12 +206,16 @@ class Output:
 
     grid : Grid
         Grid that the output was caclulated on.
+
+    dtime : datetime, optional
+        Datetime at which the input was measured.
     '''
-    def __init__(self, alr, als, alp, grid):
+    def __init__(self, alr, als, alp, grid, dtime=None):
         self._alr = alr
         self._als = als
         self._alp = alp
         self.grid = grid
+        self.dtime = dtime
 
         # Cache attributes
         self._common_b_cache = None
@@ -360,7 +369,15 @@ class Output:
         xback = self._integrate_one_way(-1, x0, rtol, atol)
         xback = np.flip(xback, axis=1)
         xout = np.row_stack((xback.T, xforw.T))
-        return FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], self)
+        fline = FieldLine(x=xout[:, 0] * const.R_sun,
+                          y=xout[:, 1] * const.R_sun,
+                          z=xout[:, 2] * const.R_sun,
+                          frame=frames.HeliographicCarrington,
+                          obstime=self.dtime,
+                          representation_type='cartesian')
+        fline._output = self
+        fline._expansion_factor = None
+        return fline
 
     def _integrate_one_way(self, dt, start_point, rtol, atol):
         import scipy.integrate
@@ -587,10 +604,10 @@ def _A_diag(A, ns, Vg, Uc, mu, m):
 
 
 if HAS_NUMBA:
-    _eigh = jit(nopython=True)(_eigh)
-    _compute_r_term = jit(nopython=True)(_compute_r_term)
-    _als_alp = jit(nopython=True)(_als_alp)
-    _A_diag = jit(nopython=True)(_A_diag)
+    _eigh = numba.jit(nopython=True)(_eigh)
+    _compute_r_term = numba.jit(nopython=True)(_compute_r_term)
+    _als_alp = numba.jit(nopython=True)(_als_alp)
+    _A_diag = numba.jit(nopython=True)(_A_diag)
 
 
 def pfss(input):
@@ -694,7 +711,7 @@ def pfss(input):
     th = np.arccos(sg)
     ph = np.linspace(0, 2 * np.pi, nphi + 1)
 
-    return Output(alr, als, alp, input.grid)
+    return Output(alr, als, alp, input.grid, input.dtime)
 
 
 class FieldLine(coord.SkyCoord):
@@ -703,16 +720,6 @@ class FieldLine(coord.SkyCoord):
 
     This is a sub-class of `astropy.coordinates.SkyCoord`. For more details
     on
-
-    Parameters
-    ----------
-    x :
-        Field line x coordinates as a fraction of solar radius
-    y :
-        Field line y coordinates as a fraction of solar radius
-    z :
-        Field line z coordinates as a fraction of solar radius
-    output : :class:`Output`
 
     Attributes
     ----------
@@ -726,15 +733,6 @@ class FieldLine(coord.SkyCoord):
         field line spherical coordinates.
         Can only be accessed if *representation_type* is ``'spherical'``.
     """
-    def __init__(self, x, y, z, output):
-        self._output = output
-        super().__init__(x=x * const.R_sun,
-                         y=y * const.R_sun,
-                         z=z * const.R_sun,
-                         frame=frames.HeliographicCarrington,
-                         representation_type='cartesian')
-        self._expansion_factor = None
-
     @property
     def is_open(self):
         """

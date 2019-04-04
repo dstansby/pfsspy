@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.2.0
+-----
+
+- :class:`pfsspy.Input` and :class:`pfsspy.Output` now take the optiona keyword
+  argument *dtime*, which stores the datetime on which the magnetic field
+  measurements were made. This is then propagated to the *obstime* attribute
+  of computed field lines, allowing them to be transformed in to coordinate
+  systems other than Carrignton frames.
+- :class:`pfsspy.FieldLine` no longer overrrides the SkyCoord ``__init__``;
+  this should not matter to users, as FieldLine objects are constructed
+  internally by calling :meth:`pfsspy.Output.trace`
+
 0.1.5
 -----
 
