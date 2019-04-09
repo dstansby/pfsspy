@@ -144,7 +144,7 @@ class Input:
         nphi = self.br.shape[1]
         self.grid = Grid(ns, nphi, nr, rss)
 
-    def plot_input(self, ax=None):
+    def plot_input(self, ax=None, **kwargs):
         """
         Plot a 2D image of the magnetic field boundary condition.
 
@@ -153,7 +153,7 @@ class Input:
         ax : Axes
             Axes to plot to. If ``None``, creates a new figure.
         """
-        mesh = pfsspy.plot.radial_cut(self.grid.pc, self.grid.sc, self.br, ax)
+        mesh = pfsspy.plot.radial_cut(self.grid.pc, self.grid.sc, self.br, ax, **kwargs)
         return mesh
 
 
