@@ -109,17 +109,16 @@ def _find_indices(xi, grid):
 
 
 def _evaluate_linear(values_in, indices, norm_distances, edges):
-    values = 0
-    for j in range(edges.shape[0]):
-        edge_indices = edges[j, :]
-        weight = 1
+    # slice for broadcasting over trailing dimensions in self.values
+    vslice = (slice(None),) + (None,) * (values_in.ndim - len(indices))
+    values = 0.
+    edges = itertools.product(*[[i, i + 1] for i in indices])
+    for edge_indices in edges:
+        weight = 1.
         for ei, i, yi in zip(edge_indices, indices, norm_distances):
-            if ei == i:
-                weight *= 1 - yi
-            else:
-                weight *= yi
-        values += values_in[edge_indices[0], edge_indices[1], edge_indices[2], :] * weight
-    return np.atleast_2d(values)
+            weight *= np.where(ei == i, 1 - yi, yi)
+        values += np.asarray(values_in[edge_indices]) * weight[vslice]
+    return values
 
 
 def _ndim_coords_from_arrays(points, ndim=None):
