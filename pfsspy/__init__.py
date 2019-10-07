@@ -355,7 +355,6 @@ class Output:
         """
         return tracer.trace(seeds, self)
 
-
     def _integrate_one_way(self, dt, start_point, rtol, atol):
         import scipy.integrate
 

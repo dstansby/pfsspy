@@ -13,10 +13,12 @@ Changelog
   to::
 
     tracer = pfsspy.tracing.PythonTracer()
-    flines = tracer.trace(x0, output)
+    tracer.trace(x0, output)
+    flines = tracer.xs
 
   Additionally ``x0`` can be a 2D array that contains multiple seed
   points to trace, taking advantage of the parallelism of some solvers.
+
 0.2.0
 -----
 
