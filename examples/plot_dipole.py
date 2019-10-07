@@ -90,8 +90,8 @@ field_lines = tracer.trace(x0, output)
 
 for field_line in field_lines:
     color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
-    ax.plot(field_line.y / const.R_sun,
-            field_line.z / const.R_sun, color=color)
+    ax.plot(field_line.coords.y / const.R_sun,
+            field_line.coords.z / const.R_sun, color=color)
 
 # Add inner and outer boundary circles
 ax.add_patch(mpatch.Circle((0, 0), 1, color='k', fill=False))
