@@ -19,6 +19,7 @@ import sunpy.io.fits
 
 import pfsspy
 import pfsspy.coords as coords
+import pfsspy.tracing as tracing
 
 
 ###############################################################################
@@ -117,10 +118,11 @@ output = pfsspy.pfss(input)
 # Trace field lines from the footpoints defined above. :mod:`pfsspy.coords`
 # is used to convert the s, phi cooridnates into the cartesian coordinates that
 # are needed by the tracer.
+tracer = tracing.PythonTracer(atol=1e-8)
 flines = []
 for s, phi in zip(s.ravel(), phi.ravel()):
     x0 = np.array(pfsspy.coords.strum2cart(0.01, s, phi))
-    flines.append(output.trace(x0, atol=1e-8))
+    flines += tracer.trace(x0, output)
 
 ###############################################################################
 # Plot the input GONG magnetic field map, along with the traced mangetic field

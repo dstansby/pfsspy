@@ -1,10 +1,26 @@
 Changelog
 =========
 
+0.3.0
+-----
+
+- The API for doing magnetic field tracing has changed.
+  The new :mod:`pfsspy.tracing` module contains :class:`~pfsspy.tracing.Tracer`
+  classes that are used to perform the tracing. Code needs to be changed from::
+
+    fline = output.trace(x0)
+
+  to::
+
+    tracer = pfsspy.tracing.PythonTracer()
+    flines = tracer.trace(x0, output)
+
+  Additionally ``x0`` can be a 2D array that contains multiple seed
+  points to trace, taking advantage of the parallelism of some solvers.
 0.2.0
 -----
 
-- :class:`pfsspy.Input` and :class:`pfsspy.Output` now take the optiona keyword
+- :class:`pfsspy.Input` and :class:`pfsspy.Output` now take the optional keyword
   argument *dtime*, which stores the datetime on which the magnetic field
   measurements were made. This is then propagated to the *obstime* attribute
   of computed field lines, allowing them to be transformed in to coordinate

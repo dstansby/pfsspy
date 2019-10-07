@@ -12,6 +12,7 @@ import numpy as np
 import scipy.linalg as la
 import pfsspy.plot
 import pfsspy.coords
+import pfsspy.tracing
 
 HAS_NUMBA = False
 try:
@@ -342,42 +343,18 @@ class Output:
         b1 = self._brgi(np.stack((phi, s, rho)))[0]
         return direction * b1 / np.linalg.norm(b1)
 
-    def trace(self, x0, atol=1e-4, rtol=1e-4):
+    def trace(self, tracer, seeds):
         """
-        Traces a field-line from *x0*. *x0* **must** be a cartesian coordinate.
-        See :mod:`pfsspy.coords` for more information on coordinate transforms,
-        and helper functions for transforming between coordinate systems.
-
-        Uses `scipy.integrate.solve_ivp`, with an LSODA method.
-
         Parameters
         ----------
-        x0 : array
-            Starting coordinate, in cartesian coordinates. :mod:`pfsspy.coords`
-            can be used to convert from spherical coordinates to cartesian
-            coordinates and vice versa.
-        dtf : float, optional
-            Absolute tolerance of the tracing.
-        rtol : float, optional
-            Relative tolerance of the tracing.
-
-        Returns
-        -------
-        fl : :class:`FieldLine`
+        tracer : tracing.Tracer
+        seeds : (n, 3) shaped array
+            Starting coordinates, in cartesian coordinates.
+            :mod:`pfsspy.coords` can be used to convert from spherical
+            coordinates to cartesian coordinates and vice versa.
         """
-        xforw = self._integrate_one_way(1, x0, rtol, atol)
-        xback = self._integrate_one_way(-1, x0, rtol, atol)
-        xback = np.flip(xback, axis=1)
-        xout = np.row_stack((xback.T, xforw.T))
-        fline = FieldLine(x=xout[:, 0] * const.R_sun,
-                          y=xout[:, 1] * const.R_sun,
-                          z=xout[:, 2] * const.R_sun,
-                          frame=frames.HeliographicCarrington,
-                          obstime=self.dtime,
-                          representation_type='cartesian')
-        fline._output = self
-        fline._expansion_factor = None
-        return fline
+        return tracer.trace(seeds, self)
+
 
     def _integrate_one_way(self, dt, start_point, rtol, atol):
         import scipy.integrate

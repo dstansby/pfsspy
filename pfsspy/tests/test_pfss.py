@@ -3,6 +3,7 @@ import pfsspy
 import pytest
 import sunpy.map
 import pfsspy.coords
+from pfsspy import tracing
 
 
 @pytest.fixture
@@ -43,29 +44,34 @@ def dipole_map():
 def test_expansion_factor(dipole_map):
     inp, out = dipole_map
 
-    field_line = out.trace(np.array(pfsspy.coords.strum2cart(0.01, 0.9, 0)))
+    tracer = tracing.PythonTracer()
+    field_line = tracer.trace(
+        np.array(pfsspy.coords.strum2cart(0.01, 0.9, 0)), out)[0]
     assert field_line.expansion_factor > 1
 
-    field_line = out.trace(np.array(pfsspy.coords.strum2cart(0.01, -0.9, 0)))
+    field_line = tracer.trace(
+        np.array(pfsspy.coords.strum2cart(0.01, -0.9, 0)), out)[0]
     assert field_line.expansion_factor > 1
 
-    eq_field_line = out.trace(np.array([0, 0.9, 0.1]))
+    eq_field_line = tracer.trace(
+        np.array([0, 0.9, 0.1]), out)[0]
     assert eq_field_line.expansion_factor is None
 
     # Check that a field line near the equator has a bigger expansion
     # factor than one near the pole
-    pil_field_line = out.trace(
-        np.array(pfsspy.coords.strum2cart(np.log(2.5 - 0.01), 0.1, 0)))
+    pil_field_line = tracer.trace(
+        np.array(pfsspy.coords.strum2cart(np.log(2.5 - 0.01), 0.1, 0)), out)[0]
     assert pil_field_line.expansion_factor > field_line.expansion_factor
 
 
 def test_field_line_polarity(dipole_map):
     input, out = dipole_map
 
-    field_line = out.trace(np.array([0, 0, 1.01]))
+    tracer = tracing.PythonTracer()
+    field_line = tracer.trace(np.array([0, 0, 1.01]), out)[0]
     assert field_line.polarity == 1
 
-    field_line = out.trace(np.array([0, 0, -1.01]))
+    field_line = tracer.trace(np.array([0, 0, -1.01]), out)[0]
     assert field_line.polarity == -1
 
 
