@@ -80,9 +80,15 @@ ax.set_aspect('equal')
 # Take 32 start points spaced equally in theta
 r = 1.01
 phi = np.pi / 2
-for theta in np.linspace(0, np.pi, 33):
-    x0 = coords.sph2cart(r, theta, phi)
-    field_line = output.trace(np.array(x0))
+r = 1.01
+phi = np.pi / 2
+theta = np.linspace(0, np.pi, 33)
+x0 = np.array(coords.sph2cart(r, theta, phi)).T
+
+tracer = pfsspy.tracing.PythonTracer()
+field_lines = tracer.trace(x0, output)
+
+for field_line in field_lines:
     color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
     ax.plot(field_line.y / const.R_sun,
             field_line.z / const.R_sun, color=color)

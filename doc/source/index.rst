@@ -23,6 +23,8 @@ pfsspy can be installed from PyPi using
 Improving performance
 ---------------------
 
+numba
+~~~~~
 pfsspy automatically detects an installation of
 `numba <https://numba.pydata.org/>`_, which compiles
 some of the numerical code to speed up pfss calculations. To enable this
@@ -50,6 +52,7 @@ For the main user-facing code and a changelog see
    :maxdepth: 1
 
    pfsspy
+   tracing
    changes
 
 for usage examples see
@@ -67,7 +70,7 @@ and for the helper modules (behind the scense!) see
    helpers
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
