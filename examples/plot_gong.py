@@ -107,9 +107,9 @@ field_lines = tracer.trace(seeds, output)
 
 for field_line in field_lines:
     color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
-    ax.plot(field_line.x / const.R_sun,
-            field_line.y / const.R_sun,
-            field_line.z / const.R_sun,
+    ax.plot(field_line.coords.x / const.R_sun,
+            field_line.coords.y / const.R_sun,
+            field_line.coords.z / const.R_sun,
             color=color, linewidth=1)
 
 ax.set_title('PFSS solution')

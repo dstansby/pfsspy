@@ -694,32 +694,49 @@ class FieldLine(coord.SkyCoord):
     """
     A single magnetic field line.
 
-    This is a sub-class of `astropy.coordinates.SkyCoord`. For more details
-    on
+    Parameters
+    ----------
+    x, y, z : array
+        Field line coordinates in a Carrington frame of reference. Must be in
+        units of solar radii.
+    dtime : astropy.time.Time
+        Time at which the field line was traced. Needed for transforming the
+        field line coordinates to other coordinate frames.
+    output : Output
+        The PFSS output through which this field line was traced.
 
     Attributes
     ----------
-    representation_type : str
-        Coordinate system representation. By default is ``'cartesian'``, but
-        can also be manually set to ``'spherical'``.
-    x, y, z :
-        Field line cartesian coordinates.
-        Can only be accessed if *representation_type* is ``'cartesian'``.
-    r, theta, phi :
-        field line spherical coordinates.
-        Can only be accessed if *representation_type* is ``'spherical'``.
+    coords : astropy.coordinates.SkyCoord
+        Field line coordinates.
     """
+    def __init__(self, x, y, z, dtime, output):
+        self.coords = coord.SkyCoord(x=x * const.R_sun,
+                                     y=y * const.R_sun,
+                                     z=z * const.R_sun,
+                                     frame=frames.HeliographicCarrington,
+                                     obstime=dtime,
+                                     representation_type='cartesian')
+        self._is_open = None
+        self._polarity = None
+        self._expansion_factor = None
+        self._output = output
+
     @property
     def is_open(self):
         """
         Returns ``True`` if one of the field line is connected to the solar
         surface and one to the outer boundary, ``False`` otherwise.
         """
-        r = coord.SkyCoord(self, representation_type='spherical').radius
-        rtol = 0.1
-        if np.abs(r[0] - r[-1]) < r[0] * rtol:
-            return False
-        return True
+        if self._is_open is None:
+            r = coord.SkyCoord(
+                self.coords, representation_type='spherical').radius
+            rtol = 0.1
+            if np.abs(r[0] - r[-1]) < r[0] * rtol:
+                self._is_open = False
+            else:
+                self._is_open = True
+        return self._is_open
 
     @property
     def polarity(self):
@@ -732,16 +749,21 @@ class FieldLine(coord.SkyCoord):
             0 if the field line is closed, otherwise sign(Br) of the magnetic
             field on the solar surface.
         """
-        if not self.is_open:
-            return 0
-        # Because the field lines are integrated forwards, if the end point
-        # is on the outer boundary the field is outwards
-        foot1 = coord.SkyCoord(self[0], representation_type='spherical')
-        foot2 = coord.SkyCoord(self[-1], representation_type='spherical')
-        if foot2.radius - foot1.radius > 0:
-            return 1
-        else:
-            return -1
+        if self._polarity is None:
+            if not self.is_open:
+                self._polarity = 0
+            # Because the field lines are integrated forwards, if the end point
+            # is on the outer boundary the field is outwards
+            foot1 = coord.SkyCoord(
+                self.coords[0], representation_type='spherical')
+            foot2 = coord.SkyCoord(
+                self.coords[-1], representation_type='spherical')
+
+            if foot2.radius - foot1.radius > 0:
+                self._polarity = 1
+            else:
+                self._polarity = -1
+        return self._polarity
 
     @property
     def expansion_factor(self):
@@ -764,8 +786,8 @@ class FieldLine(coord.SkyCoord):
         if not self.is_open:
             return
         # Extract ends of magnetic field line, and get them in spherical coords
-        foot1 = coord.SkyCoord(self[0], representation_type='spherical')
-        foot2 = coord.SkyCoord(self[-1], representation_type='spherical')
+        foot1 = coord.SkyCoord(self.coords[0], representation_type='spherical')
+        foot2 = coord.SkyCoord(self.coords[-1], representation_type='spherical')
         if foot1.radius > foot2.radius:
             solar_foot = foot2
             source_foot = foot1

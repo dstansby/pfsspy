@@ -130,8 +130,9 @@ for s, phi in zip(s.ravel(), phi.ravel()):
 fig, ax = plt.subplots()
 mesh = input.plot_input(ax)
 for fline in flines:
-    fline.representation_type = 'spherical'
-    ax.plot(fline.lon / u.deg, np.sin(fline.lat), color='black', linewidth=1)
+    fline.coords.representation_type = 'spherical'
+    ax.plot(fline.coords.lon / u.deg, np.sin(fline.coords.lat),
+            color='black', linewidth=1)
 
 ax.set_xlim(55, 65)
 ax.set_ylim(0.1, 0.25)
@@ -145,9 +146,9 @@ ax = plt.subplot(1, 1, 1, projection=aia)
 transform = ax.get_transform('world')
 aia.plot(ax)
 for fline in flines:
-    fline = fline.transform_to(aia.coordinate_frame)
-    Tx = fline.Tx.to(u.deg)
-    Ty = fline.Ty.to(u.deg)
+    coords = fline.coords.transform_to(aia.coordinate_frame)
+    Tx = coords.Tx.to(u.deg)
+    Ty = coords.Ty.to(u.deg)
     ax.plot(Tx, Ty, transform=transform,
             alpha=0.8, linewidth=1, color='black')
 

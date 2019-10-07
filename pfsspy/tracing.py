@@ -71,14 +71,11 @@ class PythonTracer(Tracer):
             xback = output._integrate_one_way(-1, seed, self.rtol, self.atol)
             xback = np.flip(xback, axis=1)
             xout = np.row_stack((xback.T, xforw.T))
-            fline = pfsspy.FieldLine(x=xout[:, 0] * const.R_sun,
-                                     y=xout[:, 1] * const.R_sun,
-                                     z=xout[:, 2] * const.R_sun,
-                                     frame=frames.HeliographicCarrington,
-                                     obstime=output.dtime,
-                                     representation_type='cartesian')
-            fline._output = output
-            fline._expansion_factor = None
+            fline = pfsspy.FieldLine(xout[:, 0],
+                                     xout[:, 1],
+                                     xout[:, 2],
+                                     output.dtime,
+                                     output)
             flines.append(fline)
         return flines
 

@@ -18,6 +18,10 @@ Changelog
 
   Additionally ``x0`` can be a 2D array that contains multiple seed
   points to trace, taking advantage of the parallelism of some solvers.
+- The :class:`pfsspy.FieldLine` class no longer inherits from
+  :class:`~astropy.coordinates.SkyCoord`, but the
+  :class:`~astropy.coordinates.SkyCoord` coordinates are now stored in
+  :attr:`pfsspy.FieldLine.coords` attribute.
 
 0.2.0
 -----
