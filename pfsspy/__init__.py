@@ -690,7 +690,7 @@ def pfss(input):
     return Output(alr, als, alp, input.grid, input.dtime)
 
 
-class FieldLine(coord.SkyCoord):
+class FieldLine:
     """
     A single magnetic field line.
 
