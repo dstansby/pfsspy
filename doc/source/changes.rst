@@ -22,6 +22,8 @@ Changelog
   :class:`~astropy.coordinates.SkyCoord`, but the
   :class:`~astropy.coordinates.SkyCoord` coordinates are now stored in
   :attr:`pfsspy.FieldLine.coords` attribute.
+- :attr:`pfsspy.FieldLine.expansion_factor` now returns ``np.nan`` instead of
+  ``None`` if the field line is closed.
 
 0.2.0
 -----
