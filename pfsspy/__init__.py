@@ -777,14 +777,14 @@ class FieldLine:
         -------
         exp_fact : float
             Field line expansion factor.
-            If field line is closed, returns ``None``.
+            If field line is closed, returns np.nan.
         """
         if self._expansion_factor is not None:
             return self._expansion_factor
         import scipy.interpolate
 
         if not self.is_open:
-            return
+            return np.nan
         # Extract ends of magnetic field line, and get them in spherical coords
         foot1 = coord.SkyCoord(self.coords[0], representation_type='spherical')
         foot2 = coord.SkyCoord(self.coords[-1], representation_type='spherical')
