@@ -55,7 +55,7 @@ def test_expansion_factor(dipole_map):
 
     eq_field_line = tracer.trace(
         np.array([0, 0.9, 0.1]), out)[0]
-    assert eq_field_line.expansion_factor is None
+    assert np.isnan(eq_field_line.expansion_factor)
 
     # Check that a field line near the equator has a bigger expansion
     # factor than one near the pole
