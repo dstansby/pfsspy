@@ -24,6 +24,8 @@ Changelog
   :attr:`pfsspy.FieldLine.coords` attribute.
 - :attr:`pfsspy.FieldLine.expansion_factor` now returns ``np.nan`` instead of
   ``None`` if the field line is closed.
+- :class:`pfsspy.FieldLine` now has a :attr:`~pfsspy.FieldLine.footpoints`
+  attribute that returns the footpoint(s) of the field line.
 
 0.2.0
 -----
