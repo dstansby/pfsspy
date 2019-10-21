@@ -147,10 +147,7 @@ transform = ax.get_transform('world')
 aia.plot(ax)
 for fline in flines:
     coords = fline.coords.transform_to(aia.coordinate_frame)
-    Tx = coords.Tx.to(u.deg)
-    Ty = coords.Ty.to(u.deg)
-    ax.plot(Tx, Ty, transform=transform,
-            alpha=0.8, linewidth=1, color='black')
+    ax.plot_coord(coords, alpha=0.8, linewidth=1, color='black')
 
 ax.set_xlim(500, 900)
 ax.set_ylim(400, 800)
