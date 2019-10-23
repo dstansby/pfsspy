@@ -21,7 +21,7 @@ install:
 
 script:
 # Check that unit tests work
-- pytest pfsspy/ --cov=pfsspy/ -v
+- pytest pfsspy -v
 
 after_success:
 - pip install codecov
