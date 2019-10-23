@@ -1,10 +1,16 @@
+import astropy.units as u
+import astropy.constants as const
+from astropy.tests.helper import quantity_allclose
+import matplotlib
 import numpy as np
 import pfsspy
 import pytest
 import sunpy.map
+
 import pfsspy.coords
 from pfsspy import tracing
 
+matplotlib.use('Agg')
 
 @pytest.fixture
 def zero_map():
@@ -53,8 +59,9 @@ def test_expansion_factor(dipole_map):
         np.array(pfsspy.coords.strum2cart(0.01, -0.9, 0)), out)[0]
     assert field_line.expansion_factor > 1
 
+    # This is a closed field line
     eq_field_line = tracer.trace(
-        np.array([0, 0.9, 0.1]), out)[0]
+        np.array([0, 1, 0.1]), out)[0]
     assert np.isnan(eq_field_line.expansion_factor)
 
     # Check that a field line near the equator has a bigger expansion
@@ -73,6 +80,30 @@ def test_field_line_polarity(dipole_map):
 
     field_line = tracer.trace(np.array([0, 0, -1.01]), out)[0]
     assert field_line.polarity == -1
+
+
+def test_footpoints(dipole_map):
+    input, out = dipole_map
+
+    tracer = tracing.PythonTracer(atol=1e-8, rtol=1e-8)
+
+    def check_radius(coord, r):
+        coord.representation_type = 'spherical'
+        assert quantity_allclose(coord.radius, r)
+
+    def check_open_fline(fline):
+        check_radius(fline.solar_footpoint, const.R_sun)
+        check_radius(fline.source_surface_footpoint, 2.5 * const.R_sun)
+
+    field_line = tracer.trace(np.array([0, 0, 1.01]), out)[0]
+    check_open_fline(field_line)
+
+    field_line = tracer.trace(np.array([0, 0, -1.01]), out)[0]
+    check_open_fline(field_line)
+
+    field_line = tracer.trace(np.array([0, 1, 0.1]), out)[0]
+    check_radius(field_line.solar_footpoint, const.R_sun)
+    check_radius(field_line.source_surface_footpoint, const.R_sun)
 
 
 def test_shape(zero_map):
@@ -118,6 +149,7 @@ def test_sunpy_map_input(zero_map):
 
 
 def test_input_output(dipole_map):
+    # Smoke test of saving/loading files
     _, out = dipole_map
     out.save('test.npz')
     new_out = pfsspy.load_output('test.npz')
@@ -125,15 +157,18 @@ def test_input_output(dipole_map):
 
 
 def test_plot_input(dipole_map):
+    # Smoke test of input plotting
     inp, out = dipole_map
     inp.plot_input()
 
 
 def test_plot_source_surface(dipole_map):
+    # Smoke test of source surface plotting
     inp, out = dipole_map
     out.plot_source_surface()
 
 
 def test_plot_pil(dipole_map):
+    # Smoke test of PIL plotting
     inp, out = dipole_map
     out.plot_pil()

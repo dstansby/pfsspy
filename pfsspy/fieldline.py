@@ -82,24 +82,50 @@ class FieldLine:
         return self._polarity
 
     @property
-    def footpoints(self):
+    def solar_footpoint(self):
         """
-        Magnetic field footpoint(s).
+        Solar surface magnetic field footpoint.
 
-        These are the ends of the magnetic field line that lie on the solar
-        surface. For an open field line there is one footpoint, for a close
-        field line there are two footpoints.
+        This is the ends of the magnetic field line that lies on the solar
+        surface.
 
         Returns
         -------
-        footpoints : :class:`~astropy.coordinates.SkyCoord`
+        footpoint : :class:`~astropy.coordinates.SkyCoord`
+
+        Notes
+        -----
+        For a closed field line, both ends lie on the solar surface. This
+        method returns the field line pointing out from the solar surface in
+        this case.
         """
-        if self.polarity == 1:
+        if self.polarity == 1 or not self.is_open:
             return coord.SkyCoord(self.coords[0])
-        elif self.polarity == -1:
+        else:
+            return coord.SkyCoord(self.coords[-1])
+
+    @property
+    def source_surface_footpoint(self):
+        """
+        Solar surface magnetic field footpoint.
+
+        This is the ends of the magnetic field line that lies on the solar
+        surface.
+
+        Returns
+        -------
+        footpoint : :class:`~astropy.coordinates.SkyCoord`
+
+        Notes
+        -----
+        For a closed field line, both ends lie on the solar surface. This
+        method returns the field line pointing out from the solar surface in
+        this case.
+        """
+        if self.polarity == 1 or not self.is_open:
             return coord.SkyCoord(self.coords[-1])
         else:
-            return coord.SkyCoord(self.coords[0, -1])
+            return coord.SkyCoord(self.coords[0])
 
     @property
     def expansion_factor(self):
