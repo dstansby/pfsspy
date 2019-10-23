@@ -1,5 +1,6 @@
 import astropy.units as u
 import astropy.constants as const
+import astropy.coordinates as coord
 from astropy.tests.helper import quantity_allclose
 import matplotlib
 import numpy as np
@@ -75,11 +76,25 @@ def test_field_line_polarity(dipole_map):
     input, out = dipole_map
 
     tracer = tracing.PythonTracer()
-    field_line = tracer.trace(np.array([0, 0, 1.01]), out)[0]
-    assert field_line.polarity == 1
+    field_line = tracer.trace(np.array([0, 0, 1.01]), out)
+    assert field_line[0].polarity == 1
 
-    field_line = tracer.trace(np.array([0, 0, -1.01]), out)[0]
-    assert field_line.polarity == -1
+    field_line = tracer.trace(np.array([0, 0, -1.01]), out)
+    assert field_line[0].polarity == -1
+
+
+@pytest.mark.parametrize('seeds', [np.array([0, 0, 1.01]),
+                                   np.array([[0, 0, 1.01],
+                                             [0, 0, 1.01]])])
+def test_field_lines(dipole_map, seeds):
+    input, out = dipole_map
+
+    tracer = tracing.PythonTracer()
+    field_lines = tracer.trace(seeds, out)
+    assert isinstance(field_lines.solar_feet, coord.SkyCoord)
+    assert isinstance(field_lines.source_surface_feet, coord.SkyCoord)
+
+
 
 
 def test_footpoints(dipole_map):

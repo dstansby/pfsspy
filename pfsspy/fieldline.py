@@ -6,6 +6,72 @@ import numpy as np
 import scipy.interpolate
 
 
+class FieldLines:
+    """
+    A collection of :class:`FieldLine`.
+
+    Parameters
+    ----------
+    field_lines : list of FieldLine
+    """
+    def __init__(self, field_lines):
+        self.field_lines = field_lines
+
+        # Cached attributes
+        self._solar_feet = None
+        self._source_surface_feet = None
+
+    def __getitem__(self, idx):
+        return self.field_lines[idx]
+
+    @property
+    def solar_feet(self):
+        """
+        Coordinates of the solar footpoints.
+
+        Notes
+        -----
+        For closed field lines, the footpoint pointing out from the solar
+        surface is returned.
+        """
+        if self._solar_feet is None:
+            self._solar_feet = []
+            for fline in self.field_lines:
+                self._solar_feet.append(fline.solar_footpoint)
+
+            if len(self._solar_feet) == 1:
+                self._solar_feet = self._solar_feet[0]
+            else:
+                self._solar_feet = coord.concatenate(self._solar_feet)
+
+        return self._solar_feet
+
+    @property
+    def source_surface_feet(self):
+        """
+        Coordinates of the source suface footpoints.
+
+        Notes
+        -----
+        For closed field lines, there is no source surface footpoint, but
+        instead the solar footpoint pointing in towards the solar surface is
+        returned.
+        """
+        if self._source_surface_feet is None:
+            self._source_surface_feet = []
+            for fline in self.field_lines:
+                self._source_surface_feet.append(
+                    fline.source_surface_footpoint)
+
+            if len(self._source_surface_feet) == 1:
+                self._source_surface_feet = self._source_surface_feet[0]
+            else:
+                self._source_surface_feet = coord.concatenate(
+                    self._source_surface_feet)
+
+        return self._source_surface_feet
+
+
 class FieldLine:
     """
     A single magnetic field line.

@@ -14,7 +14,7 @@ import pfsspy.plot
 import pfsspy.coords
 import pfsspy.tracing
 
-from .fieldline import FieldLine
+from .fieldline import FieldLine, FieldLines
 
 HAS_NUMBA = False
 try:
