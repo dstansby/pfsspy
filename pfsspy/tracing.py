@@ -23,8 +23,8 @@ class Tracer(abc.ABC):
 
         Returns
         -------
-        streamlines : list of FieldLine
-            List of traced streamlines
+        streamlines : FieldLines
+            Traced field lines.
         """
         pass
 
@@ -77,5 +77,4 @@ class PythonTracer(Tracer):
                                      output.dtime,
                                      output)
             flines.append(fline)
-        return flines
-
+        return pfsspy.FieldLines(flines)
