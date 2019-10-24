@@ -20,6 +20,7 @@ class FieldLines:
         # Cached attributes
         self._solar_feet = None
         self._source_surface_feet = None
+        self._polarities = None
 
     def __getitem__(self, idx):
         return self.field_lines[idx]
@@ -45,6 +46,19 @@ class FieldLines:
                 self._solar_feet = coord.concatenate(self._solar_feet)
 
         return self._solar_feet
+
+    @property
+    def polarities(self):
+        """
+        Magnetic field line polarities.
+        """
+        if self._polarities is None:
+            self._polarities = []
+            for fline in self.field_lines:
+                self._polarities.append(fline.polarity)
+            self._polarities = np.array(self._polarities)
+
+        return self._polarities
 
     @property
     def source_surface_feet(self):

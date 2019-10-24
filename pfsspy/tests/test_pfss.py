@@ -93,6 +93,7 @@ def test_field_lines(dipole_map, seeds):
     field_lines = tracer.trace(seeds, out)
     assert isinstance(field_lines.solar_feet, coord.SkyCoord)
     assert isinstance(field_lines.source_surface_feet, coord.SkyCoord)
+    assert isinstance(field_lines.polarities, np.ndarray)
 
 
 
