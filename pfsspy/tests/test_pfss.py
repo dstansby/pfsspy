@@ -13,6 +13,7 @@ from pfsspy import tracing
 
 matplotlib.use('Agg')
 
+
 @pytest.fixture
 def zero_map():
     # Test a completely zero input
@@ -81,6 +82,11 @@ def test_field_line_polarity(dipole_map):
 
     field_line = tracer.trace(np.array([0, 0, -1.01]), out)
     assert field_line[0].polarity == -1
+
+    # This is a closed field line
+    eq_field_line = tracer.trace(
+        np.array([0, 1, 0.1]), out)[0]
+    assert eq_field_line.polarity == 0
 
 
 @pytest.mark.parametrize('seeds', [np.array([0, 0, 1.01]),

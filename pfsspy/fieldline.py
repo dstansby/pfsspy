@@ -148,17 +148,18 @@ class FieldLine:
         if self._polarity is None:
             if not self.is_open:
                 self._polarity = 0
-            # Because the field lines are integrated forwards, if the end point
-            # is on the outer boundary the field is outwards
-            foot1 = coord.SkyCoord(
-                self.coords[0], representation_type='spherical')
-            foot2 = coord.SkyCoord(
-                self.coords[-1], representation_type='spherical')
-
-            if foot2.radius - foot1.radius > 0:
-                self._polarity = 1
             else:
-                self._polarity = -1
+                # Because the field lines are integrated forwards, if the end
+                # point is on the outer boundary the field is outwards
+                foot1 = coord.SkyCoord(
+                    self.coords[0], representation_type='spherical')
+                foot2 = coord.SkyCoord(
+                    self.coords[-1], representation_type='spherical')
+
+                if foot2.radius - foot1.radius > 0:
+                    self._polarity = 1
+                else:
+                    self._polarity = -1
         return self._polarity
 
     @property

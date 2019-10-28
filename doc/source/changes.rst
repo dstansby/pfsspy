@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.3.1
+-----
+- Fixed a bug that incorrectly set closed line field polarities to -1 or 1
+  (instead of the correct value of zero).
+
 0.3.0
 -----
 
