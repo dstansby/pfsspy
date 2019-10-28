@@ -5,6 +5,15 @@ Changelog
 -----
 - Fixed a bug that incorrectly set closed line field polarities to -1 or 1
   (instead of the correct value of zero).
+- :attr:`FieldLine.footpoints` has been removed in favour of the new
+  :attr:`pfsspy.FieldLine.solar_footpoint` and
+  :attr:`pfsspy.FieldLine.source_surface_footpoint`. These each return a single
+  footpoint. For a closed field line, see the API docs for further details
+  on this.
+- :class:`pfsspy.FieldLines` has been added, as a convenience class to store a
+  collection of field lines. This means convenience attributes such as
+  :attr:`pfsspy.FieldLines.source_surface_feet` can be used, and their values are
+  cached greatly speeding up repeated use.
 
 0.3.0
 -----
