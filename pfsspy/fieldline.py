@@ -125,13 +125,14 @@ class FieldLine:
         surface and one to the outer boundary, ``False`` otherwise.
         """
         if self._is_open is None:
-            r = coord.SkyCoord(
-                self.coords, representation_type='spherical').radius
+            r = coord.SkyCoord(self.coords, representation_type='spherical')
+            foot1 = r[0]
+            foot2 = r[-1]
             rtol = 0.1
-            if np.abs(r[0] - r[-1]) < r[0] * rtol:
-                self._is_open = False
-            else:
+            if np.abs(foot1.radius - foot2.radius) > const.R_sun * rtol:
                 self._is_open = True
+            else:
+                self._is_open = False
         return self._is_open
 
     @property
