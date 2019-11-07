@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.3.2
+-----
+- Fixed a bug in :attr:`pfsspy.FieldLine.is_open`, where some open field lines
+  were incorrectly calculated to be closed.
+
 0.3.1
 -----
 - Fixed a bug that incorrectly set closed line field polarities to -1 or 1
