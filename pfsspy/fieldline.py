@@ -5,6 +5,8 @@ import sunpy.coordinates.frames as frames
 import numpy as np
 import scipy.interpolate
 
+import functools
+
 
 class FieldLines:
     """
@@ -17,15 +19,11 @@ class FieldLines:
     def __init__(self, field_lines):
         self.field_lines = field_lines
 
-        # Cached attributes
-        self._solar_feet = None
-        self._source_surface_feet = None
-        self._polarities = None
-
     def __getitem__(self, idx):
         return self.field_lines[idx]
 
     @property
+    @functools.lru_cache()
     def solar_feet(self):
         """
         Coordinates of the solar footpoints.
@@ -35,32 +33,26 @@ class FieldLines:
         For closed field lines, the footpoint pointing out from the solar
         surface is returned.
         """
-        if self._solar_feet is None:
-            self._solar_feet = []
-            for fline in self.field_lines:
-                self._solar_feet.append(fline.solar_footpoint)
+        solar_feet = [fline.solar_footpoint for fline in self.field_lines]
 
-            if len(self._solar_feet) == 1:
-                self._solar_feet = self._solar_feet[0]
-            else:
-                self._solar_feet = coord.concatenate(self._solar_feet)
+        if len(solar_feet) == 1:
+            solar_feet = solar_feet[0]
+        else:
+            solar_feet = coord.concatenate(solar_feet)
 
-        return self._solar_feet
+        return solar_feet
 
     @property
+    @functools.lru_cache()
     def polarities(self):
         """
         Magnetic field line polarities.
         """
-        if self._polarities is None:
-            self._polarities = []
-            for fline in self.field_lines:
-                self._polarities.append(fline.polarity)
-            self._polarities = np.array(self._polarities)
-
-        return self._polarities
+        polarities = [fline.polarity for fline in self.field_lines]
+        return np.array(polarities)
 
     @property
+    @functools.lru_cache()
     def source_surface_feet(self):
         """
         Coordinates of the source suface footpoints.
@@ -71,19 +63,15 @@ class FieldLines:
         instead the solar footpoint pointing in towards the solar surface is
         returned.
         """
-        if self._source_surface_feet is None:
-            self._source_surface_feet = []
-            for fline in self.field_lines:
-                self._source_surface_feet.append(
-                    fline.source_surface_footpoint)
+        source_surface_feet = [fline.source_surface_footpoint for
+                               fline in self.field_lines]
 
-            if len(self._source_surface_feet) == 1:
-                self._source_surface_feet = self._source_surface_feet[0]
-            else:
-                self._source_surface_feet = coord.concatenate(
-                    self._source_surface_feet)
+        if len(source_surface_feet) == 1:
+            source_surface_feet = source_surface_feet[0]
+        else:
+            source_surface_feet = coord.concatenate(source_surface_feet)
 
-        return self._source_surface_feet
+        return source_surface_feet
 
 
 class FieldLine:
@@ -113,29 +101,23 @@ class FieldLine:
                                      frame=frames.HeliographicCarrington,
                                      obstime=dtime,
                                      representation_type='cartesian')
-        self._is_open = None
-        self._polarity = None
-        self._expansion_factor = None
         self._output = output
 
     @property
+    @functools.lru_cache()
     def is_open(self):
         """
         Returns ``True`` if one of the field line is connected to the solar
         surface and one to the outer boundary, ``False`` otherwise.
         """
-        if self._is_open is None:
-            r = coord.SkyCoord(self.coords, representation_type='spherical')
-            foot1 = r[0]
-            foot2 = r[-1]
-            rtol = 0.1
-            if np.abs(foot1.radius - foot2.radius) > const.R_sun * rtol:
-                self._is_open = True
-            else:
-                self._is_open = False
-        return self._is_open
+        r = coord.SkyCoord(self.coords, representation_type='spherical')
+        foot1 = r[0]
+        foot2 = r[-1]
+        rtol = 0.1
+        return np.abs(foot1.radius - foot2.radius) > const.R_sun * rtol
 
     @property
+    @functools.lru_cache()
     def polarity(self):
         """
         Magnetic field line polarity.
@@ -146,22 +128,20 @@ class FieldLine:
             0 if the field line is closed, otherwise sign(Br) of the magnetic
             field on the solar surface.
         """
-        if self._polarity is None:
-            if not self.is_open:
-                self._polarity = 0
-            else:
-                # Because the field lines are integrated forwards, if the end
-                # point is on the outer boundary the field is outwards
-                foot1 = coord.SkyCoord(
-                    self.coords[0], representation_type='spherical')
-                foot2 = coord.SkyCoord(
-                    self.coords[-1], representation_type='spherical')
+        if not self.is_open:
+            return 0
 
-                if foot2.radius - foot1.radius > 0:
-                    self._polarity = 1
-                else:
-                    self._polarity = -1
-        return self._polarity
+        # Because the field lines are integrated forwards, if the end
+        # point is on the outer boundary the field is outwards
+        foot1 = coord.SkyCoord(
+            self.coords[0], representation_type='spherical')
+        foot2 = coord.SkyCoord(
+            self.coords[-1], representation_type='spherical')
+
+        if foot2.radius - foot1.radius > 0:
+            return 1
+        else:
+            return -1
 
     @property
     def solar_footpoint(self):
@@ -210,6 +190,7 @@ class FieldLine:
             return coord.SkyCoord(self.coords[0])
 
     @property
+    @functools.lru_cache()
     def expansion_factor(self):
         r"""
         Magnetic field expansion factor.
@@ -223,8 +204,7 @@ class FieldLine:
             Field line expansion factor.
             If field line is closed, returns np.nan.
         """
-        if self._expansion_factor is not None:
-            return self._expansion_factor
+
         import scipy.interpolate
 
         if not self.is_open:
@@ -252,6 +232,6 @@ class FieldLine:
         # Interpolate at each end of field line
         b_solar = interp(modb[:, :, 0], solar_foot)[0, 0]
         b_source = interp(modb[:, :, -1], source_foot)[0, 0]
-        self._expansion_factor = ((1**2 * b_solar) /
-                                  (self._output.grid.rss**2 * b_source))
-        return self._expansion_factor
+        expansion_factor = ((1**2 * b_solar) /
+                            (self._output.grid.rss**2 * b_source))
+        return expansion_factor
