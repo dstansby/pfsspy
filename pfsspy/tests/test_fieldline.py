@@ -12,3 +12,8 @@ def test_open(x, open, pol):
 
     assert (fline.is_open == open)
     assert (fline.polarity == pol)
+
+
+def test_transform():
+    # Check that field lines can be transformed into different coordinates
+    pass
