@@ -1,4 +1,4 @@
-from pfsspy import FieldLine
+from pfsspy import FieldLine, FieldLines
 
 import astropy.units as u
 from astropy.time import Time
@@ -17,6 +17,19 @@ def test_open(x, open, pol):
 
     assert (fline.is_open == open)
     assert (fline.polarity == pol)
+
+
+def test_fieldlines_obstime():
+    # Check that obstime is propagated to FieldLines and subsequent preoperties
+    x = [1, 2.5]
+    obstime = Time('1992-12-21')
+    fline1 = FieldLine(x, [0, 0], [0, 0], obstime, None)
+    fline2 = FieldLine(x, [0, 0], [0, 0], obstime, None)
+
+    flines = FieldLines([fline1, fline2])
+
+    assert flines.solar_feet.obstime == obstime
+    assert flines.source_surface_feet.obstime == obstime
 
 
 def test_transform():
