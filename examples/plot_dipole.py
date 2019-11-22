@@ -55,9 +55,11 @@ input = pfsspy.Input(br, nrho, rss)
 
 ###############################################################################
 # Using the Input object, plot the input field
-fig, ax = plt.subplots()
-mesh = input.plot_input(ax)
-fig.colorbar(mesh)
+m = input.map
+fig = plt.figure()
+ax = plt.subplot(projection=m)
+m.plot()
+plt.colorbar()
 ax.set_title('Input dipole field')
 
 ###############################################################################

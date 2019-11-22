@@ -13,7 +13,6 @@ import sunpy.map
 
 import numpy as np
 import scipy.linalg as la
-import pfsspy.plot
 import pfsspy.coords
 import pfsspy.tracing
 import pfsspy.fieldline
@@ -71,27 +70,50 @@ class Input:
     """
     def __init__(self, br, nr, rss, dtime=None):
         self.dtime = dtime
-        if isinstance(br, sunpy.map.GenericMap):
-            self.dtime = br.date
-            br = br.data
-        else:
-            self.dtime = dtime
         self.br = br
+        self._map = None
+        # Handle SunPy maps
+        if isinstance(br, sunpy.map.GenericMap):
+            self._map = br
+            self.dtime = br.date
+            self.br = br.data
+
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
         self.grid = Grid(ns, nphi, nr, rss)
 
-    def plot_input(self, ax=None, **kwargs):
+    @property
+    def map(self):
         """
-        Plot a 2D image of the magnetic field boundary condition.
+        `sunpy.map.GenericMap` representation of the input.
+        """
+        r = const.R_sun
+        shape = (self.grid.ns, self.grid.nphi)
+        header = _carr_wcs_header(r, self.dtime, shape)
+        m = sunpy.map.Map((self.br, header))
+        m.plot_settings['cmap'] = _MAG_CMAP
+        return m
 
-        Parameters
-        ----------
-        ax : Axes
-            Axes to plot to. If ``None``, creates a new figure.
-        """
-        mesh = pfsspy.plot.radial_cut(self.grid.pc, self.grid.sc, self.br, ax, **kwargs)
-        return mesh
+
+def _carr_wcs_header(r, dtime, shape):
+    # If datetime is None, put in a dummy value here to make
+    # make_fitswcs_header happy, then strip it out at the end
+    obstime = dtime or Time('2000-1-1')
+
+    frame_out = coord.SkyCoord(
+        0 * u.deg, 0 * u.deg, radius=r, obstime=obstime,
+        frame="heliographic_carrington")
+    # Construct header
+    header = sunpy.map.make_fitswcs_header(
+        shape, frame_out,
+        scale=[180 / shape[0],
+               360 / shape[1]] * u.deg / u.pix,
+        projection_code="CAR")
+
+    # pop out the time if it isn't supplied
+    if dtime is None:
+        header.pop('date-obs')
+    return header
 
 
 def carr_cea_wcs_header(dtime, shape):
@@ -223,25 +245,9 @@ class Output:
         Construct a world coordinate system describing the pfsspy solution at
         a given radius *r*.
         """
-        shape_out = (self.grid.ns, self.grid.nphi)
-        # If datetime is None, put in a dummy value here to make
-        # make_fitswcs_header happy, then strip it out at the end
-        dtime = self.dtime or Time('2000-1-1')
+        shape = (self.grid.ns, self.grid.nphi)
         # Construct output coordinate frame
-        frame_out = coord.SkyCoord(
-            0 * u.deg, 0 * u.deg, radius=r, obstime=dtime,
-            frame="heliographic_carrington")
-        # Construct header
-        header = sunpy.map.make_fitswcs_header(
-            shape_out, frame_out,
-            scale=[180 / shape_out[0],
-                   360 / shape_out[1]] * u.deg / u.pix,
-            projection_code="CAR")
-
-        # pop out the time if it isn't supplied
-        if self.dtime is None:
-            header.pop('date-obs')
-        return header
+        return _carr_wcs_header(r, self.dtime, shape)
 
     @property
     def coordinate_frame(self):
@@ -260,11 +266,14 @@ class Output:
         :class:`sunpy.map.GenericMap`
         """
         # Get radial component at the top
-        br = self.bc[0][:, :, -1].copy()
+        br = self.bc[0][:, :, -1]
         # Remove extra ghost cells off the edge of the grid
         br = br[1:-1, 1:-1].T
         m = sunpy.map.Map((br, self._wcs_header(self.grid.rss)))
+        vlim = np.max(np.abs(br))
         m.plot_settings['cmap'] = _MAG_CMAP
+        m.plot_settings['vmin'] = -vlim
+        m.plot_settings['vmax'] = vlim
         return m
 
     @property
