@@ -4,6 +4,7 @@ import functools
 import astropy
 import astropy.coordinates as coord
 import astropy.constants as const
+from astropy.time import Time
 import astropy.units as u
 import astropy.wcs
 
@@ -63,13 +64,18 @@ class Input:
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
 
-    dtime : datetime
-        Datetime at which the input map was measured.
+    dtime : datetime, optional
+        Datetime at which the input map was measured. If *br* is a `Map`, then
+        the datetime is automatically extracted from there and the *dtime*
+        argument is not required.
     """
-    def __init__(self, br, nr, rss, dtime):
+    def __init__(self, br, nr, rss, dtime=None):
         self.dtime = dtime
         if isinstance(br, sunpy.map.GenericMap):
+            self.dtime = br.date
             br = br.data
+        else:
+            self.dtime = dtime
         self.br = br
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
@@ -218,14 +224,23 @@ class Output:
         a given radius *r*.
         """
         shape_out = (self.grid.ns, self.grid.nphi)
+        # If datetime is None, put in a dummy value here to make
+        # make_fitswcs_header happy, then strip it out at the end
+        dtime = self.dtime or Time('2000-1-1')
+        # Construct output coordinate frame
         frame_out = coord.SkyCoord(
-            0 * u.deg, 0 * u.deg, radius=r, obstime=self.dtime,
+            0 * u.deg, 0 * u.deg, radius=r, obstime=dtime,
             frame="heliographic_carrington")
+        # Construct header
         header = sunpy.map.make_fitswcs_header(
             shape_out, frame_out,
             scale=[180 / shape_out[0],
                    360 / shape_out[1]] * u.deg / u.pix,
             projection_code="CAR")
+
+        # pop out the time if it isn't supplied
+        if self.dtime is None:
+            header.pop('date-obs')
         return header
 
     @property
@@ -244,10 +259,8 @@ class Output:
         -------
         :class:`sunpy.map.GenericMap`
         """
-        # Get radial component
-        br = self.bc[0]
-        # Get top layer
-        br = br[:, :, -1]
+        # Get radial component at the top
+        br = self.bc[0][:, :, -1].copy()
         # Remove extra ghost cells off the edge of the grid
         br = br[1:-1, 1:-1].T
         m = sunpy.map.Map((br, self._wcs_header(self.grid.rss)))

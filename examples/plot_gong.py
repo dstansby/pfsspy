@@ -75,16 +75,23 @@ ax.set_title('Input field')
 ###############################################################################
 # Now calculate the PFSS solution, and plot the polarity inversion line.
 output = pfsspy.pfss(input)
-output.plot_pil(ax)
+# output.plot_pil(ax)
 
 
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the
 # polarity inversion line.
-fig, ax = plt.subplots()
-mesh = output.plot_source_surface(ax)
-fig.colorbar(mesh)
-output.plot_pil(ax)
+ss_br = output.source_surface_br
+# Create the figure and axes
+fig = plt.figure()
+ax = plt.subplot(projection=ss_br)
+
+# Plot the source surface map
+ss_br.plot()
+# Plot the polarity inversion line
+ax.plot_coord(output.source_surface_pils[0])
+# Plot formatting
+plt.colorbar()
 ax.set_title('Source surface magnetic field')
 
 
