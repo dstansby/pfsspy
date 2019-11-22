@@ -326,6 +326,9 @@ class Output:
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Remove area factors:
+        br = br.copy()
+        bs = bs.copy()
+        bp = bp.copy()
         for i in range(self.grid.nphi + 2):
             br[i, :, :] = br[i, :, :] / Sbr
             bs[i, :, :] = bs[i, :, :] / Sbs
@@ -439,7 +442,6 @@ class Output:
         br[1:-1,1:-1,:] = als[1:,:,:] - als[:-1,:,:] + alp[:,:-1,:] - alp[:,1:,:]
         bs[1:-1,:,1:-1] = alp[:,:,1:] - alp[:,:,:-1]
         bp[:,1:-1,1:-1] = als[:,:,:-1] - als[:,:,1:]
-
 
         # Fill ghost values with boundary conditions:
         # - zero-gradient at outer boundary:
