@@ -36,6 +36,9 @@ if (distutils.version.LooseVersion(astropy.__version__) <
     raise RuntimeError('pfsspy requires astropy v3 to run ' +
                        f'(found version {astropy.__version__} installed)')
 
+# Default colourmap for magnetic field maps
+_MAG_CMAP = 'RdBu'
+
 
 class Input:
     r"""
@@ -60,11 +63,10 @@ class Input:
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
 
-    dtime : datetime, optional
-        Datetime at which the input map was measured. If given it is attached
-        to the output and any field lines traced from the output.
+    dtime : datetime
+        Datetime at which the input map was measured.
     """
-    def __init__(self, br, nr, rss, dtime=None):
+    def __init__(self, br, nr, rss, dtime):
         self.dtime = dtime
         if isinstance(br, sunpy.map.GenericMap):
             br = br.data
@@ -210,7 +212,7 @@ class Output:
             file, alr=self._alr, als=self._als, alp=self._alp,
             rss=np.array([self.grid.rss]))
 
-    def _wcs(self, r):
+    def _wcs_header(self, r):
         """
         Construct a world coordinate system describing the pfsspy solution at
         a given radius *r*.
@@ -224,7 +226,7 @@ class Output:
             scale=[180 / shape_out[0],
                    360 / shape_out[1]] * u.deg / u.pix,
             projection_code="CAR")
-        return astropy.wcs.WCS(header)
+        return header
 
     @property
     def coordinate_frame(self):
@@ -246,26 +248,27 @@ class Output:
         br = self.bc[0]
         # Get top layer
         br = br[:, :, -1]
-        # Remove extra cells off the edge of the grid
+        # Remove extra ghost cells off the edge of the grid
         br = br[1:-1, 1:-1].T
-        return sunpy.map.Map((br, self._wcs(self.grid.rss)))
+        m = sunpy.map.Map((br, self._wcs_header(self.grid.rss)))
+        m.plot_settings['cmap'] = _MAG_CMAP
+        return m
 
-    def plot_pil(self, ax=None, **kwargs):
+    @property
+    def source_surface_pils(self):
         """
-        Plot the polarity inversion line on the source surface.
+        Coordinates of the polarity inversion lines on the source surface.
 
-        The PIL is where Br = 0.
-
-        Parameters
-        ----------
-        ax : Axes
-            Axes to plot to. If ``None``, creates a new figure.
-
-        **kwargs :
-            Keyword arguments are handed to `ax.contour`.
+        Notes
+        -----
+        This is always returned as a list of coordinates, as in general there
+        may be more than one polarity inversion line.
         """
-        pfsspy.plot.contour(
-            self.grid.pg, self.grid.sg, self.source_surface_br, [0], ax, **kwargs)
+        from skimage import measure
+        m = self.source_surface_br
+        contours = measure.find_contours(m.data, 0)
+        contours = [m.wcs.pixel_to_world(c[:, 1], c[:, 0]) for c in contours]
+        return contours
 
     @property
     def _brgi(self):
