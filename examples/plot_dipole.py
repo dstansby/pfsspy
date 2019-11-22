@@ -11,6 +11,7 @@ source field.
 import astropy.constants as const
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+from astropy.time import Time
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatch
 import numpy as np
@@ -50,7 +51,7 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-input = pfsspy.Input(br, nrho, rss)
+input = pfsspy.Input(br, nrho, rss, dtime=Time('2018-01-01'))
 
 ###############################################################################
 # Using the Input object, plot the input field
@@ -66,10 +67,11 @@ output = pfsspy.pfss(input)
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the
 # polarity inversion line.
-fig, ax = plt.subplots()
-mesh = output.plot_source_surface(ax)
-fig.colorbar(mesh)
-output.plot_pil(ax)
+fig = plt.figure()
+output.source_surface_br.plot()
+# mesh = output.plot_source_surface(ax)
+plt.colorbar()
+# output.plot_pil(ax)
 ax.set_title('Source surface magnetic field')
 
 ###############################################################################

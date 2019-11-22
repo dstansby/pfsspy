@@ -5,9 +5,10 @@ import astropy
 import astropy.coordinates as coord
 import astropy.constants as const
 import astropy.units as u
+import astropy.wcs
 
 from sunpy.coordinates import frames
-import sunpy.map.mapbase
+import sunpy.map
 
 import numpy as np
 import scipy.linalg as la
@@ -65,7 +66,7 @@ class Input:
     """
     def __init__(self, br, nr, rss, dtime=None):
         self.dtime = dtime
-        if isinstance(br, sunpy.map.mapbase.GenericMap):
+        if isinstance(br, sunpy.map.GenericMap):
             br = br.data
         self.br = br
         ns = self.br.shape[0]
@@ -209,13 +210,21 @@ class Output:
             file, alr=self._alr, als=self._als, alp=self._alp,
             rss=np.array([self.grid.rss]))
 
-    @property
-    def source_surface_br(self):
+    def _wcs(self, r):
         """
-        Br on the source surface.
+        Construct a world coordinate system describing the pfsspy solution at
+        a given radius *r*.
         """
-        br = self.bg[..., 2]
-        return br[:, :, -1].T
+        shape_out = (self.grid.ns, self.grid.nphi)
+        frame_out = coord.SkyCoord(
+            0 * u.deg, 0 * u.deg, radius=r, obstime=self.dtime,
+            frame="heliographic_carrington")
+        header = sunpy.map.make_fitswcs_header(
+            shape_out, frame_out,
+            scale=[180 / shape_out[0],
+                   360 / shape_out[1]] * u.deg / u.pix,
+            projection_code="CAR")
+        return astropy.wcs.WCS(header)
 
     @property
     def coordinate_frame(self):
@@ -225,22 +234,21 @@ class Output:
         """
         return frames.HeliographicCarrington(obstime=self.dtime)
 
-    def plot_source_surface(self, ax=None, **kwargs):
+    def source_surface_br(self):
         """
-        Plot a 2D image of the magnetic field at the source surface.
+        Br on the source surface.
 
-        Parameters
-        ----------
-        ax : Axes
-            Axes to plot to. If ``None``, creates a new figure.
-        kwargs :
-            Additional keyword arguments are handed to `pcolormesh` that
-            renders the source surface. A useful option here is handing
-            ``rasterized=True`` to rasterize the image.
+        Returns
+        -------
+        :class:`sunpy.map.GenericMap`
         """
-        mesh = pfsspy.plot.radial_cut(
-            self.grid.pg, self.grid.sg, self.source_surface_br, ax, **kwargs)
-        return mesh
+        # Get radial component
+        br = self.bc[0]
+        # Get top layer
+        br = br[:, :, -1]
+        # Remove extra cells off the edge of the grid
+        br = br[1:-1, 1:-1].T
+        return sunpy.map.Map((br, self._wcs(self.grid.rss)))
 
     def plot_pil(self, ax=None, **kwargs):
         """
