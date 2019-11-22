@@ -4,6 +4,27 @@ Changelog
 0.5.0
 -----
 
+Changes to outputted maps
+~~~~~~~~~~~~~~~~~~~~~~~~~
+This release largely sees a transition to leveraging Sunpy Map objects.
+
+The following functionality has been added:
+
+TODO: ADD STUFF HERE
+
+And the following functionality has been removed:
+
+- ``pfsspy.Input.plot_input``. Instead :class:`Input` has a new
+  :property:`Input.map`  property, which returns a SunPy map, which can easily
+  be plotted using ``map.plot()``.
+- ``pfsspy.Output.plot_source_surface``. A map of :math:`B_{r}` on the source
+  surface can now be obtained using `pfsspy.Output.source_surface_br`, which
+  again returns a SunPy map.
+- ``pfsspy.Output.plot_pil``. The coordinates of the polarity inversion lines
+  on the source surface can now be obtained using
+  `pfsspy.Output.source_surface_pils`, which can then be plotted using
+  ``ax.plot_coord(pil[0])`` etc. See the examples section for an example.
+
 Specifying tracing seeds
 ~~~~~~~~~~~~~~~~~~~~~~~~
 In order to make specifying seeds easier, they must now be a
