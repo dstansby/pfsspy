@@ -77,3 +77,10 @@ class Grid:
         Location of the edges of grid cells in phi.
         """
         return np.linspace(0, 2 * np.pi, self.nphi + 1)
+
+    @property
+    def _grid_spacing(self):
+        """
+        Return grid spacing as a 3-len list.
+        """
+        return [self.dp, self.ds, self.dr]

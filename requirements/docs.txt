@@ -8,3 +8,4 @@ sunpy_sphinx_theme
 sphinx_rtd_theme
 sphinx-gallery
 sphinx
+streamtracer

@@ -89,20 +89,6 @@ def test_field_line_polarity(dipole_map):
     assert eq_field_line.polarity == 0
 
 
-@pytest.mark.parametrize('seeds', [np.array([0, 0, 1.01]),
-                                   np.array([[0, 0, 1.01],
-                                             [0, 0, 1.01]])])
-def test_field_lines(dipole_map, seeds):
-    input, out = dipole_map
-
-    tracer = tracing.PythonTracer()
-    field_lines = tracer.trace(seeds, out)
-    assert isinstance(field_lines[0], pfsspy.fieldline.FieldLine)
-    assert isinstance(field_lines.open_field_lines.solar_feet, coord.SkyCoord)
-    assert isinstance(field_lines.open_field_lines.source_surface_feet, coord.SkyCoord)
-    assert isinstance(field_lines.polarities, np.ndarray)
-
-
 def test_footpoints(dipole_map):
     input, out = dipole_map
 
