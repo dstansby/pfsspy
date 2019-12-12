@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.4.0
+-----
+- :class:`pfsspy.FieldLines` no longer has ``source_surface_feet`` and
+  ``solar_feet`` properties. Instad these have moved to the new
+  :class:`pfsspy.OpenFieldLines` class. All the open field lines can be accessed
+  using the new :attr:`pfsspy.FieldLines.open_field_lines`.
+
 0.3.2
 -----
 - Fixed a bug in :attr:`pfsspy.FieldLine.is_open`, where some open field lines
