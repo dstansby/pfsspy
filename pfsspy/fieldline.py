@@ -102,22 +102,22 @@ class FieldLine:
                                      obstime=dtime,
                                      representation_type='cartesian')
         self._output = output
+        # Set _is_open
+        r = np.sqrt(np.array(x)**2 + np.array(y)**2 + np.array(z)**2)
+        rtol = 0.1
+        self._is_open = np.abs(r[0] - r[-1]) > 1 * rtol
+        # Set _polarity
+        self._polarity = -np.sign(r[0] - r[-1]) * self._is_open
 
     @property
-    @functools.lru_cache()
     def is_open(self):
         """
         Returns ``True`` if one of the field line is connected to the solar
         surface and one to the outer boundary, ``False`` otherwise.
         """
-        r = coord.SkyCoord(self.coords, representation_type='spherical')
-        foot1 = r[0]
-        foot2 = r[-1]
-        rtol = 0.1
-        return np.abs(foot1.radius - foot2.radius) > const.R_sun * rtol
+        return self._is_open
 
     @property
-    @functools.lru_cache()
     def polarity(self):
         """
         Magnetic field line polarity.
@@ -128,20 +128,7 @@ class FieldLine:
             0 if the field line is closed, otherwise sign(Br) of the magnetic
             field on the solar surface.
         """
-        if not self.is_open:
-            return 0
-
-        # Because the field lines are integrated forwards, if the end
-        # point is on the outer boundary the field is outwards
-        foot1 = coord.SkyCoord(
-            self.coords[0], representation_type='spherical')
-        foot2 = coord.SkyCoord(
-            self.coords[-1], representation_type='spherical')
-
-        if foot2.radius - foot1.radius > 0:
-            return 1
-        else:
-            return -1
+        return self._polarity
 
     @property
     def solar_footpoint(self):
