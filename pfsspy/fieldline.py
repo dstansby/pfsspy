@@ -22,6 +22,9 @@ class FieldLines:
     def __getitem__(self, idx):
         return self.field_lines[idx]
 
+    def __len__(self):
+        return len(self.field_lines)
+
     @property
     @functools.lru_cache()
     def polarities(self):
@@ -44,7 +47,7 @@ class FieldLines:
         """
         An `OpenFieldLines` object containing open field lines.
         """
-        open_idxs = np.where(self.connectivities)[0]
+        open_idxs = np.where(self.connectivities == 1)[0]
         return OpenFieldLines(np.array(self.field_lines)[open_idxs])
 
     @property
@@ -52,7 +55,7 @@ class FieldLines:
         """
         An `ClosedFieldLines` object containing open field lines.
         """
-        closed_idxs = np.where(~self.connectivities)[0]
+        closed_idxs = np.where(self.connectivities == 0)[0]
         return ClosedFieldLines(self.field_lines[closed_idxs])
 
 
