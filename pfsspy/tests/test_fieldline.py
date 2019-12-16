@@ -1,4 +1,4 @@
-from pfsspy import FieldLine, FieldLines
+from pfsspy import FieldLine, FieldLines, OpenFieldLines, ClosedFieldLines
 
 import astropy.units as u
 from astropy.time import Time
@@ -22,6 +22,16 @@ def test_open(x, open, pol):
 
     assert len(flines.open_field_lines) == int(open)
     assert len(flines.closed_field_lines) == int(not open)
+
+
+@pytest.mark.parametrize('x, cls',
+                         [[[1, 2.5], ClosedFieldLines],
+                          [[1, 1], OpenFieldLines],
+                          ])
+def test_flines_errors(x, cls):
+    fline = FieldLine(x, [0, 0], [0, 0], None, None)
+    with pytest.raises(ValueError):
+        cls([fline])
 
 
 def test_transform():
