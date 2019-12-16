@@ -7,6 +7,7 @@ import matplotlib
 import numpy as np
 import pfsspy
 import sunpy.map
+import sunpy.util.exceptions
 
 import pfsspy.coords
 from pfsspy import tracing
@@ -123,7 +124,9 @@ def test_sunpy_map_input(zero_map):
     # Check that loading an input map works
     header = {'cunit1': 'degree', 'cunit2': 'degree'}
     map = sunpy.map.Map((zero_in.br, header))
-    input = pfsspy.Input(map, zero_in.grid.nr, zero_in.grid.rss)
+    with pytest.warns(sunpy.util.exceptions.SunpyUserWarning,
+                      match='Missing metadata for observation time'):
+        input = pfsspy.Input(map, zero_in.grid.nr, zero_in.grid.rss)
     assert (input.br == zero_in.br).all()
 
 
