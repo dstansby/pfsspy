@@ -1,5 +1,6 @@
 -r base.txt
 
+graphviz
 pillow
 sphinx-automodapi>=0.10
 numpydoc
