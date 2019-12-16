@@ -1,4 +1,4 @@
-from pfsspy import FieldLine, FieldLines, OpenFieldLines, ClosedFieldLines
+from pfsspy.fieldline import FieldLine, FieldLines, OpenFieldLines, ClosedFieldLines
 
 import astropy.units as u
 from astropy.time import Time

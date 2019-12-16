@@ -5,6 +5,7 @@ import numpy as np
 import sunpy.coordinates.frames as frames
 
 import pfsspy
+import pfsspy.fieldline as fieldline
 
 
 class Tracer(abc.ABC):
@@ -71,10 +72,10 @@ class PythonTracer(Tracer):
             xback = output._integrate_one_way(-1, seed, self.rtol, self.atol)
             xback = np.flip(xback, axis=1)
             xout = np.row_stack((xback.T, xforw.T))
-            fline = pfsspy.FieldLine(xout[:, 0],
-                                     xout[:, 1],
-                                     xout[:, 2],
-                                     output.dtime,
-                                     output)
+            fline = fieldline.FieldLine(xout[:, 0],
+                                        xout[:, 1],
+                                        xout[:, 2],
+                                        output.dtime,
+                                        output)
             flines.append(fline)
-        return pfsspy.FieldLines(flines)
+        return fieldline.FieldLines(flines)

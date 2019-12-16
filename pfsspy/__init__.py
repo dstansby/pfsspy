@@ -13,8 +13,8 @@ import scipy.linalg as la
 import pfsspy.plot
 import pfsspy.coords
 import pfsspy.tracing
+import pfsspy.fieldline
 
-from .fieldline import FieldLine, FieldLines, OpenFieldLines, ClosedFieldLines
 from .grid import Grid
 
 HAS_NUMBA = False
