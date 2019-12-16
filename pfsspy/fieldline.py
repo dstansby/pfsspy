@@ -14,54 +14,65 @@ class FieldLines:
 
     Parameters
     ----------
-    field_lines : list of FieldLine
+    field_lines : list of `FieldLine`.
     """
     def __init__(self, field_lines):
-        self.field_lines = field_lines
+        self.field_lines = np.array(field_lines)
 
     def __getitem__(self, idx):
         return self.field_lines[idx]
 
-    @property
-    @functools.lru_cache()
-    def solar_feet(self):
-        """
-        Coordinates of the solar footpoints.
-
-        Notes
-        -----
-        For closed field lines, the footpoint pointing out from the solar
-        surface is returned.
-        """
-        solar_feet = [fline.solar_footpoint for fline in self.field_lines]
-
-        if len(solar_feet) == 1:
-            solar_feet = solar_feet[0]
-        else:
-            solar_feet = coord.concatenate(solar_feet)
-
-        return solar_feet
+    def __len__(self):
+        return len(self.field_lines)
 
     @property
     @functools.lru_cache()
     def polarities(self):
         """
-        Magnetic field line polarities.
+        Magnetic field line polarities. ``0`` for closed, otherwise sign(Br) on
+        the solar surface.
         """
         polarities = [fline.polarity for fline in self.field_lines]
-        return np.array(polarities)
+        return np.array(polarities, dtype=int)
+
+    @property
+    def connectivities(self):
+        """
+        Field line connectivities. ``1`` for open, ``0`` for closed.
+        """
+        return np.abs(self.polarities)
+
+    @property
+    def open_field_lines(self):
+        """
+        An `OpenFieldLines` object containing open field lines.
+        """
+        open_idxs = np.where(self.connectivities == 1)[0]
+        return OpenFieldLines(np.array(self.field_lines)[open_idxs])
+
+    @property
+    def closed_field_lines(self):
+        """
+        An `ClosedFieldLines` object containing open field lines.
+        """
+        closed_idxs = np.where(self.connectivities == 0)[0]
+        return ClosedFieldLines(self.field_lines[closed_idxs])
+
+
+class OpenFieldLines(FieldLines):
+    """
+    A set of open field lines.
+    """
+    def __init__(self, field_lines):
+        super().__init__(field_lines)
+        if not np.all(self.connectivities):
+            raise ValueError('Not all field lines are open')
 
     @property
     @functools.lru_cache()
     def source_surface_feet(self):
         """
         Coordinates of the source suface footpoints.
-
-        Notes
-        -----
-        For closed field lines, there is no source surface footpoint, but
-        instead the solar footpoint pointing in towards the solar surface is
-        returned.
         """
         source_surface_feet = [fline.source_surface_footpoint for
                                fline in self.field_lines]
@@ -72,6 +83,31 @@ class FieldLines:
             source_surface_feet = coord.concatenate(source_surface_feet)
 
         return source_surface_feet
+
+    @property
+    @functools.lru_cache()
+    def solar_feet(self):
+        """
+        Coordinates of the solar footpoints.
+        """
+        solar_feet = [fline.solar_footpoint for fline in self.field_lines]
+
+        if len(solar_feet) == 1:
+            solar_feet = solar_feet[0]
+        else:
+            solar_feet = coord.concatenate(solar_feet)
+
+        return solar_feet
+
+
+class ClosedFieldLines(FieldLines):
+    """
+    A set of closed field lines.
+    """
+    def __init__(self, field_lines):
+        super().__init__(field_lines)
+        if np.any(self.connectivities):
+            raise ValueError('Not all field lines are closed')
 
 
 class FieldLine:
