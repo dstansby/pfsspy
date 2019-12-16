@@ -80,9 +80,11 @@ input = pfsspy.Input(br, nrho, rss, dtime=dtime)
 
 ###############################################################################
 # Using the `Input` object, plot the input photospheric magnetic field
-fig, ax = plt.subplots()
-mesh = input.plot_input(ax)
-fig.colorbar(mesh)
+m = input.map
+fig = plt.figure()
+ax = plt.subplot(projection=m)
+m.plot()
+plt.colorbar()
 ax.set_title('Input field')
 
 ###############################################################################
@@ -105,13 +107,16 @@ s, phi = np.meshgrid(np.linspace(0.1, 0.2, 5),
 lat = np.arcsin(s) * u.rad
 lon = phi * u.rad
 
-fig, ax = plt.subplots()
-mesh = input.plot_input(ax)
-fig.colorbar(mesh)
+m = input.map
+fig = plt.figure()
+ax = plt.subplot(projection=m)
+m.plot()
+plt.colorbar()
+
 ax.scatter(np.rad2deg(phi), s, color='k', s=1)
 
-ax.set_xlim(50, 70)
-ax.set_ylim(0, 0.35)
+# ax.set_xlim(50, 70)
+# ax.set_ylim(0, 0.35)
 ax.set_title('Field line footpoints')
 
 #######################################################################
@@ -127,15 +132,18 @@ flines = tracer.trace(seeds, output)
 ###############################################################################
 # Plot the input GONG magnetic field map, along with the traced mangetic field
 # lines.
-fig, ax = plt.subplots()
-mesh = input.plot_input(ax)
+m = input.map
+fig = plt.figure()
+ax = plt.subplot(projection=m)
+m.plot()
+plt.colorbar()
+
 for fline in flines:
     fline.coords.representation_type = 'spherical'
-    ax.plot(fline.coords.lon / u.deg, np.sin(fline.coords.lat),
-            color='black', linewidth=1)
+    ax.plot_coord(fline.coords, color='black', linewidth=1)
 
-ax.set_xlim(55, 65)
-ax.set_ylim(0.1, 0.25)
+# ax.set_xlim(55, 65)
+# ax.set_ylim(0.1, 0.25)
 ax.set_title('Photospheric field and traced field lines')
 ###############################################################################
 # Plot the AIA map, along with the traced magnetic field lines. Inside the
