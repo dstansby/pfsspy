@@ -108,7 +108,8 @@ def _carr_wcs_header(r, dtime, shape):
         shape, frame_out,
         scale=[180 / shape[0],
                360 / shape[1]] * u.deg / u.pix,
-        projection_code="CAR")
+        reference_pixel=[0.5, (shape[0] - 1) / 2] * u.pix,
+        projection_code="CEA")
 
     # pop out the time if it isn't supplied
     if dtime is None:
