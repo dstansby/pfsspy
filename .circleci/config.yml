@@ -1,16 +1,17 @@
 
 deps-run: &deps-install
-  name: Install Python dependencies
+  name: Build documentation
   command: |
-    python3 -m venv venv
-    . venv/bin/activate
     sudo apt install -y graphviz
-    pip install --user -r requirements/docs.txt | cat
-    pip install --user . | cat
+    python -m pip install --user --upgrade pip
+    python -m pip install --user numpy
+    python -m pip install --user -r requirements/docs.txt | cat
+    python -m pip install --user . | cat
 
 doc-run: &doc-build
   name: Build documentation
-  command: make html SPHINXOPTS='-W -q'
+  command: |
+    make html SPHINXOPTS='-W -q'
   working_directory: doc
 
 version: 2
