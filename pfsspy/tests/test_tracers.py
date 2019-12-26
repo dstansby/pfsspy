@@ -3,29 +3,9 @@ import numpy as np
 import pytest
 
 import pfsspy
-import pfsspy.coords
 from pfsspy import tracing
 
-
-@pytest.fixture
-def dipole_map():
-    # Test a completely zero input
-    ntheta = 30
-    nphi = 20
-    nr = 10
-    rss = 2.5
-
-    phi = np.linspace(0, 2 * np.pi, nphi)
-    theta = np.linspace(-np.pi / 2, np.pi / 2, ntheta)
-    theta, phi = np.meshgrid(theta, phi)
-
-    def dipole_Br(r, theta):
-        return 2 * np.sin(theta) / r**3
-
-    br = dipole_Br(1, theta).T
-    input = pfsspy.Input(br, nr, rss)
-    output = pfsspy.pfss(input)
-    return input, output
+from .example_maps import dipole_map
 
 
 @pytest.mark.parametrize('tracer', [tracing.PythonTracer(),

@@ -1,52 +1,17 @@
-import astropy.units as u
 import astropy.constants as const
 import astropy.coordinates as coord
 from astropy.tests.helper import quantity_allclose
+
 import matplotlib
 import numpy as np
 import pfsspy
-import pytest
 import sunpy.map
 
 import pfsspy.coords
 from pfsspy import tracing
 
+from .example_maps import dipole_map, zero_map
 matplotlib.use('Agg')
-
-
-@pytest.fixture
-def zero_map():
-    # Test a completely zero input
-    ns = 30
-    nphi = 20
-    nr = 10
-    rss = 2.5
-    br = np.zeros((ns, nphi))
-
-    input = pfsspy.Input(br, nr, rss)
-    output = pfsspy.pfss(input)
-    return input, output
-
-
-@pytest.fixture
-def dipole_map():
-    # Test a completely zero input
-    ntheta = 30
-    nphi = 20
-    nr = 10
-    rss = 2.5
-
-    phi = np.linspace(0, 2 * np.pi, nphi)
-    theta = np.linspace(-np.pi / 2, np.pi / 2, ntheta)
-    theta, phi = np.meshgrid(theta, phi)
-
-    def dipole_Br(r, theta):
-        return 2 * np.sin(theta) / r**3
-
-    br = dipole_Br(1, theta).T
-    input = pfsspy.Input(br, nr, rss)
-    output = pfsspy.pfss(input)
-    return input, output
 
 
 def test_expansion_factor(dipole_map):
