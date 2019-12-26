@@ -80,14 +80,15 @@ for tracer, name in zip([python_tracer, fortran_tracer],
 # Plot the field lines
 fig, ax = plt.subplots()
 ax.set_aspect('equal')
-linestyle = {'python': '-', 'fortran': '--'}
+style = {'python': {'linewidth': 5, 'alpha': 0.2},
+         'fortran': {'linewidth': 1}}
 
 for key in flines:
     for field_line in flines[key]:
         color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
         ax.plot(field_line.coords.y / const.R_sun,
                 field_line.coords.z / const.R_sun,
-                color=color, linestyle=linestyle[key])
+                color=color, **style[key])
 
 # Add inner and outer boundary circles
 ax.add_patch(mpatch.Circle((0, 0), 1, color='k', fill=False))
