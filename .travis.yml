@@ -15,15 +15,14 @@ before_install:
 - conda update --yes conda
 - conda create --yes -n testenv python=$TRAVIS_PYTHON_VERSION
 - source activate testenv
-
-- pip install -r requirements/test.txt
+- python -m pip install -r requirements/test.txt
 
 install:
-- pip install -e .
+- python -m pip install -e .
 
 script:
 # Check that unit tests work
-- pytest pfsspy -v
+- python -m pytest pfsspy -v
 
 after_success:
 - pip install codecov
