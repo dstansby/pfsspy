@@ -53,15 +53,12 @@ br = np.roll(br, header['CRVAL1'] + 180, axis=1)
 
 
 ###############################################################################
-# The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
-# rho = ln(r), and r is the standard spherical radial coordinate. We need to
-# define the number of rho grid points, and the source surface radius.
+# Set the model parameters
 nrho = 60
 rss = 2.5
 
 ###############################################################################
-# From the boundary condition, number of radial grid points, and source
-# surface, we now construct an Input object that stores this information
+# Construct the input, and calculate the output solution
 input = pfsspy.Input(br, nrho, rss)
 output = pfsspy.pfss(input)
 
@@ -84,7 +81,7 @@ seeds = np.array(coords.sph2cart(r, theta.ravel(), phi.ravel())).T
 ###############################################################################
 # Trace the field lines
 print('Tracing field lines...')
-tracer = tracing.FortranTracer(1000, 0.01)
+tracer = tracing.FortranTracer()
 field_lines = tracer.trace(seeds, output)
 print('Finished tracing field lines')
 
@@ -105,4 +102,6 @@ ax.contourf(np.rad2deg(phi_1d), np.cos(theta_1d), pols, norm=norm, cmap=cmap)
 
 ax.set_title('Open (blue/red) and closed (black) field')
 ax.set_aspect(0.5 * 360 / 2)
+
+plt.tight_layout()
 plt.show()
