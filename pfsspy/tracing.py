@@ -18,7 +18,8 @@ class Tracer(abc.ABC):
         Parameters
         ----------
         seeds : (n, 3) array
-            Coordinaes of the magnetic field seed points.
+            Coordinaes of the magnetic field seed points, in cartesian
+            coordinates.
         output : pfsspy.Output
             pfss output.
 
