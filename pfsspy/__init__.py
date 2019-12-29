@@ -1,4 +1,5 @@
 import distutils.version
+import functools
 
 import astropy
 import astropy.coordinates as coord
@@ -147,7 +148,6 @@ class Output:
         # Cache attributes
         self._common_b_cache = None
         self._rgi = None
-        self._bg = None
 
     def save(self, file):
         """
@@ -173,7 +173,7 @@ class Output:
         """
         Br on the source surface.
         """
-        br, _, _ = self.bg
+        br = self.bg[:, :, 2]
         return br[:, :, -1].T
 
     def plot_source_surface(self, ax=None, **kwargs):
@@ -223,7 +223,7 @@ class Output:
         rho = self.grid.rg
         s = self.grid.sg
         phi = self.grid.pg
-        br, bth, bph = self.bg
+        br, bth, bph = self.bg[..., 2], self.bg[..., 1], self.bg[..., 0]
 
         # Because we need the cartesian grid to stretch just beyond r=rss,
         # add an extra dummy layer of magnetic field pointing radially outwards
@@ -338,19 +338,17 @@ class Output:
         return br, -bs, bp
 
     @property
+    @functools.lru_cache()
     def bg(self):
         """
         B as a (weighted) averaged on grid points.
 
         Returns
         -------
-        br : array
-        bs : array
-        bp : array
+        array
+            A (nphi, ns, nrho, 3) shaped array. The last index gives the
+            corodinate axis, 0 for Bphi, 1 for Bs, 2 for Brho.
         """
-        if self._bg is not None:
-            return self._bg
-
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Weighted average to grid points:
         brg = br[:-1, :-1, :] + br[1:, :-1, :] + br[1:, 1:, :] + br[:-1, 1:, :]
@@ -364,8 +362,7 @@ class Output:
                              Sbp[1:, 1:] + Sbp[:-1, 1:])
         bsg *= -1
 
-        self._bg = brg, bsg, bpg
-        return self._bg
+        return np.stack((bpg, bsg, brg), axis=-1)
 
     def _common_b(self):
         """

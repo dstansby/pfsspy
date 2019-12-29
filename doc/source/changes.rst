@@ -17,6 +17,12 @@ Changes to field line objects
   the new :attr:`~pfsspy.fieldline.FieldLines.open_field_lines`
   property.
 
+Changes to :class:`~pfsspy.Output`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- :attr:`pfsspy.Output.bg` is now returned as a 4D array instead of three 3D
+  arrays. The final index now indexes the vector components; see the docstring
+  for more information.
+
 0.3.2
 -----
 - Fixed a bug in :attr:`pfsspy.FieldLine.is_open`, where some open field lines
