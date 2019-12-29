@@ -71,6 +71,7 @@ class FortranTracer(Tracer):
         self.step_size = step_size
         self.tracer = StreamTracer(max_steps, step_size)
 
+    @profile
     def trace(self, seeds, output):
         from streamtracer import VectorGrid
         seeds = np.atleast_2d(seeds)
@@ -80,15 +81,13 @@ class FortranTracer(Tracer):
         vectors = output.bg
 
         # Correct s direction for coordinate system distortion
-        _, sg, _ = np.meshgrid(output.grid.pg, output.grid.sg, output.grid.rg,
-                               indexing='ij')
-        sqrtsg = np.sqrt(1 - sg**2)
+        sqrtsg = output.grid._sqrtsg_correction
         # phi correction
-        with np.errstate(invalid='ignore'):
+        with np.errstate(divide='ignore'):
             vectors[..., 0] /= sqrtsg
         # Technically where s=0 Bphi is now infinite, but because this is
         # singular and Bphi doesn't matter, just set it to a large number
-        vectors[sg[..., 0] == 0, 0] = 0.8e+308
+        vectors[~np.isfinite(vectors[..., 0]), 0] = 0.8e+308
         # s correction
         vectors[..., 1] *= -sqrtsg
 
