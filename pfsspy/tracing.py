@@ -65,13 +65,12 @@ class FortranTracer(Tracer):
     singularity at the poles (ie. :math:`s = \pm 1`), which means seeds placed
     directly on the poles will not go anywhere.
     """
-    def __init__(self, max_steps=1000, step_size=0.05):
+    def __init__(self, max_steps=1000, step_size=0.1):
         from streamtracer import StreamTracer
         self.max_steps = max_steps
         self.step_size = step_size
         self.tracer = StreamTracer(max_steps, step_size)
 
-    @profile
     def trace(self, seeds, output):
         from streamtracer import VectorGrid
         seeds = np.atleast_2d(seeds)
@@ -83,7 +82,7 @@ class FortranTracer(Tracer):
         # Correct s direction for coordinate system distortion
         sqrtsg = output.grid._sqrtsg_correction
         # phi correction
-        with np.errstate(divide='ignore'):
+        with np.errstate(divide='ignore', invalid='ignore'):
             vectors[..., 0] /= sqrtsg
         # Technically where s=0 Bphi is now infinite, but because this is
         # singular and Bphi doesn't matter, just set it to a large number

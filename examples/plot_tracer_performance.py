@@ -34,17 +34,17 @@ print('Computed PFSS solution')
 seed0 = np.atleast_2d(np.array([1, 1, 0]))
 tracers = [pfsspy.tracing.PythonTracer(),
            pfsspy.tracing.FortranTracer()]
-nseeds = 2**np.arange(6)
+nseeds = 2**np.arange(14)
 times = [[], []]
 
 for nseed in nseeds:
     print(nseed)
     seeds = np.repeat(seed0, nseed, axis=0)
     for i, tracer in enumerate(tracers):
-        if nseed > 100 and i == 0:
+        if nseed > 64 and i == 0:
             continue
         # tracer.trace(seeds, pfss_output)
-        t = timeit.timeit(lambda: tracer.trace(seeds, pfss_output), number=2)
+        t = timeit.timeit(lambda: tracer.trace(seeds, pfss_output), number=1)
         times[i].append(t)
 
 ###############################################################################
@@ -53,6 +53,12 @@ fig, ax = plt.subplots()
 ax.scatter(nseeds[1:len(times[0])], times[0][1:], label='python')
 ax.scatter(nseeds[1:], times[1][1:], label='fortran')
 
+pydt = (times[0][4] - times[0][3]) / (nseeds[4] - nseeds[3])
+ax.plot([1, 1e5], [pydt, 1e5 * pydt])
+
+fort0 = times[1][1]
+fordt = (times[1][-1] - times[1][-2]) / (nseeds[-1] - nseeds[-2])
+ax.plot(np.logspace(0, 5, 100), fort0 + fordt * np.logspace(0, 5, 100))
 
 ax.set_xscale('log')
 ax.set_yscale('log')
