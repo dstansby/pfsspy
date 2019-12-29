@@ -173,7 +173,7 @@ class Output:
         """
         Br on the source surface.
         """
-        br = self.bg[:, :, 2]
+        br = self.bg[..., 2]
         return br[:, :, -1].T
 
     def plot_source_surface(self, ax=None, **kwargs):
