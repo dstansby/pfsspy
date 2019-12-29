@@ -76,23 +76,21 @@ class FortranTracer(Tracer):
         seeds = np.atleast_2d(seeds)
         self.validate_seeds_shape(seeds)
 
-        # Do tracing
-        brho, bs, bphi = output.bg
-        # Vectors stacked in (r, s, phi), but the indexing order on the first
-        # three indices is (phi, s, r)
-        vectors = np.stack((bphi, bs, brho), axis=-1)
+        # The indexing order on the last index is (phi, s, r)
+        vectors = output.bg
 
         # Correct s direction for coordinate system distortion
         _, sg, _ = np.meshgrid(output.grid.pg, output.grid.sg, output.grid.rg,
                                indexing='ij')
+        sqrtsg = np.sqrt(1 - sg**2)
         # phi correction
         with np.errstate(invalid='ignore'):
-            vectors[..., 0] /= np.sqrt(1 - sg**2)
-            # Technically where s=0 Bphi is now infinite, but because this is
-            # singular and Bphi doesn't matter, just set it to zero
-            vectors[sg[..., 0] == 0, 0] = 0.8e+308
+            vectors[..., 0] /= sqrtsg
+        # Technically where s=0 Bphi is now infinite, but because this is
+        # singular and Bphi doesn't matter, just set it to a large number
+        vectors[sg[..., 0] == 0, 0] = 0.8e+308
         # s correction
-        vectors[..., 1] *= -np.sqrt(1 - sg**2)
+        vectors[..., 1] *= -sqrtsg
 
         grid_spacing = output.grid._grid_spacing
         # Cyclic only in the phi direction
