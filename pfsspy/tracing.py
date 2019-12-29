@@ -107,6 +107,12 @@ class FortranTracer(Tracer):
         # Do the tracing
         self.tracer.trace(seeds, vector_grid)
         xs = self.tracer.xs
+        rots = self.tracer.ROT
+        if np.any(rots == 1):
+            warnings.warn(
+                'At least one field line ran out of steps during tracing.\n'
+                'You should probably increase max_steps '
+                f'(currently set to {self.max_steps}) and try again.')
 
         xs = [np.stack(pfsspy.coords.strum2cart(x[:, 2], x[:, 1], x[:, 0]), axis=-1) for x in xs]
         flines = [fieldline.FieldLine(x[:, 0], x[:, 1], x[:, 2], output.dtime, output) for x in xs]
