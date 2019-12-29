@@ -2,7 +2,7 @@
 deps-run: &deps-install
   name: Build documentation
   command: |
-    sudo apt install -y graphviz
+    sudo apt install -y graphviz gfortran
     python -m pip install --user --upgrade pip
     python -m pip install --user numpy
     python -m pip install --user -r requirements/docs.txt | cat

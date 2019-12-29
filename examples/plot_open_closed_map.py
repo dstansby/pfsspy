@@ -1,8 +1,8 @@
 """
-GONG PFSS extrapolation
-=======================
+Open/closed field map
+=====================
 
-Calculating PFSS solution for a GONG synoptic magnetic field map.
+Creating an open/closed field map on the solar surface.
 """
 
 ###############################################################################
@@ -10,7 +10,8 @@ Calculating PFSS solution for a GONG synoptic magnetic field map.
 import os
 import astropy.constants as const
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.colors as mcolor
+
 import numpy as np
 import sunpy.map
 
@@ -52,67 +53,55 @@ br = np.roll(br, header['CRVAL1'] + 180, axis=1)
 
 
 ###############################################################################
-# The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
-# rho = ln(r), and r is the standard spherical radial coordinate. We need to
-# define the number of rho grid points, and the source surface radius.
+# Set the model parameters
 nrho = 60
 rss = 2.5
 
 ###############################################################################
-# From the boundary condition, number of radial grid points, and source
-# surface, we now construct an Input object that stores this information
+# Construct the input, and calculate the output solution
 input = pfsspy.Input(br, nrho, rss)
-
-###############################################################################
-# Using the Input object, plot the input field
-fig, ax = plt.subplots()
-mesh = input.plot_input(ax)
-fig.colorbar(mesh)
-ax.set_title('Input field')
-
-###############################################################################
-# Now calculate the PFSS solution, and plot the polarity inversion line.
 output = pfsspy.pfss(input)
-output.plot_pil(ax)
-
-
-###############################################################################
-# Using the Output object we can plot the source surface field, and the
-# polarity inversion line.
-fig, ax = plt.subplots()
-mesh = output.plot_source_surface(ax)
-fig.colorbar(mesh)
-output.plot_pil(ax)
-ax.set_title('Source surface magnetic field')
 
 
 ###############################################################################
 # Finally, using the 3D magnetic field solution we can trace some field lines.
-# In this case 256 points equally gridded in theta and phi are chosen and
-# traced from the source surface outwards.
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+# In this case a grid of 90 x 180 points equally gridded in theta and phi are
+# chosen and traced from the source surface outwards.
+#
+# First, set up the tracing seeds
 
+r = 1
+# Number of steps in cos(latitude)
+nsteps = 90
+phi_1d = np.linspace(0, 2 * np.pi, nsteps * 2 + 1)
+theta_1d = np.arccos(np.linspace(-1, 1, nsteps + 1))
+phi, theta = np.meshgrid(phi_1d, theta_1d, indexing='ij')
+seeds = np.array(coords.sph2cart(r, theta.ravel(), phi.ravel())).T
+
+###############################################################################
+# Trace the field lines
+print('Tracing field lines...')
 tracer = tracing.FortranTracer()
-# Loop through 16 values in theta and 16 values in phi
-r = 1.01
-theta = np.linspace(0, np.pi, 17)
-phi = np.linspace(0, 2 * np.pi, 17)
-theta, phi = np.meshgrid(theta, phi)
-theta, phi = theta.ravel(), phi.ravel()
-
-seeds = np.array(coords.sph2cart(r, theta, phi)).T
-
 field_lines = tracer.trace(seeds, output)
+print('Finished tracing field lines')
 
-for field_line in field_lines:
-    color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
-    ax.plot(field_line.coords.x / const.R_sun,
-            field_line.coords.y / const.R_sun,
-            field_line.coords.z / const.R_sun,
-            color=color, linewidth=1)
+###############################################################################
+# Plot the result. The to plot is the input magnetogram, and the bottom plot
+# shows a contour map of the the footpoint polarities, which are +/- 1 for open
+# field regions and 0 for closed field regions.
+fig, axs = plt.subplots(nrows=2, sharex=True, sharey=True)
+ax = axs[0]
+input.plot_input(ax)
+ax.set_title('Input GONG magnetogram')
 
-ax.set_title('PFSS solution')
+ax = axs[1]
+cmap = mcolor.ListedColormap(['tab:red', 'black', 'tab:blue'])
+norm = mcolor.BoundaryNorm([-1.5, -0.5, 0.5, 1.5], ncolors=3)
+pols = field_lines.polarities.reshape(2 * nsteps + 1, nsteps + 1).T
+ax.contourf(np.rad2deg(phi_1d), np.cos(theta_1d), pols, norm=norm, cmap=cmap)
+
+ax.set_title('Open (blue/red) and closed (black) field')
+ax.set_aspect(0.5 * 360 / 2)
+
+plt.tight_layout()
 plt.show()
-
-# sphinx_gallery_thumbnail_number = 3

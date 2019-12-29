@@ -1,52 +1,17 @@
-import astropy.units as u
 import astropy.constants as const
 import astropy.coordinates as coord
 from astropy.tests.helper import quantity_allclose
+
 import matplotlib
 import numpy as np
 import pfsspy
-import pytest
 import sunpy.map
 
 import pfsspy.coords
 from pfsspy import tracing
 
+from .example_maps import dipole_map, zero_map
 matplotlib.use('Agg')
-
-
-@pytest.fixture
-def zero_map():
-    # Test a completely zero input
-    ns = 30
-    nphi = 20
-    nr = 10
-    rss = 2.5
-    br = np.zeros((ns, nphi))
-
-    input = pfsspy.Input(br, nr, rss)
-    output = pfsspy.pfss(input)
-    return input, output
-
-
-@pytest.fixture
-def dipole_map():
-    # Test a completely zero input
-    ntheta = 30
-    nphi = 20
-    nr = 10
-    rss = 2.5
-
-    phi = np.linspace(0, 2 * np.pi, nphi)
-    theta = np.linspace(-np.pi / 2, np.pi / 2, ntheta)
-    theta, phi = np.meshgrid(theta, phi)
-
-    def dipole_Br(r, theta):
-        return 2 * np.sin(theta) / r**3
-
-    br = dipole_Br(1, theta).T
-    input = pfsspy.Input(br, nr, rss)
-    output = pfsspy.pfss(input)
-    return input, output
 
 
 def test_expansion_factor(dipole_map):
@@ -87,20 +52,6 @@ def test_field_line_polarity(dipole_map):
     eq_field_line = tracer.trace(
         np.array([0, 1, 0.1]), out)[0]
     assert eq_field_line.polarity == 0
-
-
-@pytest.mark.parametrize('seeds', [np.array([0, 0, 1.01]),
-                                   np.array([[0, 0, 1.01],
-                                             [0, 0, 1.01]])])
-def test_field_lines(dipole_map, seeds):
-    input, out = dipole_map
-
-    tracer = tracing.PythonTracer()
-    field_lines = tracer.trace(seeds, out)
-    assert isinstance(field_lines[0], pfsspy.fieldline.FieldLine)
-    assert isinstance(field_lines.open_field_lines.solar_feet, coord.SkyCoord)
-    assert isinstance(field_lines.open_field_lines.source_surface_feet, coord.SkyCoord)
-    assert isinstance(field_lines.polarities, np.ndarray)
 
 
 def test_footpoints(dipole_map):

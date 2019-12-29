@@ -1,4 +1,4 @@
-
+import functools
 import numpy as np
 
 
@@ -77,3 +77,22 @@ class Grid:
         Location of the edges of grid cells in phi.
         """
         return np.linspace(0, 2 * np.pi, self.nphi + 1)
+
+    @property
+    def _grid_spacing(self):
+        """
+        Return grid spacing as a 3-len list.
+        """
+        return [self.dp, self.ds, self.dr]
+
+    @property
+    @functools.lru_cache()
+    def _sqrtsg_correction(self):
+        """
+        The sqrt(1 - sg**2) correction needed to trace natively. Computed here
+        once and cached for performance.
+        """
+        # Correct s direction for coordinate system distortion
+        _, sg, _ = np.meshgrid(self.pg, self.sg, self.rg,
+                               indexing='ij')
+        return np.sqrt(1 - sg**2)

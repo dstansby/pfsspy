@@ -15,6 +15,11 @@ before_install:
 - conda update --yes conda
 - conda create --yes -n testenv python=$TRAVIS_PYTHON_VERSION
 - source activate testenv
+- sudo apt update
+- sudo apt install -y gfortran
+
+# Have to install numpy first to make streamtracer work
+- python -m pip install numpy
 - python -m pip install -r requirements/test.txt
 
 install:
