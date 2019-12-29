@@ -151,13 +151,9 @@ def test_shape(zero_map):
     assert bs.shape == (nphi + 2, ns + 1, nr + 2)
     assert bp.shape == (nphi + 1, ns + 2, nr + 2)
 
-    br, bs, bp = out.bg
-    for comp in (br, bs, bp):
-        assert np.all(comp == 0)
-
-    assert br.shape == (nphi + 1, ns + 1, nr + 1)
-    assert bs.shape == (nphi + 1, ns + 1, nr + 1)
-    assert bp.shape == (nphi + 1, ns + 1, nr + 1)
+    bg = out.bg
+    assert np.all(bg == 0)
+    assert bg.shape == (nphi + 1, ns + 1, nr + 1, 3)
 
 
 def test_sunpy_map_input(zero_map):

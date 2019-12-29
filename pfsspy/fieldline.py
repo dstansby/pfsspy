@@ -250,8 +250,8 @@ class FieldLine:
             return interpolator(phi, s)
 
         # Get output magnetic field, and calculate |B|
-        br, bs, bphi = self._output.bg
-        modb = np.sqrt(br**2 + bs**2 + bphi**2)
+        bg = self._output.bg
+        modb = np.linalg.norm(bg, axis=-1)
         # Interpolate at each end of field line
         b_solar = interp(modb[:, :, 0], solar_foot)[0, 0]
         b_source = interp(modb[:, :, -1], source_foot)[0, 0]
