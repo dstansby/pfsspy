@@ -8,8 +8,7 @@ natively in python, and a fortran one that uses the streamtracer package.
 Unsurprisingly the fortran tracer is much faster, but requires a fortran
 compiler to install.
 
-In this example we show how easy it is to switch between the two different
-tracers, and how much faster the fortran tracer is.
+In this example we show how to switch between different tracers.
 """
 ###############################################################################
 # First, import required modules
