@@ -93,7 +93,7 @@ ax.set_title('Source surface magnetic field')
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-tracer = tracing.FortranTracer()
+tracer = tracing.PythonTracer()
 # Loop through 16 values in theta and 16 values in phi
 r = 1.01
 theta = np.linspace(0, np.pi, 17)
