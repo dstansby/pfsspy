@@ -27,3 +27,11 @@ def test_field_lines(dipole_map, seeds, tracer):
                       coord.SkyCoord)
     assert isinstance(field_lines.polarities,
                       np.ndarray)
+
+
+def test_rot_warning(dipole_map):
+    tracer = tracing.FortranTracer(max_steps=2)
+    input, out = dipole_map
+
+    with pytest.warns(UserWarning, match='ran out of steps'):
+        field_lines = tracer.trace(np.array([1.01, 0, 1.01]), out)
