@@ -55,7 +55,7 @@ br = np.roll(br, header['CRVAL1'] + 180, axis=1)
 # The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
 # rho = ln(r), and r is the standard spherical radial coordinate. We need to
 # define the number of rho grid points, and the source surface radius.
-nrho = 60
+nrho = 35
 rss = 2.5
 
 ###############################################################################
