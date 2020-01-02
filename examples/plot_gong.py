@@ -94,10 +94,10 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 tracer = tracing.PythonTracer()
-# Loop through 16 values in theta and 16 values in phi
+# Loop through 256 values in theta and 16 values in phi
 r = 1.01
-theta = np.linspace(0, np.pi, 9)
-phi = np.linspace(0, 2 * np.pi, 9)
+theta = np.linspace(0, np.pi, 17)
+phi = np.linspace(0, 2 * np.pi, 17)
 theta, phi = np.meshgrid(theta, phi)
 theta, phi = theta.ravel(), phi.ravel()
 
