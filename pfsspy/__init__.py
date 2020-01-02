@@ -251,8 +251,7 @@ class Output:
 
     def _wcs_header(self):
         """
-        Construct a world coordinate system describing the pfsspy solution at
-        a given radius *r*.
+        Construct a world coordinate system describing the pfsspy solution.
         """
         shape = (self.grid.ns, self.grid.nphi)
         # Construct output coordinate frame
