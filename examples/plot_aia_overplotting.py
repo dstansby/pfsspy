@@ -58,13 +58,15 @@ dtime = aia.date
 # at your own risk!
 [[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
 br = br - np.mean(br)
-###############################################################################
-# GONG maps have their LH edge at -180deg in Carrington Longitude,
-# so roll to get it at 0deg. This way the input magnetic field is in a
-# Carrington frame of reference, which matters later when lining the field
-# lines up with the AIA image.
-br = np.roll(br, header['CRVAL1'] + 180, axis=1)
 
+###############################################################################
+# GONG maps have their LH edge at varying Carrington longitudes,
+# so roll to get it at -180deg, which is what the carr_cea_wcs_header function
+# expects.
+br = np.roll(br, header['CRVAL1'], axis=1)
+
+header = pfsspy.carr_cea_wcs_header(aia.date, br.shape)
+gong_map = sunpy.map.Map((br, header))
 
 ###############################################################################
 # The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
@@ -76,7 +78,7 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an `Input` object that stores this information
-input = pfsspy.Input(br, nrho, rss, dtime=dtime)
+input = pfsspy.Input(gong_map, nrho, rss)
 
 ###############################################################################
 # Using the `Input` object, plot the input photospheric magnetic field
@@ -113,7 +115,8 @@ ax = plt.subplot(projection=m)
 m.plot()
 plt.colorbar()
 
-ax.scatter(np.rad2deg(phi), s, color='k', s=1)
+ax.scatter(np.rad2deg(phi), np.rad2deg(np.arcsin(s)),
+           color='k', s=1, transform=ax.get_transform('world'))
 
 # ax.set_xlim(50, 70)
 # ax.set_ylim(0, 0.35)
@@ -140,8 +143,7 @@ plt.colorbar()
 
 for fline in flines:
     coords = fline.coords.transform_to(m.coordinate_frame)
-    coords.representation_type = 'spherical'
-    ax.plot(coords.lon, coords.lat, color='black', linewidth=1, transform=ax.get_transform('world'))
+    ax.plot_coord(coords, color='black', linewidth=1)
 
 # ax.set_xlim(55, 65)
 # ax.set_ylim(0.1, 0.25)
@@ -156,7 +158,7 @@ transform = ax.get_transform('world')
 aia.plot(ax)
 for fline in flines:
     coords = fline.coords.transform_to(aia.coordinate_frame)
-    ax.plot(coords.Tx, coords.Ty, alpha=0.8, linewidth=1, color='black', transform=ax.get_transform('world'))
+    ax.plot_coord(coords, alpha=0.8, linewidth=1, color='black')
 
 ax.set_xlim(500, 900)
 ax.set_ylim(400, 800)
