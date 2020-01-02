@@ -6,11 +6,17 @@ Changelog
 
 New fortran field line tracer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- :mod:`pfsspy.tracing` contains a new tracer,
-  :class:`~pfsspy.tracing.FortranTracer`. This requires and uses the
-  streamtracer package, which does streamline tracing rapidly in python-wrapped
-  fortran code. For large numbers of field lines this results in an ~50x
-  speedup compared to the :class:`~pfsspy.tracing.PythonTracer`.
+:mod:`pfsspy.tracing` contains a new tracer,
+:class:`~pfsspy.tracing.FortranTracer`. This requires and uses the
+`streamtracer <https://streamtracer.readthedocs.io/en/stable/>`_ package
+which does streamline tracing rapidly in python-wrapped
+fortran code. For large numbers of field lines this results in an ~50x
+speedup compared to the :class:`~pfsspy.tracing.PythonTracer`.
+
+Changing existing code to use the new tracer is as easy as swapping out
+``tracer = pfsspy.tracer.PythonTracer()`` for
+``tracer = pfsspy.tracer.FortranTracer()``. If you notice any issues with the
+new tracer, please report them at https://github.com/dstansby/pfsspy/issues.
 
 Changes to field line objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

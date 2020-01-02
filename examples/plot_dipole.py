@@ -42,7 +42,7 @@ br = dipole_Br(1, s).T
 # The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
 # rho = ln(r), and r is the standard spherical radial coordinate. We need to
 # define the number of rho grid points, and the source surface radius.
-nrho = 50
+nrho = 30
 rss = 2.5
 
 ###############################################################################
