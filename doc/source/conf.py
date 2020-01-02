@@ -25,7 +25,7 @@ import sys
 # -- Project information -----------------------------------------------------
 
 project = 'pfsspy'
-copyright = '2018-2019 pfsspy contributors'
+copyright = '2018-2020 pfsspy contributors'
 author = 'pfsspy contributors'
 
 # The short X.Y version
