@@ -45,6 +45,11 @@ if not os.path.exists('190310t0014gong.fits'):
 # at your own risk!
 [[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
 br = br - np.mean(br)
+
+###############################################################################
+# GONG maps have their LH edge at varying Carrington longitudes,
+# so roll to get it at -180deg, which is what the carr_cea_wcs_header function
+# expects.
 br = np.roll(br, header['CRVAL1'], axis=1)
 
 header = pfsspy.carr_cea_wcs_header(header['DATE'], br.shape)
