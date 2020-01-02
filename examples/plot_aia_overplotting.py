@@ -118,11 +118,9 @@ output = pfsspy.pfss(input)
 # Trace field lines from the footpoints defined above. :mod:`pfsspy.coords`
 # is used to convert the s, phi cooridnates into the cartesian coordinates that
 # are needed by the tracer.
-tracer = tracing.PythonTracer(atol=1e-8)
-flines = []
-for s, phi in zip(s.ravel(), phi.ravel()):
-    x0 = np.array(pfsspy.coords.strum2cart(0.01, s, phi))
-    flines += tracer.trace(x0, output)
+tracer = tracing.PythonTracer(atol=1e-6)
+x0 = np.array(pfsspy.coords.strum2cart(0.01, s.ravel(), phi.ravel())).T
+flines = tracer.trace(x0, output)
 
 ###############################################################################
 # Plot the input GONG magnetic field map, along with the traced mangetic field

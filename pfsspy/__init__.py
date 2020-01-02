@@ -219,19 +219,20 @@ class Output:
         if self._rgi is not None:
             return self._rgi
 
+        f32 = np.float32
         # - (rho,s,phi) coordinates:
-        rho = self.grid.rg
-        s = self.grid.sg
-        phi = self.grid.pg
+        rho = self.grid.rg.astype(f32)
+        s = self.grid.sg.astype(f32)
+        phi = self.grid.pg.astype(f32)
         br, bth, bph = self.bg[..., 2], self.bg[..., 1], self.bg[..., 0]
 
         # Because we need the cartesian grid to stretch just beyond r=rss,
         # add an extra dummy layer of magnetic field pointing radially outwards
         rho = np.append(rho, rho[-1] + 0.01)
         extras = np.ones(br.shape[0:2] + (1, ))
-        br = np.concatenate((br, extras), axis=2)
-        bth = np.concatenate((bth, 0 * extras), axis=2)
-        bph = np.concatenate((bph, 0 * extras), axis=2)
+        br = np.concatenate((br, extras), axis=2).astype(f32)
+        bth = np.concatenate((bth, 0 * extras), axis=2).astype(f32)
+        bph = np.concatenate((bph, 0 * extras), axis=2).astype(f32)
 
         # - convert to Cartesian components and make interpolator on
         # (rho,s,phi) grid:
@@ -361,7 +362,6 @@ class Output:
             bpg[i, :, :] /= (Sbp[:-1, :-1] + Sbp[1:, :-1] +
                              Sbp[1:, 1:] + Sbp[:-1, 1:])
         bsg *= -1
-
         return np.stack((bpg, bsg, brg), axis=-1)
 
     def _common_b(self):
