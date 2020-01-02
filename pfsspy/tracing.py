@@ -98,6 +98,11 @@ class FortranTracer(Tracer):
         """
         from streamtracer import VectorGrid
 
+        seeds = np.atleast_2d(seeds)
+        self.validate_seeds_shape(seeds)
+        # Hacky way to rotate by 180deg
+        seeds[:, 0:2] *= -1
+
         # The indexing order on the last index is (phi, s, r)
         vectors = output.bg.copy()
 
@@ -153,6 +158,9 @@ class FortranTracer(Tracer):
                 f'(currently set to {self.max_steps}) and try again.')
 
         xs = [np.stack(pfsspy.coords.strum2cart(x[:, 2], x[:, 1], x[:, 0]), axis=-1) for x in xs]
+        # Hacky way to rotate back by 180deg
+        for xout in xs:
+            xout[:, 0:2] *= -1
         flines = [fieldline.FieldLine(x[:, 0], x[:, 1], x[:, 2], output.dtime, output) for x in xs]
         return fieldline.FieldLines(flines)
 
@@ -189,6 +197,8 @@ class PythonTracer(Tracer):
             xback = output._integrate_one_way(-1, seed, self.rtol, self.atol)
             xback = np.flip(xback, axis=1)
             xout = np.row_stack((xback.T, xforw.T))
+            # Hacky way to roate back by 180deg
+            xout[:, 0:2] *= -1
             fline = fieldline.FieldLine(xout[:, 0],
                                         xout[:, 1],
                                         xout[:, 2],
