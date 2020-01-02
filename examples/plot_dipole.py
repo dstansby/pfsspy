@@ -15,6 +15,7 @@ from astropy.time import Time
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatch
 import numpy as np
+import sunpy.map
 import pfsspy
 import pfsspy.coords as coords
 
@@ -51,7 +52,9 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-input = pfsspy.Input(br, nrho, rss)
+header = pfsspy.carr_cea_wcs_header(Time('2020-1-1'), br.shape)
+input_map = sunpy.map.Map((br, header))
+input = pfsspy.Input(input_map, nrho, rss)
 
 ###############################################################################
 # Using the Input object, plot the input field
