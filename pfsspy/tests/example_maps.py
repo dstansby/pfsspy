@@ -1,5 +1,7 @@
 import pytest
 import numpy as np
+from sunpy.map import Map
+from astropy.time import Time
 import pfsspy
 
 
@@ -11,8 +13,10 @@ def zero_map():
     nr = 10
     rss = 2.5
     br = np.zeros((ns, nphi))
+    header = pfsspy.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
+    input_map = Map((br, header))
 
-    input = pfsspy.Input(br, nr, rss)
+    input = pfsspy.Input(input_map, nr, rss)
     output = pfsspy.pfss(input)
     return input, output
 
@@ -33,6 +37,9 @@ def dipole_map():
         return 2 * np.sin(theta) / r**3
 
     br = dipole_Br(1, theta).T
-    input = pfsspy.Input(br, nr, rss)
+    header = pfsspy.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
+    input_map = Map((br, header))
+
+    input = pfsspy.Input(input_map, nr, rss)
     output = pfsspy.pfss(input)
     return input, output

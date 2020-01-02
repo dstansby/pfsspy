@@ -3,6 +3,8 @@ import astropy.coordinates as coord
 import astropy.units as u
 from astropy.tests.helper import quantity_allclose
 
+import pytest
+
 import matplotlib
 import numpy as np
 import pfsspy

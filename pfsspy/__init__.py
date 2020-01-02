@@ -73,13 +73,9 @@ class Input:
         argument is not required.
     """
     def __init__(self, br, nr, rss, dtime=None):
-        self.dtime = dtime
-        self.br = br
-        self._map = None
-        # Handle SunPy maps
         if not isinstance(br, sunpy.map.GenericMap):
             raise ValueError('br must be a SunPy Map')
-
+        self.dtime = dtime
         self._map = br
         self.dtime = br.date
         self.br = br.data
