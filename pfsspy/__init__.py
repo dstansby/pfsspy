@@ -99,7 +99,7 @@ def carr_cea_wcs_header(dtime, shape):
         Map data. First entry is latitude, second entry is longitude.
 
     References
-    -----
+    ----------
     .. [1] W. T. Thompson, "Coordinate systems for solar image data",
        https://doi.org/10.1051/0004-6361:20054262
     """
