@@ -49,16 +49,10 @@ class Input:
         :math:`s = \cos (\theta)`. See :mod:`pfsspy.coords` for more
         information on the coordinate system.
 
-    .. warning::
-        If *br* is not given as a SunPy map, it is assumed that the LH and RH
-        edges are at 0 and 360 degrees Carrington longitude respectively.
-
     Parameters
     ----------
-    br : 2D array, :class:`sunpy.map.Map`
-        Boundary condition of radial magnetic field at the inner surface. If
-        a SunPy map is automatically extracted as map.data with *no*
-        processing.
+    br : :class:`sunpy.map.Map`
+        Boundary condition of radial magnetic field at the inner surface.
 
     nr : int
         Number of cells in the radial direction to calculate the PFSS solution
@@ -66,17 +60,11 @@ class Input:
 
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
-
-    dtime : datetime, optional
-        Datetime at which the input map was measured. If *br* is a `Map`, then
-        the datetime is automatically extracted from there and the *dtime*
-        argument is not required.
     """
-    def __init__(self, br, nr, rss, dtime=None):
+    def __init__(self, br, nr, rss):
         if not isinstance(br, sunpy.map.GenericMap):
             raise ValueError('br must be a SunPy Map')
-        self.dtime = dtime
-        self._map = br
+        self._map_in = br
         self.dtime = br.date
         self.br = br.data
 
@@ -87,7 +75,7 @@ class Input:
     @property
     def map(self):
         """
-        `sunpy.map.GenericMap` representation of the input.
+        :class:`sunpy.map.GenericMap` representation of the input.
         """
         shape = (self.grid.ns, self.grid.nphi)
         header = carr_cea_wcs_header(self.dtime, shape)
