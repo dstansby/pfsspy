@@ -49,6 +49,10 @@ class Input:
         :math:`s = \cos (\theta)`. See :mod:`pfsspy.coords` for more
         information on the coordinate system.
 
+    .. warning::
+        If *br* is not given as a SunPy map, it is assumed that the LH and RH
+        edges are at 0 and 360 degrees Carrington longitude respectively.
+
     Parameters
     ----------
     br : 2D array, :class:`sunpy.map.Map`
@@ -87,30 +91,34 @@ class Input:
         """
         `sunpy.map.GenericMap` representation of the input.
         """
-        r = const.R_sun
         shape = (self.grid.ns, self.grid.nphi)
-        header = _carr_cea_wcs_header(r, self.dtime, shape)
+        header = _carr_cea_wcs_header(self.dtime, shape)
         m = sunpy.map.Map((self.br, header))
         m.plot_settings['cmap'] = _MAG_CMAP
         return m
 
 
-def _carr_cea_wcs_header(r, dtime, shape):
+def carr_cea_wcs_header(dtime, shape):
     """
-    Create a Carrington WCS header for a CEA projection.
+    Create a Carrington WCS header for a Cylindrical Equal Area (CEA)
+    projection. See [1]_ for information on how this is constructed.
 
-    r : Radius
-    dtime : datetime, optional
-        Can be *None*.
+    dtime : datetime, None
+        Datetime to associate with the map.
     shape : [ntheta, nphi]
         Map shape. First entry is latitude, second entry is longitude.
+
+    References
+    -----
+    .. [1] W. T. Thompson, "Coordinate systems for solar image data",
+       https://doi.org/10.1051/0004-6361:20054262
     """
     # If datetime is None, put in a dummy value here to make
     # make_fitswcs_header happy, then strip it out at the end
     obstime = dtime or astropy.time.Time('2000-1-1')
 
     frame_out = coord.SkyCoord(
-        0 * u.deg, 0 * u.deg, radius=r, obstime=obstime,
+        0 * u.deg, 0 * u.deg, obstime=obstime,
         frame="heliographic_carrington")
     # Construct header
     header = sunpy.map.make_fitswcs_header(
@@ -255,14 +263,14 @@ class Output:
             file, alr=self._alr, als=self._als, alp=self._alp,
             rss=np.array([self.grid.rss]))
 
-    def _wcs_header(self, r):
+    def _wcs_header(self):
         """
         Construct a world coordinate system describing the pfsspy solution at
         a given radius *r*.
         """
         shape = (self.grid.ns, self.grid.nphi)
         # Construct output coordinate frame
-        return _carr_cea_wcs_header(r, self.dtime, shape)
+        return _carr_cea_wcs_header(self.dtime, shape)
 
     @property
     def coordinate_frame(self):
