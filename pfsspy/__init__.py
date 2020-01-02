@@ -77,10 +77,12 @@ class Input:
         self.br = br
         self._map = None
         # Handle SunPy maps
-        if isinstance(br, sunpy.map.GenericMap):
-            self._map = br
-            self.dtime = br.date
-            self.br = br.data
+        if not isinstance(br, sunpy.map.GenericMap):
+            raise ValueError('br must be a SunPy Map')
+
+        self._map = br
+        self.dtime = br.date
+        self.br = br.data
 
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
@@ -92,7 +94,7 @@ class Input:
         `sunpy.map.GenericMap` representation of the input.
         """
         shape = (self.grid.ns, self.grid.nphi)
-        header = _carr_cea_wcs_header(self.dtime, shape)
+        header = carr_cea_wcs_header(self.dtime, shape)
         m = sunpy.map.Map((self.br, header))
         m.plot_settings['cmap'] = _MAG_CMAP
         return m
@@ -105,8 +107,8 @@ def carr_cea_wcs_header(dtime, shape):
 
     dtime : datetime, None
         Datetime to associate with the map.
-    shape : [ntheta, nphi]
-        Map shape. First entry is latitude, second entry is longitude.
+    data : [ntheta, nphi]
+        Map data. First entry is latitude, second entry is longitude.
 
     References
     -----
@@ -270,7 +272,7 @@ class Output:
         """
         shape = (self.grid.ns, self.grid.nphi)
         # Construct output coordinate frame
-        return _carr_cea_wcs_header(self.dtime, shape)
+        return carr_cea_wcs_header(self.dtime, shape)
 
     @property
     def coordinate_frame(self):
@@ -292,7 +294,7 @@ class Output:
         br = self.bc[0][:, :, -1]
         # Remove extra ghost cells off the edge of the grid
         br = br[1:-1, 1:-1].T
-        m = sunpy.map.Map((br, self._wcs_header(self.grid.rss)))
+        m = sunpy.map.Map((br, self._wcs_header()))
         vlim = np.max(np.abs(br))
         m.plot_settings['cmap'] = _MAG_CMAP
         m.plot_settings['vmin'] = -vlim

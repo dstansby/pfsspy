@@ -45,13 +45,10 @@ if not os.path.exists('190310t0014gong.fits'):
 # at your own risk!
 [[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
 br = br - np.mean(br)
-###############################################################################
-# GONG maps have their LH edge at -180deg in Carrington Longitude,
-# so roll to get it at 0deg. This way the input magnetic field is in a
-# Carrington frame of reference, which matters later when lining the field
-# lines up with the AIA image.
-br = np.roll(br, header['CRVAL1'] + 180, axis=1)
+br = np.roll(br, header['CRVAL1'], axis=1)
 
+header = pfsspy.carr_cea_wcs_header(header['DATE'], br.shape)
+gong_map = sunpy.map.Map((br, header))
 
 ###############################################################################
 # The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
@@ -63,7 +60,13 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-input = pfsspy.Input(br, nrho, rss)
+input = pfsspy.Input(gong_map, nrho, rss)
+
+
+def set_axes_lims(ax):
+    ax.set_xlim(0, 360)
+    ax.set_ylim(0, 180)
+
 
 ###############################################################################
 # Using the Input object, plot the input field
@@ -73,6 +76,7 @@ ax = plt.subplot(projection=m)
 m.plot()
 plt.colorbar()
 ax.set_title('Input field')
+set_axes_lims(ax)
 
 ###############################################################################
 # Now calculate the PFSS solution, and plot the polarity inversion line.
@@ -95,6 +99,7 @@ ax.plot_coord(output.source_surface_pils[0])
 # Plot formatting
 plt.colorbar()
 ax.set_title('Source surface magnetic field')
+set_axes_lims(ax)
 
 
 ###############################################################################
