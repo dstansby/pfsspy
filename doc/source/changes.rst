@@ -15,7 +15,7 @@ TODO: ADD STUFF HERE
 And the following functionality has been removed:
 
 - ``pfsspy.Input.plot_input``. Instead :class:`Input` has a new
-  :property:`Input.map`  property, which returns a SunPy map, which can easily
+  :attr:`Input.map`  property, which returns a SunPy map, which can easily
   be plotted using ``map.plot()``.
 - ``pfsspy.Output.plot_source_surface``. A map of :math:`B_{r}` on the source
   surface can now be obtained using `pfsspy.Output.source_surface_br`, which

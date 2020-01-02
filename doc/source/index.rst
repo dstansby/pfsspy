@@ -68,6 +68,7 @@ for the helper modules (behind the scense!) see
    :maxdepth: 2
 
    helpers
+   synoptic_fits
 
 and for a quick reference guide to synoptic map FITS conventions see
 

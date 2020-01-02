@@ -4,7 +4,7 @@ import functools
 import astropy
 import astropy.coordinates as coord
 import astropy.constants as const
-from astropy.time import Time
+import astropy.time
 import astropy.units as u
 import astropy.wcs
 
@@ -89,16 +89,25 @@ class Input:
         """
         r = const.R_sun
         shape = (self.grid.ns, self.grid.nphi)
-        header = _carr_wcs_header(r, self.dtime, shape)
+        header = _carr_cea_wcs_header(r, self.dtime, shape)
         m = sunpy.map.Map((self.br, header))
         m.plot_settings['cmap'] = _MAG_CMAP
         return m
 
 
-def _carr_wcs_header(r, dtime, shape):
+def _carr_cea_wcs_header(r, dtime, shape):
+    """
+    Create a Carrington WCS header for a CEA projection.
+
+    r : Radius
+    dtime : datetime, optional
+        Can be *None*.
+    shape : [ntheta, nphi]
+        Map shape. First entry is latitude, second entry is longitude.
+    """
     # If datetime is None, put in a dummy value here to make
     # make_fitswcs_header happy, then strip it out at the end
-    obstime = dtime or Time('2000-1-1')
+    obstime = dtime or astropy.time.Time('2000-1-1')
 
     frame_out = coord.SkyCoord(
         0 * u.deg, 0 * u.deg, radius=r, obstime=obstime,
@@ -108,9 +117,14 @@ def _carr_wcs_header(r, dtime, shape):
         shape, frame_out,
         scale=[180 / shape[0],
                360 / shape[1]] * u.deg / u.pix,
-        reference_pixel=[0.5, (shape[0] - 1) / 2] * u.pix,
+        reference_pixel=[(shape[1] / 2) + 1, (shape[0] / 2) + 1] * u.pix,
         projection_code="CEA")
 
+    # Fill in these missing values
+    header['PV1_1'] = 1
+    header['PV2_1'] = 1
+    # Fix CELT for lat axis
+    header['CDELT2'] = (180 / np.pi) * (2 / shape[0])
     # pop out the time if it isn't supplied
     if dtime is None:
         header.pop('date-obs')
@@ -248,7 +262,7 @@ class Output:
         """
         shape = (self.grid.ns, self.grid.nphi)
         # Construct output coordinate frame
-        return _carr_wcs_header(r, self.dtime, shape)
+        return _carr_cea_wcs_header(r, self.dtime, shape)
 
     @property
     def coordinate_frame(self):

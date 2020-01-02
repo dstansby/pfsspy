@@ -139,8 +139,9 @@ m.plot()
 plt.colorbar()
 
 for fline in flines:
-    fline.coords.representation_type = 'spherical'
-    ax.plot_coord(fline.coords, color='black', linewidth=1)
+    coords = fline.coords.transform_to(m.coordinate_frame)
+    coords.representation_type = 'spherical'
+    ax.plot(coords.lon, coords.lat, color='black', linewidth=1, transform=ax.get_transform('world'))
 
 # ax.set_xlim(55, 65)
 # ax.set_ylim(0.1, 0.25)
@@ -155,7 +156,7 @@ transform = ax.get_transform('world')
 aia.plot(ax)
 for fline in flines:
     coords = fline.coords.transform_to(aia.coordinate_frame)
-    ax.plot_coord(coords, alpha=0.8, linewidth=1, color='black')
+    ax.plot(coords.Tx, coords.Ty, alpha=0.8, linewidth=1, color='black', transform=ax.get_transform('world'))
 
 ax.set_xlim(500, 900)
 ax.set_ylim(400, 800)
