@@ -11,7 +11,9 @@ overplot the traced field lines on an AIA 193 map.
 from datetime import datetime
 import os
 
+import astropy.constants as const
 import astropy.units as u
+from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 import numpy as np
 import sunpy.map
@@ -100,6 +102,8 @@ aia.plot(ax)
 # above.
 s, phi = np.meshgrid(np.linspace(0.1, 0.2, 5),
                      np.deg2rad(np.linspace(55, 65, 5)))
+lat = np.arcsin(s) * u.rad
+lon = phi * u.rad
 
 fig, ax = plt.subplots()
 mesh = input.plot_input(ax)
@@ -110,17 +114,15 @@ ax.set_xlim(50, 70)
 ax.set_ylim(0, 0.35)
 ax.set_title('Field line footpoints')
 
-###############################################################################
+#######################################################################
 # Compute the PFSS solution from the GONG magnetic field input
 output = pfsspy.pfss(input)
 
 ###############################################################################
-# Trace field lines from the footpoints defined above. :mod:`pfsspy.coords`
-# is used to convert the s, phi cooridnates into the cartesian coordinates that
-# are needed by the tracer.
+# Trace field lines from the footpoints defined above.
 tracer = tracing.PythonTracer(atol=1e-6)
-x0 = np.array(pfsspy.coords.strum2cart(0.01, s.ravel(), phi.ravel())).T
-flines = tracer.trace(x0, output)
+seeds = SkyCoord(lon.ravel(), lat.ravel(), 1.01 * const.R_sun, frame=output.coordinate_frame)
+flines = tracer.trace(seeds, output)
 
 ###############################################################################
 # Plot the input GONG magnetic field map, along with the traced mangetic field

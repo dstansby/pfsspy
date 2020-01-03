@@ -9,6 +9,8 @@ Calculating PFSS solution for a GONG synoptic magnetic field map.
 # First, import required modules
 import os
 import astropy.constants as const
+import astropy.units as u
+from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
@@ -94,13 +96,13 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 tracer = tracing.PythonTracer()
-r = 1.2
-theta = np.linspace(0, np.pi, 8, endpoint=False)
-phi = np.linspace(0, 2 * np.pi, 8, endpoint=False)
-theta, phi = np.meshgrid(theta, phi)
-theta, phi = theta.ravel(), phi.ravel()
+r = 1.2 * const.R_sun
+lat = np.linspace(-np.pi / 2, np.pi / 2, 8, endpoint=False)
+lon = np.linspace(0, 2 * np.pi, 8, endpoint=False)
+lat, lon = np.meshgrid(lat, lon, indexing='ij')
+lat, lon = lat.ravel() * u.rad, lon.ravel() * u.rad
 
-seeds = np.array(coords.sph2cart(r, theta, phi)).T
+seeds = SkyCoord(lon, lat, r, frame=output.coordinate_frame)
 
 field_lines = tracer.trace(seeds, output)
 

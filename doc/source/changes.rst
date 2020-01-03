@@ -1,6 +1,31 @@
 Changelog
 =========
 
+0.5.0
+-----
+
+Specifying tracing seeds
+~~~~~~~~~~~~~~~~~~~~~~~~
+In order to make specifying seeds easier, they must now be a
+:class:`~astropy.coordinates.SkyCoord` object. The coordinates are internally
+transformed to the Carrington frame of the PFSS solution, and then traced.
+
+This should make specifying coordinates easier, as lon/lat/r coordinates can
+be created using::
+
+  seeds = astropy.coordinates.SkyCoord(lon, lat, r, frame=output.coordinate_frame)
+
+To convert from the old x, y, z array used for seeds, do::
+
+  r, lat, lon = pfsspy.coords.cart2sph
+  r = r * astropy.constants.R_sun
+  lat = (lat - np.pi / 2) * u.rad
+  lon = lon * u.rad
+
+  seeds = astropy.coordinates.SkyCoord(lon, lat, r, frame=output.coordinate_frame)
+
+Note that the latitude must be in the range :math:`[-\pi/2, \pi/2]`.
+
 0.4.1
 -----
 

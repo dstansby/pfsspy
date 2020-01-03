@@ -2,6 +2,8 @@ import abc
 import warnings
 
 import astropy.constants as const
+import astropy.coordinates as astrocoords
+import astropy.units as u
 import numpy as np
 import sunpy.coordinates.frames as frames
 
@@ -32,14 +34,13 @@ class Tracer(abc.ABC):
         pass
 
     @staticmethod
-    def validate_seeds_shape(seeds):
+    def validate_seeds(seeds):
         """
-        Check that *seeds* has the right shape.
+        Check that *seeds* has the right shape and is the correct type.
         """
-        if not seeds.ndim == 2:
-            raise ValueError(f'seeds must be a 2D array (got shape {seeds.shape})')
-        if not seeds.shape[1] == 3:
-            raise ValueError(f'seeds must be a (n, 3) shaped array (got shape {seeds.shape})')
+        if not isinstance(seeds, astrocoords.SkyCoord):
+            raise ValueError('seeds must be SkyCoord object '
+                             f'(got {type(seeds)} instead)')
 
     @staticmethod
     def cartesian_to_coordinate():
@@ -47,6 +48,18 @@ class Tracer(abc.ABC):
         Convert cartesian coordinate outputted by a tracer to a `FieldLine`
         object.
         """
+
+    @staticmethod
+    def transform_seeds(seeds, output):
+        """
+        Transform *seeds* to the coordinate system of *output*.
+
+        Paramters
+        ---------
+        seeds : astropy.coordinates.SkyCoord
+        output : pfsspy.Output
+        """
+        return seeds.transform_to(output.coordinate_frame)
 
 
 class FortranTracer(Tracer):
@@ -72,10 +85,12 @@ class FortranTracer(Tracer):
         self.step_size = step_size
         self.tracer = StreamTracer(max_steps, step_size)
 
-    def trace(self, seeds, output):
+    @staticmethod
+    def vector_grid(output):
+        """
+        Create a `streamtracer.VectorGrid` object from an `~pfsspy.Ouput`.
+        """
         from streamtracer import VectorGrid
-        seeds = np.atleast_2d(seeds)
-        self.validate_seeds_shape(seeds)
 
         # The indexing order on the last index is (phi, s, r)
         vectors = output.bg
@@ -98,12 +113,28 @@ class FortranTracer(Tracer):
         origin_coord = [0, -1, 0]
         vector_grid = VectorGrid(vectors, grid_spacing, cyclic=cyclic,
                                  origin_coord=origin_coord)
+        return vector_grid
 
-        # Transform seeds from cartesian to strum
-        seeds = pfsspy.coords.cart2strum(seeds[:, 0], seeds[:, 1], seeds[:, 2])
-        seeds = np.stack(seeds, axis=-1)
-        # Put the seeds in (phi, s, rho) order
-        seeds = seeds[:, ::-1]
+    def trace(self, seeds, output):
+        self.validate_seeds(seeds)
+        seeds = self.transform_seeds(seeds, output)
+
+        phi = seeds.lon
+        phi.wrap_angle = 360 * u.deg
+        phi = phi.to_value(u.rad)
+        if not np.all((0 <= phi) & (phi <= 2 * np.pi)):
+            raise ValueError('Some phi coords not in range [0, 2pi]')
+
+        s = np.sin(seeds.lat).to_value(u.dimensionless_unscaled)
+        if not np.all((-1 <= s) & (s <= 1)):
+            raise ValueError('Some s coords not in range [-1, 1]')
+
+        rho = np.log(seeds.radius.to_value(const.R_sun))
+
+        seeds = np.atleast_2d(np.stack((phi, s, rho), axis=-1))
+
+        # Get a grid
+        vector_grid = self.vector_grid(output)
 
         # Do the tracing
         self.tracer.trace(seeds, vector_grid)
@@ -137,8 +168,15 @@ class PythonTracer(Tracer):
         self.rtol = rtol
 
     def trace(self, seeds, output):
-        seeds = np.atleast_2d(seeds)
-        self.validate_seeds_shape(seeds)
+        self.validate_seeds(seeds)
+        seeds = self.transform_seeds(seeds, output)
+        seeds.representation_type = 'cartesian'
+        x = seeds.x.to_value(const.R_sun)
+        y = seeds.y.to_value(const.R_sun)
+        z = seeds.z.to_value(const.R_sun)
+
+        seeds = np.atleast_2d(np.stack((x, y, z), axis=-1))
+
         flines = []
         for seed in seeds:
             xforw = output._integrate_one_way(1, seed, self.rtol, self.atol)

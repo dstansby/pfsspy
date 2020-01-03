@@ -176,6 +176,14 @@ class Output:
         br = self.bg[..., 2]
         return br[:, :, -1].T
 
+    @property
+    def coordinate_frame(self):
+        """
+        The ~`sunpy.coordinates.frames.HeliographicCarrington` frame that
+        the PFSS solution is in.
+        """
+        return frames.HeliographicCarrington(obstime=self.dtime)
+
     def plot_source_surface(self, ax=None, **kwargs):
         """
         Plot a 2D image of the magnetic field at the source surface.
