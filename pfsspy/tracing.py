@@ -93,7 +93,7 @@ class FortranTracer(Tracer):
         from streamtracer import VectorGrid
 
         # The indexing order on the last index is (phi, s, r)
-        vectors = output.bg
+        vectors = output.bg.copy()
 
         # Correct s direction for coordinate system distortion
         sqrtsg = output.grid._sqrtsg_correction
