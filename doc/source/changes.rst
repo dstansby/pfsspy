@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.4.2
+-----
+
+- Fix a bug where :class`pfsspy.tracing.FotranTracer` would overwrite the
+  magnetic field values in an :class:`~pfsspy.Output` each time it was used.
+
 0.4.1
 -----
 
