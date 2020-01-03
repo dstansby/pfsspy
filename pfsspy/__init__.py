@@ -269,6 +269,7 @@ class Output:
         """
         return frames.HeliographicCarrington(obstime=self.dtime)
 
+    @property
     def source_surface_br(self):
         """
         Br on the source surface.
