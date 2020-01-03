@@ -26,6 +26,12 @@ To convert from the old x, y, z array used for seeds, do::
 
 Note that the latitude must be in the range :math:`[-\pi/2, \pi/2]`.
 
+0.4.2
+-----
+
+- Fix a bug where :class`pfsspy.tracing.FotranTracer` would overwrite the
+  magnetic field values in an :class:`~pfsspy.Output` each time it was used.
+
 0.4.1
 -----
 

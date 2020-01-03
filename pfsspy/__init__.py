@@ -370,7 +370,9 @@ class Output:
             bpg[i, :, :] /= (Sbp[:-1, :-1] + Sbp[1:, :-1] +
                              Sbp[1:, 1:] + Sbp[:-1, 1:])
         bsg *= -1
-        return np.stack((bpg, bsg, brg), axis=-1)
+        out = np.stack((bpg, bsg, brg), axis=-1)
+        out.flags.writeable = False
+        return out
 
     def _common_b(self):
         """
