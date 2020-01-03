@@ -66,7 +66,7 @@ class FortranTracer(Tracer):
     singularity at the poles (ie. :math:`s = \pm 1`), which means seeds placed
     directly on the poles will not go anywhere.
     """
-    def __init__(self, max_steps=1000, step_size=0.1):
+    def __init__(self, max_steps=1000, step_size=0.01):
         from streamtracer import StreamTracer
         self.max_steps = max_steps
         self.step_size = step_size
