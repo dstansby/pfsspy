@@ -185,8 +185,8 @@ class PythonTracer(Tracer):
         self.validate_seeds(seeds)
         seeds = self.transform_seeds(seeds, output)
         seeds.representation_type = 'cartesian'
-        x = seeds.x.to_value(const.R_sun)
-        y = seeds.y.to_value(const.R_sun)
+        x = -seeds.x.to_value(const.R_sun)
+        y = -seeds.y.to_value(const.R_sun)
         z = seeds.z.to_value(const.R_sun)
 
         seeds = np.atleast_2d(np.stack((x, y, z), axis=-1))
