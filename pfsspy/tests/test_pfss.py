@@ -1,5 +1,6 @@
 import astropy.constants as const
 import astropy.coordinates as coord
+import astropy.units as u
 from astropy.tests.helper import quantity_allclose
 
 import matplotlib
@@ -13,49 +14,56 @@ from pfsspy import tracing
 from .example_maps import dipole_map, zero_map
 matplotlib.use('Agg')
 
+R_sun = const.R_sun
+
 
 def test_expansion_factor(dipole_map):
     inp, out = dipole_map
+    out_frame = out.coordinate_frame
 
     tracer = tracing.PythonTracer()
-    field_line = tracer.trace(
-        np.array(pfsspy.coords.strum2cart(0.01, 0.9, 0)), out)[0]
+    seed = coord.SkyCoord(0 * u.deg, 80 * u.deg, 1.1 * R_sun, frame=out_frame)
+    field_line = tracer.trace(seed, out)[0]
     assert field_line.expansion_factor > 1
 
-    field_line = tracer.trace(
-        np.array(pfsspy.coords.strum2cart(0.01, -0.9, 0)), out)[0]
+    seed = coord.SkyCoord(0 * u.deg, -80 * u.deg, 1.1 * R_sun, frame=out_frame)
+    field_line = tracer.trace(seed, out)[0]
     assert field_line.expansion_factor > 1
 
     # This is a closed field line
-    eq_field_line = tracer.trace(
-        np.array([0, 1, 0.1]), out)[0]
+    seed = coord.SkyCoord(0 * u.deg, 0 * u.deg, 1.1 * R_sun, frame=out_frame)
+    eq_field_line = tracer.trace(seed, out)[0]
     assert np.isnan(eq_field_line.expansion_factor)
 
     # Check that a field line near the equator has a bigger expansion
     # factor than one near the pole
-    pil_field_line = tracer.trace(
-        np.array(pfsspy.coords.strum2cart(np.log(2.5 - 0.01), 0.1, 0)), out)[0]
+    seed = coord.SkyCoord(0 * u.deg, 10 * u.deg, 2.49 * R_sun, frame=out_frame)
+    pil_field_line = tracer.trace(seed, out)[0]
     assert pil_field_line.expansion_factor > field_line.expansion_factor
 
 
 def test_field_line_polarity(dipole_map):
     input, out = dipole_map
+    out_frame = out.coordinate_frame
 
     tracer = tracing.PythonTracer()
-    field_line = tracer.trace(np.array([0, 0, 1.01]), out)
+    seed = coord.SkyCoord(0 * u.deg, 90*u.deg, 1.01 * R_sun, frame=out_frame)
+    field_line = tracer.trace(seed, out)
     assert field_line[0].polarity == 1
 
-    field_line = tracer.trace(np.array([0, 0, -1.01]), out)
+    seed = coord.SkyCoord(0 * u.deg, -90*u.deg, 1.01 * R_sun, frame=out_frame)
+    field_line = tracer.trace(seed, out)
     assert field_line[0].polarity == -1
 
     # This is a closed field line
-    eq_field_line = tracer.trace(
-        np.array([0, 1, 0.1]), out)[0]
+    seed = coord.SkyCoord(0 * u.deg, 0 * u.deg, 1.01 * R_sun, frame=out_frame)
+    eq_field_line = tracer.trace(seed, out)[0]
     assert eq_field_line.polarity == 0
 
 
 def test_footpoints(dipole_map):
     input, out = dipole_map
+    out_frame = out.coordinate_frame
 
     tracer = tracing.PythonTracer(atol=1e-8, rtol=1e-8)
 
@@ -67,13 +75,16 @@ def test_footpoints(dipole_map):
         check_radius(fline.solar_footpoint, const.R_sun)
         check_radius(fline.source_surface_footpoint, 2.5 * const.R_sun)
 
-    field_line = tracer.trace(np.array([0, 0, 1.01]), out)[0]
+    seed = coord.SkyCoord(0 * u.deg, 90*u.deg, 1.01 * R_sun, frame=out_frame)
+    field_line = tracer.trace(seed, out)[0]
     check_open_fline(field_line)
 
-    field_line = tracer.trace(np.array([0, 0, -1.01]), out)[0]
+    seed = coord.SkyCoord(0 * u.deg, -90*u.deg, 1.01 * R_sun, frame=out_frame)
+    field_line = tracer.trace(seed, out)[0]
     check_open_fline(field_line)
 
-    field_line = tracer.trace(np.array([0, 1, 0.1]), out)[0]
+    seed = coord.SkyCoord(0 * u.deg, 0 * u.deg, 1.01 * R_sun, frame=out_frame)
+    field_line = tracer.trace(seed, out)[0]
     check_radius(field_line.solar_footpoint, const.R_sun)
     check_radius(field_line.source_surface_footpoint, const.R_sun)
 

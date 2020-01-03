@@ -8,7 +8,10 @@ Creating an open/closed field map on the solar surface.
 ###############################################################################
 # First, import required modules
 import os
+
+import astropy.units as u
 import astropy.constants as const
+from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolor
 
@@ -70,13 +73,14 @@ output = pfsspy.pfss(input)
 #
 # First, set up the tracing seeds
 
-r = 1
+r = const.R_sun
 # Number of steps in cos(latitude)
 nsteps = 90
-phi_1d = np.linspace(0, 2 * np.pi, nsteps * 2 + 1)
-theta_1d = np.arccos(np.linspace(-1, 1, nsteps + 1))
-phi, theta = np.meshgrid(phi_1d, theta_1d, indexing='ij')
-seeds = np.array(coords.sph2cart(r, theta.ravel(), phi.ravel())).T
+lon_1d = np.linspace(0, 2 * np.pi, nsteps * 2 + 1)
+lat_1d = np.arcsin(np.linspace(-1, 1, nsteps + 1))
+lon, lat = np.meshgrid(lon_1d, lat_1d, indexing='ij')
+lon, lat = lon*u.rad, lat*u.rad
+seeds = SkyCoord(lon.ravel(), lat.ravel(), r, frame=output.coordinate_frame)
 
 ###############################################################################
 # Trace the field lines
@@ -98,7 +102,7 @@ ax = axs[1]
 cmap = mcolor.ListedColormap(['tab:red', 'black', 'tab:blue'])
 norm = mcolor.BoundaryNorm([-1.5, -0.5, 0.5, 1.5], ncolors=3)
 pols = field_lines.polarities.reshape(2 * nsteps + 1, nsteps + 1).T
-ax.contourf(np.rad2deg(phi_1d), np.cos(theta_1d), pols, norm=norm, cmap=cmap)
+ax.contourf(np.rad2deg(lon_1d), np.sin(lat_1d), pols, norm=norm, cmap=cmap)
 
 ax.set_title('Open (blue/red) and closed (black) field')
 ax.set_aspect(0.5 * 360 / 2)

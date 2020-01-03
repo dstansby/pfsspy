@@ -43,9 +43,31 @@ def strum2cart(rho, s, phi):
     return sph2cart(r, theta, phi)
 
 
+def cart2sph(x, y, z):
+    """
+    Convert cartesian coordinates to spherical coordinates.
+
+    Returns
+    -------
+    r
+    theta
+    phi
+    """
+    phi = (np.arctan2(y, x) + 2 * np.pi) % (2 * np.pi)
+    r = np.sqrt(x**2 + y**2 + z**2)
+    theta = np.arccos(z / r)
+    return r, theta, phi
+
+
 def cart2strum(x, y, z):
     """
     Convert cartesian coordinates to strumfric coordinates.
+
+    Returns
+    -------
+    rho
+    s
+    phi
     """
     phi = (np.arctan2(y, x) + 2 * np.pi) % (2 * np.pi)
     r = np.sqrt(x**2 + y**2 + z**2)

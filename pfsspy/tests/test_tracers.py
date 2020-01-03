@@ -1,4 +1,6 @@
 import astropy.coordinates as coord
+import astropy.constants as const
+import astropy.units as u
 import numpy as np
 import pytest
 
@@ -11,14 +13,12 @@ from .example_maps import dipole_map
 @pytest.mark.parametrize('tracer', [tracing.PythonTracer(),
                                     tracing.FortranTracer()],
                          ids=('python', 'fortran'))
-@pytest.mark.parametrize('seeds', [np.array([1.01, 0, 1.01]),
-                                   np.array([[1.01, 0, 1.01],
-                                             [1.01, 0, 1.01]])],
-                         ids=('1 seed', 'multiple seeds'))
-def test_field_lines(dipole_map, seeds, tracer):
+def test_field_lines(dipole_map, tracer):
     input, out = dipole_map
+    out_frame = out.coordinate_frame
 
-    field_lines = tracer.trace(seeds, out)
+    seed = coord.SkyCoord(0*u.deg, -45*u.deg, 1.01*const.R_sun, frame=out_frame)
+    field_lines = tracer.trace(seed, out)
     assert isinstance(field_lines[0],
                       pfsspy.fieldline.FieldLine)
     assert isinstance(field_lines.open_field_lines.solar_feet,
@@ -32,6 +32,9 @@ def test_field_lines(dipole_map, seeds, tracer):
 def test_rot_warning(dipole_map):
     tracer = tracing.FortranTracer(max_steps=2)
     input, out = dipole_map
+    out_frame = out.coordinate_frame
+    seed = coord.SkyCoord(0*u.deg, -45*u.deg, 1.01*const.R_sun,
+                          frame=out_frame)
 
     with pytest.warns(UserWarning, match='ran out of steps'):
-        field_lines = tracer.trace(np.array([1.01, 0, 1.01]), out)
+        field_lines = tracer.trace(seed, out)
