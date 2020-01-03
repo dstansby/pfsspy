@@ -128,7 +128,7 @@ output = pfsspy.pfss(input)
 
 ###############################################################################
 # Trace field lines from the footpoints defined above.
-tracer = tracing.PythonTracer(atol=1e-6)
+tracer = tracing.FortranTracer()
 seeds = SkyCoord(lon.ravel(), lat.ravel(), 1.01 * const.R_sun, frame=output.coordinate_frame)
 flines = tracer.trace(seeds, output)
 

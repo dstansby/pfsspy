@@ -98,11 +98,6 @@ class FortranTracer(Tracer):
         """
         from streamtracer import VectorGrid
 
-        seeds = np.atleast_2d(seeds)
-        self.validate_seeds_shape(seeds)
-        # Hacky way to rotate by 180deg
-        seeds[:, 0:2] *= -1
-
         # The indexing order on the last index is (phi, s, r)
         vectors = output.bg.copy()
 
@@ -130,7 +125,7 @@ class FortranTracer(Tracer):
         self.validate_seeds(seeds)
         seeds = self.transform_seeds(seeds, output)
 
-        phi = seeds.lon
+        phi = seeds.lon + 180 * u.deg
         phi.wrap_angle = 360 * u.deg
         phi = phi.to_value(u.rad)
         if not np.all((0 <= phi) & (phi <= 2 * np.pi)):
