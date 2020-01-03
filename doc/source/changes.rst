@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.4.1
+-----
+
+- Reduced the default step size for the :class:`~pfsspy.tracing.FortranTracer`
+  from 0.1 to 0.01 to give more resolved field lines by default.
+
 0.4.0
 -----
 
