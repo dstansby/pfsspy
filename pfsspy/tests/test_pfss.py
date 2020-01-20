@@ -121,17 +121,6 @@ def test_shape(zero_map):
     assert bg.shape == (nphi + 1, ns + 1, nr + 1, 3)
 
 
-def test_sunpy_map_input(zero_map):
-    zero_in, _ = zero_map
-    # Check that loading an input map works
-    header = {'cunit1': 'degree', 'cunit2': 'degree'}
-    map = sunpy.map.Map((zero_in.br, header))
-    with pytest.warns(sunpy.util.exceptions.SunpyUserWarning,
-                      match='Missing metadata for observation time'):
-        input = pfsspy.Input(map, zero_in.grid.nr, zero_in.grid.rss)
-    assert (input.br == zero_in.br).all()
-
-
 def test_input_output(dipole_map):
     # Smoke test of saving/loading files
     _, out = dipole_map

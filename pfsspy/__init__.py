@@ -64,6 +64,13 @@ class Input:
     def __init__(self, br, nr, rss):
         if not isinstance(br, sunpy.map.GenericMap):
             raise ValueError('br must be a SunPy Map')
+
+        for i in ('1', '2'):
+            proj = br.meta[f'ctype{i}'][5:8]
+            if proj != 'CEA':
+                raise ValueError(f'Projection type in CTYPE{i} keyword '
+                                 f'must be CEA (got "{proj}")')
+
         self._map_in = br
         self.dtime = br.date
         self.br = br.data
