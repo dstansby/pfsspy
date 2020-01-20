@@ -168,3 +168,8 @@ def test_header_generation():
     assert header['CRVAL2'] == 0
     assert header['CUNIT1'] == 'deg'
     assert header['CUNIT2'] == 'deg'
+
+
+def test_non_map_input():
+    with pytest.raises(ValueError, match='br must be a SunPy Map'):
+        pfsspy.Input(np.random.rand(2, 2), 1, 1)
