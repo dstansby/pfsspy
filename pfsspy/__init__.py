@@ -53,6 +53,7 @@ class Input:
     ----------
     br : :class:`sunpy.map.Map`
         Boundary condition of radial magnetic field at the inner surface.
+        Note that the data *must* have a cylindrical equal area projection.
 
     nr : int
         Number of cells in the radial direction to calculate the PFSS solution
