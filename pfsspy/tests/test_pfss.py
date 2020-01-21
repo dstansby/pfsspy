@@ -14,14 +14,14 @@ import sunpy.util.exceptions
 import pfsspy.coords
 from pfsspy import tracing
 
-from .example_maps import dipole_map, zero_map
+from .example_maps import dipole_map, zero_map, dipole_result
 matplotlib.use('Agg')
 
 R_sun = const.R_sun
 
 
-def test_expansion_factor(dipole_map):
-    inp, out = dipole_map
+def test_expansion_factor(dipole_result):
+    inp, out = dipole_result
     out_frame = out.coordinate_frame
 
     tracer = tracing.PythonTracer()
@@ -45,8 +45,8 @@ def test_expansion_factor(dipole_map):
     assert pil_field_line.expansion_factor > field_line.expansion_factor
 
 
-def test_field_line_polarity(dipole_map):
-    input, out = dipole_map
+def test_field_line_polarity(dipole_result):
+    input, out = dipole_result
     out_frame = out.coordinate_frame
 
     tracer = tracing.PythonTracer()
@@ -64,8 +64,8 @@ def test_field_line_polarity(dipole_map):
     assert eq_field_line.polarity == 0
 
 
-def test_footpoints(dipole_map):
-    input, out = dipole_map
+def test_footpoints(dipole_result):
+    input, out = dipole_result
     out_frame = out.coordinate_frame
 
     tracer = tracing.PythonTracer(atol=1e-8, rtol=1e-8)
@@ -121,9 +121,9 @@ def test_shape(zero_map):
     assert bg.shape == (nphi + 1, ns + 1, nr + 1, 3)
 
 
-def test_input_output(dipole_map):
+def test_input_output(dipole_result):
     # Smoke test of saving/loading files
-    _, out = dipole_map
+    _, out = dipole_result
     out.save('test.npz')
     new_out = pfsspy.load_output('test.npz')
     assert (new_out.al[0] == out.al[0]).all()
@@ -168,6 +168,12 @@ def test_header_generation():
     assert header['CRVAL2'] == 0
     assert header['CUNIT1'] == 'deg'
     assert header['CUNIT2'] == 'deg'
+
+
+def test_wrong_projection_error(dipole_map):
+    dipole_map.meta['ctype1'] = 'HGLN-CAR'
+    with pytest.raises(ValueError, match='must be CEA'):
+        pfsspy.Input(dipole_map, 5, 2.5)
 
 
 def test_non_map_input():

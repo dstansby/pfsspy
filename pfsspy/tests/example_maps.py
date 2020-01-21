@@ -23,11 +23,8 @@ def zero_map():
 
 @pytest.fixture
 def dipole_map():
-    # Test a completely zero input
     ntheta = 30
     nphi = 20
-    nr = 10
-    rss = 2.5
 
     phi = np.linspace(0, 2 * np.pi, nphi)
     theta = np.linspace(-np.pi / 2, np.pi / 2, ntheta)
@@ -38,8 +35,14 @@ def dipole_map():
 
     br = dipole_Br(1, theta).T
     header = pfsspy.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
-    input_map = Map((br, header))
+    return Map((br, header))
 
-    input = pfsspy.Input(input_map, nr, rss)
+
+@pytest.fixture
+def dipole_result(dipole_map):
+    nr = 10
+    rss = 2.5
+
+    input = pfsspy.Input(dipole_map, nr, rss)
     output = pfsspy.pfss(input)
     return input, output
