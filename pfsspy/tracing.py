@@ -67,7 +67,13 @@ class FortranTracer(Tracer):
     directly on the poles will not go anywhere.
     """
     def __init__(self, max_steps=1000, step_size=0.01):
-        from streamtracer import StreamTracer
+        try:
+            from streamtracer import StreamTracer
+        except ModuleNotFoundError as e:
+            raise RuntimeError(
+                'Using FortranTracer requires the streamtracer module, '
+                'but streamtracer could not be loaded '
+                f'with the following error:\n{e}')
         self.max_steps = max_steps
         self.step_size = step_size
         self.tracer = StreamTracer(max_steps, step_size)
