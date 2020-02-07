@@ -54,8 +54,8 @@ class Tracer(abc.ABC):
         """
         Transform *seeds* to the coordinate system of *output*.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         seeds : astropy.coordinates.SkyCoord
         output : pfsspy.Output
         """

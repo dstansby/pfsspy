@@ -26,6 +26,14 @@ To convert from the old x, y, z array used for seeds, do::
 
 Note that the latitude must be in the range :math:`[-\pi/2, \pi/2]`.
 
+0.4.3
+-----
+
+- Improved the error thrown when trying to use
+  :class`pfsspy.tracing.FotranTracer` without the ``streamtracer`` module
+  installed.
+- Fixed some layout issues in the documentation.
+
 0.4.2
 -----
 
