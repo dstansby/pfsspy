@@ -46,13 +46,12 @@ release = ''
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx_automodapi.automodapi',
-    'numpydoc',
     'sphinx_gallery.gen_gallery',
 ]
-numpydoc_show_class_members = False
-
+napoleon_google_docstring = False
 
 sphinx_gallery_conf = {
     'examples_dirs': '../../examples',

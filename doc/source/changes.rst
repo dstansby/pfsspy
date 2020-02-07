@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.4.3
+-----
+
+- Improved the error thrown when trying to use
+  :class`pfsspy.tracing.FotranTracer` without the ``streamtracer`` module
+  installed.
+- Fixed some layout issues in the documentation.
+
 0.4.2
 -----
 
