@@ -224,15 +224,15 @@ class Output:
     grid : Grid
         Grid that the output was caclulated on.
 
-    dtime : datetime, optional
-        Datetime at which the input was measured.
+    input_map : sunpy.map.Map
+        The input map.
     '''
-    def __init__(self, alr, als, alp, grid, dtime=None):
+    def __init__(self, alr, als, alp, grid, input_map=None):
         self._alr = alr
         self._als = als
         self._alp = alp
         self.grid = grid
-        self.dtime = dtime
+        self.input_map = input_map
 
         # Cache attributes
         self._common_b_cache = None
@@ -261,17 +261,24 @@ class Output:
         """
         Construct a world coordinate system describing the pfsspy solution.
         """
-        shape = (self.grid.ns, self.grid.nphi)
-        # Construct output coordinate frame
-        return carr_cea_wcs_header(self.dtime, shape)
+        return self.input_map.wcs
 
     @property
     def coordinate_frame(self):
         """
-        The ~`sunpy.coordinates.frames.HeliographicCarrington` frame that
-        the PFSS solution is in.
+        The coordinate frame that the PFSS solution is in.
+
+        Notes
+        -----
+        This is either a `~sunpy.coordinates.frames.HeliographicCarrington` or
+        `~sunpy.coordinates.frames.HeliographicStonyhurst` frame, depending on
+        the input map.
         """
-        return frames.HeliographicCarrington(obstime=self.dtime)
+        return self.input_map.coordinate_frame
+
+    @property
+    def dtime(self):
+        return self.input_map.date
 
     @property
     def source_surface_br(self):
@@ -713,4 +720,4 @@ def pfss(input):
     th = np.arccos(sg)
     ph = np.linspace(0, 2 * np.pi, nphi + 1)
 
-    return Output(alr, als, alp, input.grid, input.dtime)
+    return Output(alr, als, alp, input.grid, input.map)
