@@ -66,11 +66,7 @@ class Input:
         if not isinstance(br, sunpy.map.GenericMap):
             raise ValueError('br must be a SunPy Map')
 
-        for i in ('1', '2'):
-            proj = br.meta[f'ctype{i}'][5:8]
-            if proj != 'CEA':
-                raise ValueError(f'Projection type in CTYPE{i} keyword '
-                                 f'must be CEA (got "{proj}")')
+        self._validate_cea(br.meta)
 
         self._map_in = br
         self.dtime = br.date
@@ -79,6 +75,14 @@ class Input:
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
         self.grid = Grid(ns, nphi, nr, rss)
+
+    @staticmethod
+    def _validate_cea(meta):
+        for i in ('1', '2'):
+            proj = meta[f'ctype{i}'][5:8]
+            if proj != 'CEA':
+                raise ValueError(f'Projection type in CTYPE{i} keyword '
+                                 f'must be CEA (got "{proj}")')
 
     @property
     def map(self):
