@@ -89,15 +89,7 @@ class Input:
         """
         :class:`sunpy.map.GenericMap` representation of the input.
         """
-        shape = (self.grid.ns, self.grid.nphi)
-        header = carr_cea_wcs_header(self.dtime, shape)
-        m = sunpy.map.Map((self.br, header))
-
-        vlim = np.max(np.abs(self.br))
-        m.plot_settings['cmap'] = _MAG_CMAP
-        m.plot_settings['vmin'] = -vlim
-        m.plot_settings['vmax'] = vlim
-        return m
+        return self._map_in
 
 
 def carr_cea_wcs_header(dtime, shape):
