@@ -128,12 +128,7 @@ class FortranTracer(Tracer):
         phi = seeds.lon + 180 * u.deg
         # Force 360deg wrapping
         phi = astrocoords.Longitude(phi.to(u.rad)).to_value(u.rad)
-        if not np.all((0 <= phi) & (phi <= 2 * np.pi)):
-            raise ValueError('Some phi coords not in range [0, 2pi]')
-
         s = np.sin(seeds.lat).to_value(u.dimensionless_unscaled)
-        if not np.all((-1 <= s) & (s <= 1)):
-            raise ValueError('Some s coords not in range [-1, 1]')
 
         rho = np.log(seeds.radius.to_value(const.R_sun))
 
