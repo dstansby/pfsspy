@@ -62,12 +62,19 @@ for usage examples see
 
    auto_examples/index
 
-and for the helper modules (behind the scense!) see
+for the helper modules (behind the scense!) see
 
 .. toctree::
    :maxdepth: 2
 
    helpers
+
+and for a quick reference guide to synoptic map FITS conventions see
+
+.. toctree::
+   :maxdepth: 1
+
+   synoptic_fits
 
 Indices and tables
 ------------------
