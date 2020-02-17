@@ -151,3 +151,26 @@ def test_plot_pil(dipole_map):
     # Smoke test of PIL plotting
     inp, out = dipole_map
     out.plot_pil()
+
+
+def test_header_generation():
+    dtime = None
+    ntheta = 180
+    nphi = 360
+    shape = [ntheta, nphi]
+    header = pfsspy.carr_cea_wcs_header(dtime, shape)
+    assert header['LONPOLE'] == 0
+    assert header['CTYPE1'] == 'CRLN-CEA'
+    assert header['CTYPE2'] == 'CRLT-CEA'
+    assert header['PV1_1'] == 1
+    assert header['PV2_1'] == 1
+    assert header['CDELT1'] == 360 / nphi
+    np.testing.assert_almost_equal(
+        header['CDELT2'], (180 / np.pi) * (2 / ntheta))
+
+    assert header['CRPIX1'] == (nphi / 2) + 0.5
+    assert header['CRPIX2'] == (ntheta / 2) + 0.5
+    assert header['CRVAL1'] == 0
+    assert header['CRVAL2'] == 0
+    assert header['CUNIT1'] == 'deg'
+    assert header['CUNIT2'] == 'deg'
