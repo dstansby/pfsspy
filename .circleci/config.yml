@@ -11,7 +11,7 @@ deps-run: &deps-install
 doc-run: &doc-build
   name: Build documentation
   command: |
-    make html SPHINXOPTS='-W -q'
+    make html SPHINXOPTS='-W -q --keep-going'
   working_directory: doc
 
 version: 2
