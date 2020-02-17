@@ -4,6 +4,44 @@ Changelog
 0.5.0
 -----
 
+Changes to outputted maps
+~~~~~~~~~~~~~~~~~~~~~~~~~
+This release largely sees a transition to leveraging Sunpy Map objects. As such,
+the following changes have been made:
+
+:class:`pfsspy.Input` now *must* take a :class:`sunpy.map.GenericMap` as an
+input boundary condition (as opposed to a numpy array). To convert a numpy array
+to a :class:`~sunpy.map.GenericMap`, the helper function
+:func:`pfsspy.carr_cea_wcs_header` can be used::
+
+  map_date = datetime(...)
+  br = np.array(...)
+  header = pfsspy.carr_cea_wcs_header(map_date, br.shape)
+
+  m = sunpy.map.Map((br, header))
+  pfss_input = pfsspy.Input(m, ...)
+
+
+:meth:`pfsspy.Output.source_surface_br` now returns a :class:`~sunpy.map.GenericMap`
+instead of an array. To get the data array use ``source_surface_br.data``.
+
+The new :meth:`pfsspy.Output.source_surface_pils` returns the coordinates of
+the polarity inversion lines on the source surface.
+
+In favour of directly using the plotting functionality built into SunPy,
+the following plotting functionality has been removed:
+
+- ``pfsspy.Input.plot_input``. Instead :class:`Input` has a new
+  :attr:`Input.map`  property, which returns a SunPy map, which can easily
+  be plotted using ``map.plot()``.
+- ``pfsspy.Output.plot_source_surface``. A map of :math:`B_{r}` on the source
+  surface can now be obtained using `pfsspy.Output.source_surface_br`, which
+  again returns a SunPy map.
+- ``pfsspy.Output.plot_pil``. The coordinates of the polarity inversion lines
+  on the source surface can now be obtained using
+  `pfsspy.Output.source_surface_pils`, which can then be plotted using
+  ``ax.plot_coord(pil[0])`` etc. See the examples section for an example.
+
 Specifying tracing seeds
 ~~~~~~~~~~~~~~~~~~~~~~~~
 In order to make specifying seeds easier, they must now be a

@@ -47,12 +47,15 @@ if not os.path.exists('190310t0014gong.fits'):
 # at your own risk!
 [[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
 br = br - np.mean(br)
+
 ###############################################################################
-# GONG maps have their LH edge at -180deg in Carrington Longitude,
-# so roll to get it at 0deg. This way the input magnetic field is in a
-# Carrington frame of reference, which matters later when lining the field
-# lines up with the AIA image.
-br = np.roll(br, header['CRVAL1'] + 180, axis=1)
+# GONG maps have their LH edge at varying Carrington longitudes,
+# so roll to get it at -180deg, which is what the carr_cea_wcs_header function
+# expects.
+br = np.roll(br, header['CRVAL1'], axis=1)
+
+header = pfsspy.carr_cea_wcs_header(header['DATE'], br.shape)
+gong_map = sunpy.map.Map((br, header))
 
 
 ###############################################################################
@@ -62,7 +65,7 @@ rss = 2.5
 
 ###############################################################################
 # Construct the input, and calculate the output solution
-input = pfsspy.Input(br, nrho, rss)
+input = pfsspy.Input(gong_map, nrho, rss)
 output = pfsspy.pfss(input)
 
 
@@ -85,7 +88,7 @@ seeds = SkyCoord(lon.ravel(), lat.ravel(), r, frame=output.coordinate_frame)
 ###############################################################################
 # Trace the field lines
 print('Tracing field lines...')
-tracer = tracing.FortranTracer()
+tracer = tracing.FortranTracer(max_steps=2000)
 field_lines = tracer.trace(seeds, output)
 print('Finished tracing field lines')
 
@@ -93,19 +96,20 @@ print('Finished tracing field lines')
 # Plot the result. The to plot is the input magnetogram, and the bottom plot
 # shows a contour map of the the footpoint polarities, which are +/- 1 for open
 # field regions and 0 for closed field regions.
-fig, axs = plt.subplots(nrows=2, sharex=True, sharey=True)
-ax = axs[0]
-input.plot_input(ax)
+fig = plt.figure()
+m = input.map
+ax = fig.add_subplot(2, 1, 1, projection=m)
+m.plot()
 ax.set_title('Input GONG magnetogram')
 
-ax = axs[1]
+ax = fig.add_subplot(2, 1, 2)
 cmap = mcolor.ListedColormap(['tab:red', 'black', 'tab:blue'])
 norm = mcolor.BoundaryNorm([-1.5, -0.5, 0.5, 1.5], ncolors=3)
 pols = field_lines.polarities.reshape(2 * nsteps + 1, nsteps + 1).T
 ax.contourf(np.rad2deg(lon_1d), np.sin(lat_1d), pols, norm=norm, cmap=cmap)
+ax.set_ylabel('sin(latitude)')
 
 ax.set_title('Open (blue/red) and closed (black) field')
 ax.set_aspect(0.5 * 360 / 2)
 
-plt.tight_layout()
 plt.show()

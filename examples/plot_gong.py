@@ -45,13 +45,15 @@ if not os.path.exists('190310t0014gong.fits'):
 # at your own risk!
 [[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
 br = br - np.mean(br)
-###############################################################################
-# GONG maps have their LH edge at -180deg in Carrington Longitude,
-# so roll to get it at 0deg. This way the input magnetic field is in a
-# Carrington frame of reference, which matters later when lining the field
-# lines up with the AIA image.
-br = np.roll(br, header['CRVAL1'] + 180, axis=1)
 
+###############################################################################
+# GONG maps have their LH edge at varying Carrington longitudes,
+# so roll to get it at -180deg, which is what the carr_cea_wcs_header function
+# expects.
+br = np.roll(br, header['CRVAL1'], axis=1)
+
+header = pfsspy.carr_cea_wcs_header(header['DATE'], br.shape)
+gong_map = sunpy.map.Map((br, header))
 
 ###############################################################################
 # The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
@@ -63,29 +65,46 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-input = pfsspy.Input(br, nrho, rss)
+input = pfsspy.Input(gong_map, nrho, rss)
+
+
+def set_axes_lims(ax):
+    ax.set_xlim(0, 360)
+    ax.set_ylim(0, 180)
+
 
 ###############################################################################
 # Using the Input object, plot the input field
-fig, ax = plt.subplots()
-mesh = input.plot_input(ax)
-fig.colorbar(mesh)
+m = input.map
+fig = plt.figure()
+ax = plt.subplot(projection=m)
+m.plot()
+plt.colorbar()
 ax.set_title('Input field')
+set_axes_lims(ax)
 
 ###############################################################################
 # Now calculate the PFSS solution, and plot the polarity inversion line.
 output = pfsspy.pfss(input)
-output.plot_pil(ax)
+# output.plot_pil(ax)
 
 
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the
 # polarity inversion line.
-fig, ax = plt.subplots()
-mesh = output.plot_source_surface(ax)
-fig.colorbar(mesh)
-output.plot_pil(ax)
+ss_br = output.source_surface_br
+# Create the figure and axes
+fig = plt.figure()
+ax = plt.subplot(projection=ss_br)
+
+# Plot the source surface map
+ss_br.plot()
+# Plot the polarity inversion line
+ax.plot_coord(output.source_surface_pils[0])
+# Plot formatting
+plt.colorbar()
 ax.set_title('Source surface magnetic field')
+set_axes_lims(ax)
 
 
 ###############################################################################

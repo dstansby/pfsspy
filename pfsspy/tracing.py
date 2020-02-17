@@ -125,15 +125,10 @@ class FortranTracer(Tracer):
         self.validate_seeds(seeds)
         seeds = self.transform_seeds(seeds, output)
 
-        phi = seeds.lon
-        phi.wrap_angle = 360 * u.deg
-        phi = phi.to_value(u.rad)
-        if not np.all((0 <= phi) & (phi <= 2 * np.pi)):
-            raise ValueError('Some phi coords not in range [0, 2pi]')
-
+        phi = seeds.lon + 180 * u.deg
+        # Force 360deg wrapping
+        phi = astrocoords.Longitude(phi.to(u.rad)).to_value(u.rad)
         s = np.sin(seeds.lat).to_value(u.dimensionless_unscaled)
-        if not np.all((-1 <= s) & (s <= 1)):
-            raise ValueError('Some s coords not in range [-1, 1]')
 
         rho = np.log(seeds.radius.to_value(const.R_sun))
 
@@ -153,6 +148,9 @@ class FortranTracer(Tracer):
                 f'(currently set to {self.max_steps}) and try again.')
 
         xs = [np.stack(pfsspy.coords.strum2cart(x[:, 2], x[:, 1], x[:, 0]), axis=-1) for x in xs]
+        # Hacky way to rotate back by 180deg
+        for xout in xs:
+            xout[:, 0:2] *= -1
         flines = [fieldline.FieldLine(x[:, 0], x[:, 1], x[:, 2], output.dtime, output) for x in xs]
         return fieldline.FieldLines(flines)
 
@@ -177,8 +175,8 @@ class PythonTracer(Tracer):
         self.validate_seeds(seeds)
         seeds = self.transform_seeds(seeds, output)
         seeds.representation_type = 'cartesian'
-        x = seeds.x.to_value(const.R_sun)
-        y = seeds.y.to_value(const.R_sun)
+        x = -seeds.x.to_value(const.R_sun)
+        y = -seeds.y.to_value(const.R_sun)
         z = seeds.z.to_value(const.R_sun)
 
         seeds = np.atleast_2d(np.stack((x, y, z), axis=-1))
@@ -189,6 +187,8 @@ class PythonTracer(Tracer):
             xback = output._integrate_one_way(-1, seed, self.rtol, self.atol)
             xback = np.flip(xback, axis=1)
             xout = np.row_stack((xback.T, xforw.T))
+            # Hacky way to roate back by 180deg
+            xout[:, 0:2] *= -1
             fline = fieldline.FieldLine(xout[:, 0],
                                         xout[:, 1],
                                         xout[:, 2],

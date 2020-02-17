@@ -4,14 +4,15 @@ import functools
 import astropy
 import astropy.coordinates as coord
 import astropy.constants as const
+import astropy.time
 import astropy.units as u
+import astropy.wcs
 
 from sunpy.coordinates import frames
-import sunpy.map.mapbase
+import sunpy.map
 
 import numpy as np
 import scipy.linalg as la
-import pfsspy.plot
 import pfsspy.coords
 import pfsspy.tracing
 import pfsspy.fieldline
@@ -35,6 +36,9 @@ if (distutils.version.LooseVersion(astropy.__version__) <
     raise RuntimeError('pfsspy requires astropy v3 to run ' +
                        f'(found version {astropy.__version__} installed)')
 
+# Default colourmap for magnetic field maps
+_MAG_CMAP = 'RdBu'
+
 
 class Input:
     r"""
@@ -47,10 +51,9 @@ class Input:
 
     Parameters
     ----------
-    br : 2D array, :class:`sunpy.map.Map`
-        Boundary condition of radial magnetic field at the inner surface. If
-        a SunPy map is automatically extracted as map.data with *no*
-        processing.
+    br : :class:`sunpy.map.Map`
+        Boundary condition of radial magnetic field at the inner surface.
+        Note that the data *must* have a cylindrical equal area projection.
 
     nr : int
         Number of cells in the radial direction to calculate the PFSS solution
@@ -58,31 +61,35 @@ class Input:
 
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
-
-    dtime : datetime, optional
-        Datetime at which the input map was measured. If given it is attached
-        to the output and any field lines traced from the output.
     """
-    def __init__(self, br, nr, rss, dtime=None):
-        self.dtime = dtime
-        if isinstance(br, sunpy.map.mapbase.GenericMap):
-            br = br.data
-        self.br = br
+    def __init__(self, br, nr, rss):
+        if not isinstance(br, sunpy.map.GenericMap):
+            raise ValueError('br must be a SunPy Map')
+
+        self._validate_cea(br.meta)
+
+        self._map_in = br
+        self.dtime = br.date
+        self.br = br.data
+
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
         self.grid = Grid(ns, nphi, nr, rss)
 
-    def plot_input(self, ax=None, **kwargs):
-        """
-        Plot a 2D image of the magnetic field boundary condition.
+    @staticmethod
+    def _validate_cea(meta):
+        for i in ('1', '2'):
+            proj = meta[f'ctype{i}'][5:8]
+            if proj != 'CEA':
+                raise ValueError(f'Projection type in CTYPE{i} keyword '
+                                 f'must be CEA (got "{proj}")')
 
-        Parameters
-        ----------
-        ax : Axes
-            Axes to plot to. If ``None``, creates a new figure.
+    @property
+    def map(self):
         """
-        mesh = pfsspy.plot.radial_cut(self.grid.pc, self.grid.sc, self.br, ax, **kwargs)
-        return mesh
+        :class:`sunpy.map.GenericMap` representation of the input.
+        """
+        return self._map_in
 
 
 def carr_cea_wcs_header(dtime, shape):
@@ -176,15 +183,15 @@ class Output:
     grid : Grid
         Grid that the output was caclulated on.
 
-    dtime : datetime, optional
-        Datetime at which the input was measured.
+    input_map : sunpy.map.Map
+        The input map.
     '''
-    def __init__(self, alr, als, alp, grid, dtime=None):
+    def __init__(self, alr, als, alp, grid, input_map=None):
         self._alr = alr
         self._als = als
         self._alp = alp
         self.grid = grid
-        self.dtime = dtime
+        self.input_map = input_map
 
         # Cache attributes
         self._common_b_cache = None
@@ -209,55 +216,64 @@ class Output:
             file, alr=self._alr, als=self._als, alp=self._alp,
             rss=np.array([self.grid.rss]))
 
-    @property
-    def source_surface_br(self):
+    def _wcs_header(self):
         """
-        Br on the source surface.
+        Construct a world coordinate system describing the pfsspy solution.
         """
-        br = self.bg[..., 2]
-        return br[:, :, -1].T
+        return self.input_map.wcs
 
     @property
     def coordinate_frame(self):
         """
-        The ~`sunpy.coordinates.frames.HeliographicCarrington` frame that
-        the PFSS solution is in.
+        The coordinate frame that the PFSS solution is in.
+
+        Notes
+        -----
+        This is either a `~sunpy.coordinates.frames.HeliographicCarrington` or
+        `~sunpy.coordinates.frames.HeliographicStonyhurst` frame, depending on
+        the input map.
         """
-        return frames.HeliographicCarrington(obstime=self.dtime)
+        return self.input_map.coordinate_frame
 
-    def plot_source_surface(self, ax=None, **kwargs):
+    @property
+    def dtime(self):
+        return self.input_map.date
+
+    @property
+    def source_surface_br(self):
         """
-        Plot a 2D image of the magnetic field at the source surface.
+        Br on the source surface.
 
-        Parameters
-        ----------
-        ax : Axes
-            Axes to plot to. If ``None``, creates a new figure.
-        kwargs :
-            Additional keyword arguments are handed to `pcolormesh` that
-            renders the source surface. A useful option here is handing
-            ``rasterized=True`` to rasterize the image.
+        Returns
+        -------
+        :class:`sunpy.map.GenericMap`
         """
-        mesh = pfsspy.plot.radial_cut(
-            self.grid.pg, self.grid.sg, self.source_surface_br, ax, **kwargs)
-        return mesh
+        # Get radial component at the top
+        br = self.bc[0][:, :, -1]
+        # Remove extra ghost cells off the edge of the grid
+        br = br[1:-1, 1:-1].T
+        m = sunpy.map.Map((br, self._wcs_header()))
+        vlim = np.max(np.abs(br))
+        m.plot_settings['cmap'] = _MAG_CMAP
+        m.plot_settings['vmin'] = -vlim
+        m.plot_settings['vmax'] = vlim
+        return m
 
-    def plot_pil(self, ax=None, **kwargs):
+    @property
+    def source_surface_pils(self):
         """
-        Plot the polarity inversion line on the source surface.
+        Coordinates of the polarity inversion lines on the source surface.
 
-        The PIL is where Br = 0.
-
-        Parameters
-        ----------
-        ax : Axes
-            Axes to plot to. If ``None``, creates a new figure.
-
-        **kwargs :
-            Keyword arguments are handed to `ax.contour`.
+        Notes
+        -----
+        This is always returned as a list of coordinates, as in general there
+        may be more than one polarity inversion line.
         """
-        pfsspy.plot.contour(
-            self.grid.pg, self.grid.sg, self.source_surface_br, [0], ax, **kwargs)
+        from skimage import measure
+        m = self.source_surface_br
+        contours = measure.find_contours(m.data, 0)
+        contours = [m.wcs.pixel_to_world(c[:, 1], c[:, 0]) for c in contours]
+        return contours
 
     @property
     def _brgi(self):
@@ -663,4 +679,4 @@ def pfss(input):
     th = np.arccos(sg)
     ph = np.linspace(0, 2 * np.pi, nphi + 1)
 
-    return Output(alr, als, alp, input.grid, input.dtime)
+    return Output(alr, als, alp, input.grid, input.map)

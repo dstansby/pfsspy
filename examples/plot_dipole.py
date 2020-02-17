@@ -11,9 +11,11 @@ source field.
 import astropy.constants as const
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+from astropy.time import Time
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatch
 import numpy as np
+import sunpy.map
 import pfsspy
 import pfsspy.coords as coords
 
@@ -50,13 +52,17 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-input = pfsspy.Input(br, nrho, rss)
+header = pfsspy.carr_cea_wcs_header(Time('2020-1-1'), br.shape)
+input_map = sunpy.map.Map((br, header))
+input = pfsspy.Input(input_map, nrho, rss)
 
 ###############################################################################
 # Using the Input object, plot the input field
-fig, ax = plt.subplots()
-mesh = input.plot_input(ax)
-fig.colorbar(mesh)
+m = input.map
+fig = plt.figure()
+ax = plt.subplot(projection=m)
+m.plot()
+plt.colorbar()
 ax.set_title('Input dipole field')
 
 ###############################################################################
@@ -66,10 +72,18 @@ output = pfsspy.pfss(input)
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the
 # polarity inversion line.
-fig, ax = plt.subplots()
-mesh = output.plot_source_surface(ax)
-fig.colorbar(mesh)
-output.plot_pil(ax)
+ss_br = output.source_surface_br
+
+# Create the figure and axes
+fig = plt.figure()
+ax = plt.subplot(projection=ss_br)
+
+# Plot the source surface map
+ss_br.plot()
+# Plot the polarity inversion line
+ax.plot_coord(output.source_surface_pils[0])
+# Plot formatting
+plt.colorbar()
 ax.set_title('Source surface magnetic field')
 
 ###############################################################################
