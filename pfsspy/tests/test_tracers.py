@@ -7,14 +7,14 @@ import pytest
 import pfsspy
 from pfsspy import tracing
 
-from .example_maps import dipole_map
+from .example_maps import dipole_map, dipole_result
 
 
 @pytest.mark.parametrize('tracer', [tracing.PythonTracer(),
                                     tracing.FortranTracer()],
                          ids=('python', 'fortran'))
-def test_field_lines(dipole_map, tracer):
-    input, out = dipole_map
+def test_field_lines(dipole_result, tracer):
+    input, out = dipole_result
     out_frame = out.coordinate_frame
 
     seed = coord.SkyCoord(0*u.deg, -45*u.deg, 1.01*const.R_sun, frame=out_frame)
@@ -29,9 +29,9 @@ def test_field_lines(dipole_map, tracer):
                       np.ndarray)
 
 
-def test_rot_warning(dipole_map):
+def test_rot_warning(dipole_result):
     tracer = tracing.FortranTracer(max_steps=2)
-    input, out = dipole_map
+    input, out = dipole_result
     out_frame = out.coordinate_frame
     seed = coord.SkyCoord(0*u.deg, -45*u.deg, 1.01*const.R_sun,
                           frame=out_frame)
