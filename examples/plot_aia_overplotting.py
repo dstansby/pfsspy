@@ -72,7 +72,7 @@ gong_map = sunpy.map.Map((br, header))
 # The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
 # rho = ln(r), and r is the standard spherical radial coordinate. We need to
 # define the number of grid points in rho, and the source surface radius.
-nrho = 50
+nrho = 25
 rss = 2.5
 
 ###############################################################################
