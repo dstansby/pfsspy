@@ -72,6 +72,12 @@ class Input:
         self.dtime = br.date
         self.br = br.data
 
+        # Force some nice defaults
+        self._map_in.plot_settings['cmap'] = 'RdBu'
+        lim = np.nanmax(np.abs(self._map_in.data))
+        self._map_in.plot_settings['vmin'] = -lim
+        self._map_in.plot_settings['vmax'] = lim
+
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
         self.grid = Grid(ns, nphi, nr, rss)
