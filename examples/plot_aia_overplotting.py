@@ -9,7 +9,6 @@ overplot the traced field lines on an AIA 193 map.
 ###############################################################################
 # First, we import the required modules
 from datetime import datetime
-import os
 
 import astropy.constants as const
 import astropy.units as u
@@ -23,20 +22,12 @@ import pfsspy
 import pfsspy.coords as coords
 import pfsspy.tracing as tracing
 
+from gong_helpers import get_gong_map
+
 
 ###############################################################################
-# Load a GONG magnetic field map. The map date is 10/03/2019
-if not os.path.exists('190310t0014gong.fits') and not os.path.exists('190310t0014gong.fits.gz'):
-    import urllib.request
-    urllib.request.urlretrieve(
-        'https://gong2.nso.edu/oQR/zqs/201903/mrzqs190310/mrzqs190310t0014c2215_333.fits.gz',
-        '190310t0014gong.fits.gz')
-
-if not os.path.exists('190310t0014gong.fits'):
-    import gzip
-    with gzip.open('190310t0014gong.fits.gz', 'rb') as f:
-        with open('190310t0014gong.fits', 'wb') as g:
-            g.write(f.read())
+# Load a GONG magnetic field map. The map date is 10/03/2019.
+gong_fname = get_gong_map()
 
 ###############################################################################
 # Load the corresponding AIA 193 map
@@ -56,7 +47,7 @@ dtime = aia.date
 # The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
 # not obvious this is the correct way to do this, so use the following lines
 # at your own risk!
-[[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
+[[br, header]] = sunpy.io.fits.read(gong_fname)
 br = br - np.mean(br)
 
 ###############################################################################

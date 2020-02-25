@@ -7,8 +7,6 @@ Creating an open/closed field map on the solar surface.
 
 ###############################################################################
 # First, import required modules
-import os
-
 import astropy.units as u
 import astropy.constants as const
 from astropy.coordinates import SkyCoord
@@ -22,21 +20,8 @@ import pfsspy
 from pfsspy import coords
 from pfsspy import tracing
 
+from gong_helpers import get_gong_map
 
-###############################################################################
-# Load a GONG magnetic field map. If 'gong.fits' is present in the current
-# directory, just use that, otherwise download a sample GONG map.
-if not os.path.exists('190310t0014gong.fits') and not os.path.exists('190310t0014gong.fits.gz'):
-    import urllib.request
-    urllib.request.urlretrieve(
-        'https://gong2.nso.edu/oQR/zqs/201903/mrzqs190310/mrzqs190310t0014c2215_333.fits.gz',
-        '190310t0014gong.fits.gz')
-
-if not os.path.exists('190310t0014gong.fits'):
-    import gzip
-    with gzip.open('190310t0014gong.fits.gz', 'rb') as f:
-        with open('190310t0014gong.fits', 'wb') as g:
-            g.write(f.read())
 
 ###############################################################################
 # We can now use SunPy to load the GONG fits file, and extract the magnetic
@@ -45,7 +30,8 @@ if not os.path.exists('190310t0014gong.fits'):
 # The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
 # not obvious this is the correct way to do this, so use the following lines
 # at your own risk!
-[[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
+gong_fname = get_gong_map()
+[[br, header]] = sunpy.io.fits.read(gong_fname)
 br = br - np.mean(br)
 
 ###############################################################################
