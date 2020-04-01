@@ -410,7 +410,7 @@ class Output:
         return br, -bs, bp
 
     @property
-    @functools.lru_cache()
+    @functools.lru_cache(maxsize=1)
     def bg(self):
         """
         B as a (weighted) averaged on grid points.
