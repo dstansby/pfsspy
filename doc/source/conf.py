@@ -117,6 +117,7 @@ html_static_path = []
 #
 # html_sidebars = {}
 
+default_role = 'py:obj'
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -201,4 +202,6 @@ epub_exclude_files = ['search.html']
 intersphinx_mapping = {'https://docs.python.org/3/': None,
                        'http://docs.astropy.org/en/stable': None,
                        'https://docs.sunpy.org/en/stable': None,
-                       'https://docs.scipy.org/doc/numpy': None}
+                       'https://docs.scipy.org/doc/numpy': None,
+                       'https://streamtracer.readthedocs.io/en/stable': None,
+                       'https://docs.scipy.org/doc/scipy/reference': None}
