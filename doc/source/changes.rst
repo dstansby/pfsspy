@@ -33,7 +33,7 @@ the following plotting functionality has been removed:
 
 - ``pfsspy.Input.plot_input``. Instead :class:`Input` has a new
   :attr:`Input.map`  property, which returns a SunPy map, which can easily
-  be plotted using ``map.plot()``.
+  be plotted using `GenericMap.plot()`.
 - ``pfsspy.Output.plot_source_surface``. A map of :math:`B_{r}` on the source
   surface can now be obtained using `pfsspy.Output.source_surface_br`, which
   again returns a SunPy map.
@@ -63,6 +63,18 @@ To convert from the old x, y, z array used for seeds, do::
   seeds = astropy.coordinates.SkyCoord(lon, lat, r, frame=output.coordinate_frame)
 
 Note that the latitude must be in the range :math:`[-\pi/2, \pi/2]`.
+
+Using `FieldLine` objects
+~~~~~~~~~~~~~~~~~~~~~~~~~
+The input to `FieldLine` objects is now a set of `SkyCoord` along with the
+`Output` through which the field lines were traced.
+
+Tracing seeds
+~~~~~~~~~~~~~
+`Tracer` no longer has a ``transform_seeds`` helper method, which has been
+replaced by `coords_to_xyz` and `xyz_to_coords`. These new methods convert
+between `SkyCoord` objects, and Cartesian xyz coordinates of the internal
+magnetic field grid.
 
 0.4.3
 -----
