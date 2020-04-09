@@ -119,7 +119,7 @@ def carr_cea_wcs_header(dtime, shape):
 
     frame_out = coord.SkyCoord(
         0 * u.deg, 0 * u.deg, obstime=obstime,
-        frame="heliographic_carrington")
+        frame="heliographic_carrington", observer='sun')
     # Construct header
     header = sunpy.map.make_fitswcs_header(
         shape, frame_out,
