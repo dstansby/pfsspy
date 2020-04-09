@@ -20,9 +20,8 @@ class Tracer(abc.ABC):
         """
         Parameters
         ----------
-        seeds : (n, 3) array
-            Coordinaes of the magnetic field seed points, in cartesian
-            coordinates.
+        seeds : astropy.coordinates.SkyCoord
+            Coordinaes of the magnetic field seed points.
         output : pfsspy.Output
             pfss output.
 
@@ -90,9 +89,9 @@ class FortranTracer(Tracer):
 
     Parameters
     ----------
-    max_steps: int, optional
+    max_steps: int
         Maximum number of steps each streamline can take before stopping.
-    step_size : float, optional
+    step_size : float
         Step size as a fraction of cell size at the equator.
 
     Notes
@@ -182,9 +181,9 @@ class PythonTracer(Tracer):
     """
     def __init__(self, atol=1e-4, rtol=1e-4):
         """
-        dtf : float, optional
+        dtf : float
             Absolute tolerance of the tracing.
-        rtol : float, optional
+        rtol : float
             Relative tolerance of the tracing.
         """
         self.atol = atol
