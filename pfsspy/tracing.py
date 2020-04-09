@@ -115,7 +115,7 @@ class FortranTracer(Tracer):
     @staticmethod
     def vector_grid(output):
         """
-        Create a `streamtracer.VectorGrid` object from an `~pfsspy.Ouput`.
+        Create a `streamtracer.VectorGrid` object from an `~pfsspy.Output`.
         """
         from streamtracer import VectorGrid
 

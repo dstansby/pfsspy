@@ -31,9 +31,9 @@ the polarity inversion lines on the source surface.
 In favour of directly using the plotting functionality built into SunPy,
 the following plotting functionality has been removed:
 
-- ``pfsspy.Input.plot_input``. Instead `Input` has a new
-  `Input.map`  property, which returns a SunPy map, which can easily
-  be plotted using `GenericMap.plot()`.
+- ``pfsspy.Input.plot_input``. Instead `~pfsspy.Input` has a new
+  `~pfsspy.Input.map`  property, which returns a SunPy map, which can easily
+  be plotted using `sunpy.map.GenericMap.plot`.
 - ``pfsspy.Output.plot_source_surface``. A map of :math:`B_{r}` on the source
   surface can now be obtained using `pfsspy.Output.source_surface_br`, which
   again returns a SunPy map.
@@ -64,17 +64,19 @@ To convert from the old x, y, z array used for seeds, do::
 
 Note that the latitude must be in the range :math:`[-\pi/2, \pi/2]`.
 
-Using `FieldLine` objects
-~~~~~~~~~~~~~~~~~~~~~~~~~
-The input to `FieldLine` objects is now a set of `SkyCoord` along with the
-`Output` through which the field lines were traced.
+Using `~pfsspy.fieldline.FieldLine` objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The input to `~pfsspy.fieldline.FieldLine` objects is now a set of
+`~astropy.coordinates.SkyCoord` along with the `~pfsspy.Output` through which
+the field lines were traced.
 
 Tracing seeds
 ~~~~~~~~~~~~~
-`Tracer` no longer has a ``transform_seeds`` helper method, which has been
-replaced by `coords_to_xyz` and `xyz_to_coords`. These new methods convert
-between `SkyCoord` objects, and Cartesian xyz coordinates of the internal
-magnetic field grid.
+`pfsspy.tracing.Tracer` no longer has a ``transform_seeds`` helper method, which
+has been replaced by `~pfsspy.tracing.Tracer.coords_to_xyz` and
+`~pfsspy.tracing.Tracer.xyz_to_coords`. These new methods convert
+between `~astropy.coordinates.SkyCoord` objects, and Cartesian xyz coordinates
+of the internal magnetic field grid.
 
 0.4.3
 -----
@@ -134,21 +136,21 @@ Changes to `~pfsspy.Output`
 
 0.3.2
 -----
-- Fixed a bug in `pfsspy.FieldLine.is_open`, where some open field lines
+- Fixed a bug in ``pfsspy.FieldLine.is_open``, where some open field lines
   were incorrectly calculated to be closed.
 
 0.3.1
 -----
 - Fixed a bug that incorrectly set closed line field polarities to -1 or 1
   (instead of the correct value of zero).
-- `FieldLine.footpoints` has been removed in favour of the new
-  `pfsspy.FieldLine.solar_footpoint` and
-  `pfsspy.FieldLine.source_surface_footpoint`. These each return a single
+- ``FieldLine.footpoints`` has been removed in favour of the new
+  ``pfsspy.FieldLine.solar_footpoint`` and
+  ``pfsspy.FieldLine.source_surface_footpoint``. These each return a single
   footpoint. For a closed field line, see the API docs for further details
   on this.
-- `pfsspy.FieldLines` has been added, as a convenience class to store a
+- ``pfsspy.FieldLines`` has been added, as a convenience class to store a
   collection of field lines. This means convenience attributes such as
-  `pfsspy.FieldLines.source_surface_feet` can be used, and their values are
+  ``pfsspy.FieldLines.source_surface_feet`` can be used, and their values are
   cached greatly speeding up repeated use.
 
 0.3.0
@@ -168,13 +170,13 @@ Changes to `~pfsspy.Output`
 
   Additionally ``x0`` can be a 2D array that contains multiple seed
   points to trace, taking advantage of the parallelism of some solvers.
-- The `pfsspy.FieldLine` class no longer inherits from
+- The ``pfsspy.FieldLine`` class no longer inherits from
   `~astropy.coordinates.SkyCoord`, but the
   `~astropy.coordinates.SkyCoord` coordinates are now stored in
-  `pfsspy.FieldLine.coords` attribute.
-- `pfsspy.FieldLine.expansion_factor` now returns ``np.nan`` instead of
+  ``pfsspy.FieldLine.coords`` attribute.
+- ``pfsspy.FieldLine.expansion_factor`` now returns ``np.nan`` instead of
   ``None`` if the field line is closed.
-- `pfsspy.FieldLine` now has a `~pfsspy.FieldLine.footpoints`
+- ``pfsspy.FieldLine`` now has a ``~pfsspy.FieldLine.footpoints``
   attribute that returns the footpoint(s) of the field line.
 
 0.2.0
@@ -184,15 +186,15 @@ Changes to `~pfsspy.Output`
   argument *dtime*, which stores the datetime on which the magnetic field
   measurements were made. This is then propagated to the *obstime* attribute
   of computed field lines, allowing them to be transformed in to coordinate
-  systems other than Carrignton frames.
-- `pfsspy.FieldLine` no longer overrrides the SkyCoord ``__init__``;
+  systems other than Carrington frames.
+- ``pfsspy.FieldLine`` no longer overrrides the SkyCoord ``__init__``;
   this should not matter to users, as FieldLine objects are constructed
   internally by calling `pfsspy.Output.trace`
 
 0.1.5
 -----
 
-- `Output.plot_source_surface` now accepts keyword arguments that are given to
+- ``Output.plot_source_surface`` now accepts keyword arguments that are given to
   Matplotlib to control the plotting of the source surface.
 
 0.1.4
@@ -206,7 +208,7 @@ Changes to `~pfsspy.Output`
 0.1.3
 -----
 
-- `pfsspy.Output.plot_pil` now accepts keyword arguments that are given
+- ``pfsspy.Output.plot_pil`` now accepts keyword arguments that are given
   to Matplotlib to control the style of the contour.
-- `pfsspy.FieldLine.expansion_factor` is now cached, and is only
+- ``pfsspy.FieldLine.expansion_factor`` is now cached, and is only
   calculated once if accessed multiple times.
