@@ -116,12 +116,8 @@ class FieldLine:
 
     Parameters
     ----------
-    x, y, z : array
-        Field line coordinates in a Carrington frame of reference. Must be in
-        units of solar radii.
-    dtime : astropy.time.Time
-        Time at which the field line was traced. Needed for transforming the
-        field line coordinates to other coordinate frames.
+    coords : astropy.coordinates.SkyCoord
+        Field line coordinates.
     output : Output
         The PFSS output through which this field line was traced.
 
