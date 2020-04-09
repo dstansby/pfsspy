@@ -9,9 +9,9 @@ Changes to outputted maps
 This release largely sees a transition to leveraging Sunpy Map objects. As such,
 the following changes have been made:
 
-:class:`pfsspy.Input` now *must* take a :class:`sunpy.map.GenericMap` as an
+`pfsspy.Input` now *must* take a `sunpy.map.GenericMap` as an
 input boundary condition (as opposed to a numpy array). To convert a numpy array
-to a :class:`~sunpy.map.GenericMap`, the helper function
+to a `~sunpy.map.GenericMap`, the helper function
 :func:`pfsspy.carr_cea_wcs_header` can be used::
 
   map_date = datetime(...)
@@ -22,17 +22,17 @@ to a :class:`~sunpy.map.GenericMap`, the helper function
   pfss_input = pfsspy.Input(m, ...)
 
 
-:meth:`pfsspy.Output.source_surface_br` now returns a :class:`~sunpy.map.GenericMap`
+`pfsspy.Output.source_surface_br` now returns a `~sunpy.map.GenericMap`
 instead of an array. To get the data array use ``source_surface_br.data``.
 
-The new :meth:`pfsspy.Output.source_surface_pils` returns the coordinates of
+The new `pfsspy.Output.source_surface_pils` returns the coordinates of
 the polarity inversion lines on the source surface.
 
 In favour of directly using the plotting functionality built into SunPy,
 the following plotting functionality has been removed:
 
-- ``pfsspy.Input.plot_input``. Instead :class:`Input` has a new
-  :attr:`Input.map`  property, which returns a SunPy map, which can easily
+- ``pfsspy.Input.plot_input``. Instead `Input` has a new
+  `Input.map`  property, which returns a SunPy map, which can easily
   be plotted using `GenericMap.plot()`.
 - ``pfsspy.Output.plot_source_surface``. A map of :math:`B_{r}` on the source
   surface can now be obtained using `pfsspy.Output.source_surface_br`, which
@@ -45,7 +45,7 @@ the following plotting functionality has been removed:
 Specifying tracing seeds
 ~~~~~~~~~~~~~~~~~~~~~~~~
 In order to make specifying seeds easier, they must now be a
-:class:`~astropy.coordinates.SkyCoord` object. The coordinates are internally
+`~astropy.coordinates.SkyCoord` object. The coordinates are internally
 transformed to the Carrington frame of the PFSS solution, and then traced.
 
 This should make specifying coordinates easier, as lon/lat/r coordinates can
@@ -88,12 +88,12 @@ magnetic field grid.
 -----
 
 - Fix a bug where :class`pfsspy.tracing.FotranTracer` would overwrite the
-  magnetic field values in an :class:`~pfsspy.Output` each time it was used.
+  magnetic field values in an `~pfsspy.Output` each time it was used.
 
 0.4.1
 -----
 
-- Reduced the default step size for the :class:`~pfsspy.tracing.FortranTracer`
+- Reduced the default step size for the `~pfsspy.tracing.FortranTracer`
   from 0.1 to 0.01 to give more resolved field lines by default.
 
 0.4.0
@@ -102,11 +102,11 @@ magnetic field grid.
 New fortran field line tracer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 :mod:`pfsspy.tracing` contains a new tracer,
-:class:`~pfsspy.tracing.FortranTracer`. This requires and uses the
+`~pfsspy.tracing.FortranTracer`. This requires and uses the
 `streamtracer <https://streamtracer.readthedocs.io/en/stable/>`_ package
 which does streamline tracing rapidly in python-wrapped
 fortran code. For large numbers of field lines this results in an ~50x
-speedup compared to the :class:`~pfsspy.tracing.PythonTracer`.
+speedup compared to the `~pfsspy.tracing.PythonTracer`.
 
 Changing existing code to use the new tracer is as easy as swapping out
 ``tracer = pfsspy.tracer.PythonTracer()`` for
@@ -117,45 +117,45 @@ Changes to field line objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - ``pfsspy.FieldLines`` and ``pfsspy.FieldLine`` have moved to
-  :class:`pfsspy.fieldline.FieldLines` and
-  :class:`pfsspy.fieldline.FieldLine`.
-- :class:`~pfsspy.fieldline.FieldLines` no longer has ``source_surface_feet``
+  `pfsspy.fieldline.FieldLines` and
+  `pfsspy.fieldline.FieldLine`.
+- `~pfsspy.fieldline.FieldLines` no longer has ``source_surface_feet``
   and ``solar_feet`` properties. Instead these have moved to the new
-  :class:`pfsspy.fieldline.OpenFieldLines` class. All the open field lines
-  can be accessed from a :class:`~pfsspy.fieldline.FieldLines` instance using
-  the new :attr:`~pfsspy.fieldline.FieldLines.open_field_lines`
+  `pfsspy.fieldline.OpenFieldLines` class. All the open field lines
+  can be accessed from a `~pfsspy.fieldline.FieldLines` instance using
+  the new `~pfsspy.fieldline.FieldLines.open_field_lines`
   property.
 
-Changes to :class:`~pfsspy.Output`
+Changes to `~pfsspy.Output`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- :attr:`pfsspy.Output.bg` is now returned as a 4D array instead of three 3D
+- `pfsspy.Output.bg` is now returned as a 4D array instead of three 3D
   arrays. The final index now indexes the vector components; see the docstring
   for more information.
 
 0.3.2
 -----
-- Fixed a bug in :attr:`pfsspy.FieldLine.is_open`, where some open field lines
+- Fixed a bug in `pfsspy.FieldLine.is_open`, where some open field lines
   were incorrectly calculated to be closed.
 
 0.3.1
 -----
 - Fixed a bug that incorrectly set closed line field polarities to -1 or 1
   (instead of the correct value of zero).
-- :attr:`FieldLine.footpoints` has been removed in favour of the new
-  :attr:`pfsspy.FieldLine.solar_footpoint` and
-  :attr:`pfsspy.FieldLine.source_surface_footpoint`. These each return a single
+- `FieldLine.footpoints` has been removed in favour of the new
+  `pfsspy.FieldLine.solar_footpoint` and
+  `pfsspy.FieldLine.source_surface_footpoint`. These each return a single
   footpoint. For a closed field line, see the API docs for further details
   on this.
-- :class:`pfsspy.FieldLines` has been added, as a convenience class to store a
+- `pfsspy.FieldLines` has been added, as a convenience class to store a
   collection of field lines. This means convenience attributes such as
-  :attr:`pfsspy.FieldLines.source_surface_feet` can be used, and their values are
+  `pfsspy.FieldLines.source_surface_feet` can be used, and their values are
   cached greatly speeding up repeated use.
 
 0.3.0
 -----
 
 - The API for doing magnetic field tracing has changed.
-  The new :mod:`pfsspy.tracing` module contains :class:`~pfsspy.tracing.Tracer`
+  The new :mod:`pfsspy.tracing` module contains `~pfsspy.tracing.Tracer`
   classes that are used to perform the tracing. Code needs to be changed from::
 
     fline = output.trace(x0)
@@ -168,26 +168,26 @@ Changes to :class:`~pfsspy.Output`
 
   Additionally ``x0`` can be a 2D array that contains multiple seed
   points to trace, taking advantage of the parallelism of some solvers.
-- The :class:`pfsspy.FieldLine` class no longer inherits from
-  :class:`~astropy.coordinates.SkyCoord`, but the
-  :class:`~astropy.coordinates.SkyCoord` coordinates are now stored in
-  :attr:`pfsspy.FieldLine.coords` attribute.
-- :attr:`pfsspy.FieldLine.expansion_factor` now returns ``np.nan`` instead of
+- The `pfsspy.FieldLine` class no longer inherits from
+  `~astropy.coordinates.SkyCoord`, but the
+  `~astropy.coordinates.SkyCoord` coordinates are now stored in
+  `pfsspy.FieldLine.coords` attribute.
+- `pfsspy.FieldLine.expansion_factor` now returns ``np.nan`` instead of
   ``None`` if the field line is closed.
-- :class:`pfsspy.FieldLine` now has a :attr:`~pfsspy.FieldLine.footpoints`
+- `pfsspy.FieldLine` now has a `~pfsspy.FieldLine.footpoints`
   attribute that returns the footpoint(s) of the field line.
 
 0.2.0
 -----
 
-- :class:`pfsspy.Input` and :class:`pfsspy.Output` now take the optional keyword
+- `pfsspy.Input` and `pfsspy.Output` now take the optional keyword
   argument *dtime*, which stores the datetime on which the magnetic field
   measurements were made. This is then propagated to the *obstime* attribute
   of computed field lines, allowing them to be transformed in to coordinate
   systems other than Carrignton frames.
-- :class:`pfsspy.FieldLine` no longer overrrides the SkyCoord ``__init__``;
+- `pfsspy.FieldLine` no longer overrrides the SkyCoord ``__init__``;
   this should not matter to users, as FieldLine objects are constructed
-  internally by calling :meth:`pfsspy.Output.trace`
+  internally by calling `pfsspy.Output.trace`
 
 0.1.5
 -----
@@ -206,7 +206,7 @@ Changes to :class:`~pfsspy.Output`
 0.1.3
 -----
 
-- :meth:`pfsspy.Output.plot_pil` now accepts keyword arguments that are given
+- `pfsspy.Output.plot_pil` now accepts keyword arguments that are given
   to Matplotlib to control the style of the contour.
-- :attr:`pfsspy.FieldLine.expansion_factor` is now cached, and is only
+- `pfsspy.FieldLine.expansion_factor` is now cached, and is only
   calculated once if accessed multiple times.

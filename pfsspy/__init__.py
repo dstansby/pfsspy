@@ -51,7 +51,7 @@ class Input:
 
     Parameters
     ----------
-    br : :class:`sunpy.map.Map`
+    br : sunpy.map.GenericMap
         Boundary condition of radial magnetic field at the inner surface.
         Note that the data *must* have a cylindrical equal area projection.
 
@@ -189,7 +189,7 @@ class Output:
     grid : Grid
         Grid that the output was caclulated on.
 
-    input_map : sunpy.map.Map
+    input_map : sunpy.map.GenericMap
         The input map.
     '''
     def __init__(self, alr, als, alp, grid, input_map=None):
@@ -352,10 +352,9 @@ class Output:
         Parameters
         ----------
         tracer : tracing.Tracer
-        seeds : (n, 3) shaped array
-            Starting coordinates, in cartesian coordinates.
-            :mod:`pfsspy.coords` can be used to convert from spherical
-            coordinates to cartesian coordinates and vice versa.
+            Field line tracer.
+        seeds : astropy.coordinates.SkyCoord
+            Starting coordinates.
         """
         return tracer.trace(seeds, self)
 
@@ -423,7 +422,7 @@ class Output:
 
         Returns
         -------
-        array
+        numpy.ndarray
             A (nphi, ns, nrho, 3) shaped array. The last index gives the
             corodinate axis, 0 for Bphi, 1 for Bs, 2 for Brho.
         """
