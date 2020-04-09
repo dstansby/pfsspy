@@ -1,6 +1,6 @@
 
 deps-run: &deps-install
-  name: Build documentation
+  name: Install dependencies
   command: |
     sudo apt install -y graphviz gfortran
     python -m pip install --user --upgrade pip

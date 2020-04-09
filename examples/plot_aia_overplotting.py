@@ -22,21 +22,27 @@ import sunpy.io.fits
 import pfsspy
 import pfsspy.coords as coords
 import pfsspy.tracing as tracing
+from gong_helpers import get_gong_map, fix_gong_header
 
 
 ###############################################################################
-# Load a GONG magnetic field map. The map date is 10/03/2019
-if not os.path.exists('190310t0014gong.fits') and not os.path.exists('190310t0014gong.fits.gz'):
-    import urllib.request
-    urllib.request.urlretrieve(
-        'https://gong2.nso.edu/oQR/zqs/201903/mrzqs190310/mrzqs190310t0014c2215_333.fits.gz',
-        '190310t0014gong.fits.gz')
+# Load a GONG magnetic field map. If 'gong.fits' is present in the current
+# directory, just use that, otherwise download a sample GONG map.
+gong_fname = get_gong_map()
 
-if not os.path.exists('190310t0014gong.fits'):
-    import gzip
-    with gzip.open('190310t0014gong.fits.gz', 'rb') as f:
-        with open('190310t0014gong.fits', 'wb') as g:
-            g.write(f.read())
+###############################################################################
+# We can now use SunPy to load the GONG fits file, and extract the magnetic
+# field data.
+#
+# Note that some of the metadata has to be updated to make it FITS compatible.
+#
+# The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
+# not obvious this is the correct way to do this, so use the following lines
+# at your own risk!
+[[br, header]] = sunpy.io.fits.read(gong_fname)
+header = fix_gong_header(header)
+br = br - np.mean(br)
+gong_map = sunpy.map.Map((br, header))
 
 ###############################################################################
 # Load the corresponding AIA 193 map
@@ -48,22 +54,6 @@ if not os.path.exists('AIA20190310.fits'):
 
 aia = sunpy.map.Map('AIA20190310.fits')
 dtime = aia.date
-
-###############################################################################
-# We can now use SunPy to load the GONG fits file, and extract the magnetic
-# field data.
-#
-# Note that some of the metadata has to be updated to make it FITS compatible.
-#
-# The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
-# not obvious this is the correct way to do this, so use the following lines
-# at your own risk!
-[[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
-header['CUNIT1'] = 'deg'
-header['CUNIT2'] = 'deg'
-header['CDELT2'] = 180 / np.pi * header['CDELT2']
-br = br - np.mean(br)
-gong_map = sunpy.map.Map((br, header))
 
 ###############################################################################
 # The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
