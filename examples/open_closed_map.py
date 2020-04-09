@@ -21,40 +21,26 @@ import sunpy.map
 import pfsspy
 from pfsspy import coords
 from pfsspy import tracing
+from gong_helpers import get_gong_map, fix_gong_header
 
 
 ###############################################################################
 # Load a GONG magnetic field map. If 'gong.fits' is present in the current
 # directory, just use that, otherwise download a sample GONG map.
-if not os.path.exists('190310t0014gong.fits') and not os.path.exists('190310t0014gong.fits.gz'):
-    import urllib.request
-    urllib.request.urlretrieve(
-        'https://gong2.nso.edu/oQR/zqs/201903/mrzqs190310/mrzqs190310t0014c2215_333.fits.gz',
-        '190310t0014gong.fits.gz')
-
-if not os.path.exists('190310t0014gong.fits'):
-    import gzip
-    with gzip.open('190310t0014gong.fits.gz', 'rb') as f:
-        with open('190310t0014gong.fits', 'wb') as g:
-            g.write(f.read())
+gong_fname = get_gong_map()
 
 ###############################################################################
 # We can now use SunPy to load the GONG fits file, and extract the magnetic
 # field data.
 #
+# Note that some of the metadata has to be updated to make it FITS compatible.
+#
 # The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
 # not obvious this is the correct way to do this, so use the following lines
 # at your own risk!
-[[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
+[[br, header]] = sunpy.io.fits.read(gong_fname)
+header = fix_gong_header(header)
 br = br - np.mean(br)
-
-###############################################################################
-# GONG maps have their LH edge at varying Carrington longitudes,
-# so roll to get it at -180deg, which is what the carr_cea_wcs_header function
-# expects.
-br = np.roll(br, header['CRVAL1'], axis=1)
-
-header = pfsspy.carr_cea_wcs_header(header['DATE'], br.shape)
 gong_map = sunpy.map.Map((br, header))
 
 
@@ -78,7 +64,7 @@ output = pfsspy.pfss(input)
 
 r = const.R_sun
 # Number of steps in cos(latitude)
-nsteps = 90
+nsteps = 30
 lon_1d = np.linspace(0, 2 * np.pi, nsteps * 2 + 1)
 lat_1d = np.arcsin(np.linspace(-1, 1, nsteps + 1))
 lon, lat = np.meshgrid(lon_1d, lat_1d, indexing='ij')
