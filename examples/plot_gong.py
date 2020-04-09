@@ -127,6 +127,7 @@ field_lines = tracer.trace(seeds, output)
 
 for field_line in field_lines:
     color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
+    field_line.coords.representation_type = 'cartesian'
     ax.plot(field_line.coords.x / const.R_sun,
             field_line.coords.y / const.R_sun,
             field_line.coords.z / const.R_sun,
