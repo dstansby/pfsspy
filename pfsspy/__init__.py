@@ -229,6 +229,12 @@ class Output:
         return self.input_map.wcs
 
     @property
+    def _lon0(self):
+        """Longitude offset of the map."""
+        return (self.input_map.meta['crval1'] *
+                u.Unit(self.input_map.meta['cunit1']))
+
+    @property
     def coordinate_frame(self):
         """
         The coordinate frame that the PFSS solution is in.

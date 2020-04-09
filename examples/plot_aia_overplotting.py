@@ -53,19 +53,16 @@ dtime = aia.date
 # We can now use SunPy to load the GONG fits file, and extract the magnetic
 # field data.
 #
+# Note that some of the metadata has to be updated to make it FITS compatible.
+#
 # The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
 # not obvious this is the correct way to do this, so use the following lines
 # at your own risk!
 [[br, header]] = sunpy.io.fits.read('190310t0014gong.fits')
+header['CUNIT1'] = 'deg'
+header['CUNIT2'] = 'deg'
+header['CDELT2'] = 180 / np.pi * header['CDELT2']
 br = br - np.mean(br)
-
-###############################################################################
-# GONG maps have their LH edge at varying Carrington longitudes,
-# so roll to get it at -180deg, which is what the carr_cea_wcs_header function
-# expects.
-br = np.roll(br, header['CRVAL1'], axis=1)
-
-header = pfsspy.carr_cea_wcs_header(aia.date, br.shape)
 gong_map = sunpy.map.Map((br, header))
 
 ###############################################################################
@@ -100,27 +97,26 @@ aia.plot(ax)
 ###############################################################################
 # Now we construct a 10 x 10 grid of footpoitns to trace some magnetic field
 # lines from.
-#
-# The figure shows a zoom in of the magnetic field map, with the footpoints
-# overplotted. The footpoints are centered around the active region metnioned
-# above.
 s, phi = np.meshgrid(np.linspace(0.1, 0.2, 5),
                      np.deg2rad(np.linspace(55, 65, 5)))
 lat = np.arcsin(s) * u.rad
 lon = phi * u.rad
+seeds = SkyCoord(lon.ravel(), lat.ravel(), 1.01 * const.R_sun,
+                 frame=gong_map.coordinate_frame)
 
+###############################################################################
+# Plot the magnetogram and the seed footpoints The footpoints are centered
+# around the active region metnioned above.
 m = input.map
 fig = plt.figure()
 ax = plt.subplot(projection=m)
 m.plot()
 plt.colorbar()
 
-ax.scatter(np.rad2deg(phi), np.rad2deg(np.arcsin(s)),
-           color='k', s=1, transform=ax.get_transform('world'))
+ax.plot_coord(seeds, color='black', marker='o', linewidth=0, markersize=2)
 
-# ax.set_xlim(50, 70)
-# ax.set_ylim(0, 0.35)
 ax.set_title('Field line footpoints')
+ax.set_ylim(bottom=0)
 
 #######################################################################
 # Compute the PFSS solution from the GONG magnetic field input
@@ -129,7 +125,6 @@ output = pfsspy.pfss(input)
 ###############################################################################
 # Trace field lines from the footpoints defined above.
 tracer = tracing.PythonTracer()
-seeds = SkyCoord(lon.ravel(), lat.ravel(), 1.01 * const.R_sun, frame=output.coordinate_frame)
 flines = tracer.trace(seeds, output)
 
 ###############################################################################
@@ -142,8 +137,7 @@ m.plot()
 plt.colorbar()
 
 for fline in flines:
-    coords = fline.coords.transform_to(m.coordinate_frame)
-    ax.plot_coord(coords, color='black', linewidth=1)
+    ax.plot_coord(fline.coords, color='black', linewidth=1)
 
 # ax.set_xlim(55, 65)
 # ax.set_ylim(0.1, 0.25)
@@ -157,8 +151,7 @@ ax = plt.subplot(1, 1, 1, projection=aia)
 transform = ax.get_transform('world')
 aia.plot(ax)
 for fline in flines:
-    coords = fline.coords.transform_to(aia.coordinate_frame)
-    ax.plot_coord(coords, alpha=0.8, linewidth=1, color='black')
+    ax.plot_coord(fline.coords, alpha=0.8, linewidth=1, color='black')
 
 ax.set_xlim(500, 900)
 ax.set_ylim(400, 800)
