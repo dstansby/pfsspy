@@ -116,12 +116,8 @@ class FieldLine:
 
     Parameters
     ----------
-    x, y, z : array
-        Field line coordinates in a Carrington frame of reference. Must be in
-        units of solar radii.
-    dtime : astropy.time.Time
-        Time at which the field line was traced. Needed for transforming the
-        field line coordinates to other coordinate frames.
+    coords : astropy.coordinates.SkyCoord
+        Field line coordinates.
     output : Output
         The PFSS output through which this field line was traced.
 
@@ -130,18 +126,13 @@ class FieldLine:
     coords : astropy.coordinates.SkyCoord
         Field line coordinates.
     """
-    def __init__(self, x, y, z, dtime, output):
-        self.coords = coord.SkyCoord(x=x * const.R_sun,
-                                     y=y * const.R_sun,
-                                     z=z * const.R_sun,
-                                     frame=frames.HeliographicCarrington,
-                                     obstime=dtime,
-                                     representation_type='cartesian')
+    def __init__(self, coords, output):
+        self.coords = coords
         self._output = output
         # Set _is_open
-        r = np.sqrt(np.array(x)**2 + np.array(y)**2 + np.array(z)**2)
-        rtol = 0.1
-        self._is_open = np.abs(r[0] - r[-1]) > 1 * rtol
+        r = coords.radius
+        atol = 0.1
+        self._is_open = np.abs(r[0] - r[-1]) > const.R_sun * atol
         # Set _polarity
         self._polarity = -np.sign(r[0] - r[-1]) * self._is_open
 

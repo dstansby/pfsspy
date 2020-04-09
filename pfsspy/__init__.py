@@ -119,7 +119,7 @@ def carr_cea_wcs_header(dtime, shape):
 
     frame_out = coord.SkyCoord(
         0 * u.deg, 0 * u.deg, obstime=obstime,
-        frame="heliographic_carrington")
+        frame="heliographic_carrington", observer='sun')
     # Construct header
     header = sunpy.map.make_fitswcs_header(
         shape, frame_out,
@@ -227,6 +227,12 @@ class Output:
         Construct a world coordinate system describing the pfsspy solution.
         """
         return self.input_map.wcs
+
+    @property
+    def _lon0(self):
+        """Longitude offset of the map."""
+        return (self.input_map.meta['crval1'] *
+                u.Unit(self.input_map.meta['cunit1']))
 
     @property
     def coordinate_frame(self):

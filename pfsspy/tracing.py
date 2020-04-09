@@ -50,16 +50,38 @@ class Tracer(abc.ABC):
         """
 
     @staticmethod
-    def transform_seeds(seeds, output):
+    def coords_to_xyz(seeds, output):
         """
-        Transform *seeds* to the coordinate system of *output*.
+        Given a set of astropy sky coordinates, transoform them to
+        cartesian x, y, z coordinates.
 
         Parameters
         ----------
         seeds : astropy.coordinates.SkyCoord
         output : pfsspy.Output
         """
-        return seeds.transform_to(output.coordinate_frame)
+        seeds = seeds.transform_to(output.coordinate_frame)
+        # In general the phi value of the magnetic field array can differ from
+        # the longitude value in world coordinates
+        lon = seeds.lon
+        # Note we want 0deg longitude to be a point on the LH side of the map,
+        # but _lon0 is center of map, so offset by 180deg
+        lon -= output._lon0 - 180 * u.deg
+        x, y, z = astrocoords.spherical_to_cartesian(
+            seeds.radius, seeds.lat, lon)
+        x = x.to_value(const.R_sun)
+        y = y.to_value(const.R_sun)
+        z = z.to_value(const.R_sun)
+        return x, y, z
+
+    @staticmethod
+    def xyz_to_coords(x, y, z, output):
+        r, lat, lon = astrocoords.cartesian_to_spherical(x, y, z)
+        r *= const.R_sun
+        lon += output._lon0 + 180 * u.deg
+        coords = astrocoords.SkyCoord(
+            lon, lat, r, frame=output.coordinate_frame)
+        return coords
 
 
 class FortranTracer(Tracer):
@@ -123,14 +145,13 @@ class FortranTracer(Tracer):
 
     def trace(self, seeds, output):
         self.validate_seeds(seeds)
-        seeds = self.transform_seeds(seeds, output)
+        x, y, z = self.coords_to_xyz(seeds, output)
+        r, lat, phi = astrocoords.cartesian_to_spherical(x, y, z)
 
-        phi = seeds.lon + 180 * u.deg
         # Force 360deg wrapping
-        phi = astrocoords.Longitude(phi.to(u.rad)).to_value(u.rad)
-        s = np.sin(seeds.lat).to_value(u.dimensionless_unscaled)
-
-        rho = np.log(seeds.radius.to_value(const.R_sun))
+        phi = astrocoords.Longitude(phi).to_value(u.rad)
+        s = np.sin(lat).to_value(u.dimensionless_unscaled)
+        rho = np.log(r)
 
         seeds = np.atleast_2d(np.stack((phi, s, rho), axis=-1))
 
@@ -148,10 +169,8 @@ class FortranTracer(Tracer):
                 f'(currently set to {self.max_steps}) and try again.')
 
         xs = [np.stack(pfsspy.coords.strum2cart(x[:, 2], x[:, 1], x[:, 0]), axis=-1) for x in xs]
-        # Hacky way to rotate back by 180deg
-        for xout in xs:
-            xout[:, 0:2] *= -1
-        flines = [fieldline.FieldLine(x[:, 0], x[:, 1], x[:, 2], output.dtime, output) for x in xs]
+        xs = [self.xyz_to_coords(x[:, 0], x[:, 1], x[:, 2], output) for x in xs]
+        flines = [fieldline.FieldLine(coords, output) for coords in xs]
         return fieldline.FieldLines(flines)
 
 
@@ -173,12 +192,7 @@ class PythonTracer(Tracer):
 
     def trace(self, seeds, output):
         self.validate_seeds(seeds)
-        seeds = self.transform_seeds(seeds, output)
-        seeds.representation_type = 'cartesian'
-        x = -seeds.x.to_value(const.R_sun)
-        y = -seeds.y.to_value(const.R_sun)
-        z = seeds.z.to_value(const.R_sun)
-
+        x, y, z = self.coords_to_xyz(seeds, output)
         seeds = np.atleast_2d(np.stack((x, y, z), axis=-1))
 
         flines = []
@@ -188,11 +202,8 @@ class PythonTracer(Tracer):
             xback = np.flip(xback, axis=1)
             xout = np.row_stack((xback.T, xforw.T))
             # Hacky way to roate back by 180deg
-            xout[:, 0:2] *= -1
-            fline = fieldline.FieldLine(xout[:, 0],
-                                        xout[:, 1],
-                                        xout[:, 2],
-                                        output.dtime,
-                                        output)
+            coords = self.xyz_to_coords(xout[:, 0], xout[:, 1], xout[:, 2], output)
+            fline = fieldline.FieldLine(coords, output)
+
             flines.append(fline)
         return fieldline.FieldLines(flines)
