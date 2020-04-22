@@ -74,5 +74,5 @@ plt.show()
 ###############################################################################
 # This shows the results of the above script, run on a 2014 MacBook pro with
 # a 2.6 GHz Dual-Core Intel Core i5:
-# 
-# .. image:: ../example_figures/tracer_performace.png
+#
+# .. image:: ../../example_figures/tracer_performace.png
