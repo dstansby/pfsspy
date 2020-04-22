@@ -21,6 +21,7 @@ before_install:
 # Have to install numpy first to make streamtracer work
 - python -m pip install numpy
 - python -m pip install -r requirements/test.txt
+- python -m pip install numba
 
 install:
 - python -m pip install -e .
