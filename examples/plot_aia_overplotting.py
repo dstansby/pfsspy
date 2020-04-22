@@ -22,7 +22,7 @@ import sunpy.io.fits
 import pfsspy
 import pfsspy.coords as coords
 import pfsspy.tracing as tracing
-from gong_helpers import get_gong_map, fix_gong_header
+from gong_helpers import get_gong_map
 
 
 ###############################################################################
@@ -34,15 +34,12 @@ gong_fname = get_gong_map()
 # We can now use SunPy to load the GONG fits file, and extract the magnetic
 # field data.
 #
-# Note that some of the metadata has to be updated to make it FITS compatible.
-#
 # The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
 # not obvious this is the correct way to do this, so use the following lines
 # at your own risk!
-[[br, header]] = sunpy.io.fits.read(gong_fname)
-header = fix_gong_header(header)
-br = br - np.mean(br)
-gong_map = sunpy.map.Map((br, header))
+gong_map = sunpy.map.Map(gong_fname)
+# Remove the mean
+gong_map = sunpy.map.Map(gong_map.data - np.mean(gong_map.data), gong_map.meta)
 
 ###############################################################################
 # Load the corresponding AIA 193 map

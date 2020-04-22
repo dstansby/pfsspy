@@ -16,6 +16,8 @@ import scipy.linalg as la
 import pfsspy.coords
 import pfsspy.tracing
 import pfsspy.fieldline
+# Import here to register map sources
+import pfsspy.map
 
 from .grid import Grid
 
