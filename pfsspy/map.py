@@ -30,8 +30,8 @@ class ADAPTMap(sunpy.map.GenericMap):
         if not ((header['cunit2'] == 'deg') & 
                 (header['naxis2']*header['cdelt2'] == 180)) :
             raise AssertionError("Latitude metadata doesn't add to 180deg")
-        header['ctype1'] = 'CRLN'
-        header['ctype2'] = 'CRLT'
+        header['ctype1'] = 'CRLN-CAR'
+        header['ctype2'] = 'CRLT-CAR'
         super().__init__(data, header, **kwargs)
 
     @classmethod
