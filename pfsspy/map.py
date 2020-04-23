@@ -22,3 +22,18 @@ class GongSynopticMap(sunpy.map.GenericMap):
         """Determines if header corresponds to an GONG map."""
         return (str(header.get('TELESCOP', '')).endswith('GONG') and
                 str(header.get('CTYPE1', '').startswith('CRLN')))
+
+
+class ADAPTMap(sunpy.map.GenericMap):
+    def __init__(self, data, header, **kwargs):
+        header['date-obs'] = header['maptime']
+        header['t_obs'] = header['maptime']
+        header['ctype1'] = 'CRLN-CEA'
+        header['ctype2'] = 'CRLT-CEA'
+        super().__init__(data, header, **kwargs)
+
+    @classmethod
+    def is_datasource_for(cls, data, header, **kwargs):
+        """Determines if header corresponds to an ADAPT map."""
+        return header.get('model') == 'ADAPT'
+
