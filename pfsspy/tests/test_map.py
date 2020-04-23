@@ -25,3 +25,10 @@ def gong_map():
 def test_gong_source(gong_map):
     m = sunpy.map.Map(gong_map)
     assert isinstance(m, pfsspy.map.GongSynopticMap)
+
+def test_adapt_map():
+    import sunpy.io
+    adapt_fits = sunpy.io.fits.read("ftp://gong.nso.edu/adapt/maps/gong/2020/adapt40311_03k012_202001010000_i00005600n1.fts.gz")
+    for map_slice in adapt_fits[0].data :
+        m = sunpy.map.Map((map_slice,adapt_fits[0].header))
+        assert isinstance(m, pfsspy.map.ADAPTMap)
