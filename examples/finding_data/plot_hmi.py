@@ -5,16 +5,16 @@ How to search for HMI data.
 
 This example shows how to search for, download, and load HMI data, using the
 `sunpy.net.Fido` interface. HMI data is available via. the Joint Stanford
-Operations Center (JSOC_), and the radial magnetic field synoptic maps come
+Operations Center (`JSOC`_), and the radial magnetic field synoptic maps come
 in two sizes:
 
 - 'hmi.Synoptic_Mr_720s': 3600 x 1440 in (lon, lat)
 - 'hmi.mrsynop_small_720s': 720 x 360 in (lon, lat)
 
-For more information on the maps, see the synoptic maps page_ on the JSOC site.
+For more information on the maps, see the `synoptic maps page`_ on the JSOC site.
 
-_JSOC
-_synoptic maps page http://jsoc.stanford.edu/HMI/LOS_Synoptic_charts.html
+.. _JSOC: http://jsoc.stanford.edu/
+.. _synoptic maps page: http://jsoc.stanford.edu/HMI/LOS_Synoptic_charts.html
 """
 
 ###############################################################################
