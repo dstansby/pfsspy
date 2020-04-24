@@ -7,4 +7,5 @@ sphinx_rtd_theme
 sphinx-gallery
 sphinx>2
 bs4
+drms
 zeep
