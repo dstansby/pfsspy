@@ -22,3 +22,20 @@ class GongSynopticMap(sunpy.map.GenericMap):
         """Determines if header corresponds to an GONG map."""
         return (str(header.get('TELESCOP', '')).endswith('GONG') and
                 str(header.get('CTYPE1', '').startswith('CRLN')))
+
+
+class ADAPTMap(sunpy.map.GenericMap):
+    def __init__(self, data, header, **kwargs):
+        header['date-obs'] = header['maptime']
+        if not ((header['cunit2'] == 'deg') & 
+                (header['naxis2']*header['cdelt2'] == 180)) :
+            raise AssertionError("Latitude metadata doesn't add to 180deg")
+        header['ctype1'] = 'CRLN-CAR'
+        header['ctype2'] = 'CRLT-CAR'
+        super().__init__(data, header, **kwargs)
+
+    @classmethod
+    def is_datasource_for(cls, data, header, **kwargs):
+        """Determines if header corresponds to an ADAPT map."""
+        return header.get('model') == 'ADAPT'
+
