@@ -40,19 +40,22 @@ print(result)
 
 ###############################################################################
 # If we just want to download a specific map, we can specify a Carrington
-# rotation number
+# rotation number. In addition, downloading files from JSOC requires a
+# notification email. If you use this code, please replace this email address
+# with your own one, registered here:
+# http://jsoc.stanford.edu/ajax/register_email.html
 crot = a.jsoc.PrimeKey('CAR_ROT', 2210)
 result = Fido.search(time, series, crot, a.jsoc.Notify("jsoc@cadair.com"))
 print(result)
 
 ###############################################################################
-# Download the files
-#
-# This will download the files to the default sunpy download directory.
+# Download the files. This downloads files to the default sunpy download
+# directory.
 files = Fido.fetch(result)
+print(files)
 
 ###############################################################################
 # Read in a file. This will read in the first file downloaded to a sunpy Map
 # object.
-hmi_map = sunpy.map.Map(files[0])
+hmi_map = sunpy.map.Map(files[1])
 print(hmi_map)
