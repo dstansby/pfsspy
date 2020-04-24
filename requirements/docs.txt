@@ -6,4 +6,5 @@ sphinx-automodapi>=0.10
 sphinx_rtd_theme
 sphinx-gallery
 sphinx>2
+bs4
 zeep
