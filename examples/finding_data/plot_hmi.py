@@ -57,5 +57,5 @@ print(files)
 ###############################################################################
 # Read in a file. This will read in the first file downloaded to a sunpy Map
 # object.
-hmi_map = sunpy.map.Map(files[1])
+hmi_map = sunpy.map.Map(files[0])
 print(hmi_map)
