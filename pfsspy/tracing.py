@@ -73,15 +73,6 @@ class Tracer(abc.ABC):
         z = z.to_value(const.R_sun)
         return x, y, z
 
-    @staticmethod
-    def xyz_to_coords(x, y, z, output):
-        r, lat, lon = astrocoords.cartesian_to_spherical(x, y, z)
-        r *= const.R_sun
-        lon += output._lon0 + 180 * u.deg
-        coords = astrocoords.SkyCoord(
-            lon, lat, r, frame=output.coordinate_frame)
-        return coords
-
 
 class FortranTracer(Tracer):
     r"""
@@ -168,8 +159,7 @@ class FortranTracer(Tracer):
                 f'(currently set to {self.max_steps}) and try again.')
 
         xs = [np.stack(pfsspy.coords.strum2cart(x[:, 2], x[:, 1], x[:, 0]), axis=-1) for x in xs]
-        xs = [self.xyz_to_coords(x[:, 0], x[:, 1], x[:, 2], output) for x in xs]
-        flines = [fieldline.FieldLine(coords, output) for coords in xs]
+        flines = [fieldline.FieldLine(x[:, 0], x[:, 1], x[:, 2], output) for x in xs]
         return fieldline.FieldLines(flines)
 
 
@@ -200,9 +190,7 @@ class PythonTracer(Tracer):
             xback = output._integrate_one_way(-1, seed, self.rtol, self.atol)
             xback = np.flip(xback, axis=1)
             xout = np.row_stack((xback.T, xforw.T))
-            # Hacky way to roate back by 180deg
-            coords = self.xyz_to_coords(xout[:, 0], xout[:, 1], xout[:, 2], output)
-            fline = fieldline.FieldLine(coords, output)
+            fline = fieldline.FieldLine(xout[:, 0], xout[:, 1], xout[:, 2], output)
 
             flines.append(fline)
         return fieldline.FieldLines(flines)

@@ -70,12 +70,6 @@ pfsspy now comes with built in `sunpy` map sources for GONG and ADAPT synoptic
 maps, which automatically fix some non-compliant FITS header values. To use
 these, just import ``pfsspy`` and load the .FITS files as normal with sunpy.
 
-Using `~pfsspy.fieldline.FieldLine` objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The input to `~pfsspy.fieldline.FieldLine` objects is now a set of
-`~astropy.coordinates.SkyCoord` along with the `~pfsspy.Output` through which
-the field lines were traced.
-
 Tracing seeds
 ~~~~~~~~~~~~~
 `pfsspy.tracing.Tracer` no longer has a ``transform_seeds`` helper method, which

@@ -1,6 +1,7 @@
 import astropy.coordinates as coord
 import astropy.constants as const
 import sunpy.coordinates.frames as frames
+import astropy.units as u
 
 import numpy as np
 import scipy.interpolate
@@ -126,15 +127,27 @@ class FieldLine:
     coords : astropy.coordinates.SkyCoord
         Field line coordinates.
     """
-    def __init__(self, coords, output):
-        self.coords = coords
+    def __init__(self, x, y, z, output):
+        self._x = np.array(x)
+        self._y = np.array(y)
+        self._z = np.array(z)
+        self._r = np.sqrt(self._x**2 + self._y**2 + self._z**2)
         self._output = output
         # Set _is_open
-        r = coords.radius
         atol = 0.1
-        self._is_open = np.abs(r[0] - r[-1]) > const.R_sun * atol
+        self._is_open = np.abs(self._r[0] - self._r[-1]) > atol
         # Set _polarity
-        self._polarity = -np.sign(r[0] - r[-1]) * self._is_open
+        self._polarity = -np.sign(self._r[0] - self._r[-1]) * self._is_open
+
+    @property
+    def coords(self):
+        r, lat, lon = coord.cartesian_to_spherical(
+            self._x, self._y, self._z)
+        r *= const.R_sun
+        lon += self._output._lon0 + 180 * u.deg
+        coords = coord.SkyCoord(
+            lon, lat, r, frame=self._output.coordinate_frame)
+        return coords
 
     @property
     def is_open(self):
@@ -176,9 +189,9 @@ class FieldLine:
         this case.
         """
         if self.polarity == 1 or not self.is_open:
-            return coord.SkyCoord(self.coords[0])
+            return self.coords[0]
         else:
-            return coord.SkyCoord(self.coords[-1])
+            return self.coords[-1]
 
     @property
     def source_surface_footpoint(self):
@@ -199,9 +212,9 @@ class FieldLine:
         this case.
         """
         if self.polarity == 1 or not self.is_open:
-            return coord.SkyCoord(self.coords[-1])
+            return self.coords[-1]
         else:
-            return coord.SkyCoord(self.coords[0])
+            return self.coords[0]
 
     @property
     @functools.lru_cache()
