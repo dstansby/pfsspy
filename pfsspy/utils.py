@@ -2,32 +2,39 @@ import sunpy.map,sunpy.io
 import numpy as np
 import os, warnings,copy
 from scipy import interpolate
+from astropy import units as u
 
 def roll_to_CRLN(synmap) :
     """ Roll sunpy.map.Map synoptic map so LH edge is 0 Carr Lon.
 
-    Description
-    -----------
-    
-
     Parameters
     ----------
-    synmap : `sunpy.map.Map` 
-        a `sunpy.map.Map` instance containing a synoptic map
+    synmap : `sunpy.map.GenericMap` 
+        a `sunpy.map.GenericMap` instance containing a synoptic map
     
     Returns
     -------
-    synmap_rolled : `sunpy.map.Map` 
-        a `sunpy.map.Map` instance with it's data appropriately 
+    synmap_rolled : `sunpy.map.GenericMap` 
+        a `sunpy.map.GenericMap` instance with it's data appropriately 
         rolled to align Carrington Longitude 0 with LH edge
 
     """
-    rolled_data = np.roll(synmap.data, 
-                          np.int((synmap.meta['CRVAL1'] + 180)
-                                 /np.abs(synmap.meta['cdelt1'])
-                                 ),axis=1)
-    rolled_header = synmap.meta
-    rolled_header['CRVAL1'] = 0
+    data,header = synmap.data,synmap.meta
+    rolled_header = copy.copy(header)
+
+    # Identify reference pixel and calculate what it's longitude
+    # should be after the roll
+    rolled_crval1 = (header['CRPIX1']-0.5)*header['CDELT1']
+
+    # Calculate longitude roll needed
+    roll_lng = rolled_crval1 - header['CRVAL1']
+
+    # Convert to integer pixels
+    roll_px = int(roll_lng*header['CDELT1'])
+    
+    rolled_data = np.roll(data,int(roll_px),axis=1)
+    rolled_header['CRVAL1'] = (header['CRPIX1']-0.5)*header['CDELT1']
+
     return sunpy.map.Map(rolled_data,rolled_header)
 
 
@@ -69,7 +76,7 @@ def interp_CAR2CEA(synmap) :
         raise TypeError(f"Header 'ctype2' {lat_type} not recognized, "\
                         +"map may not be synoptic map")
 
-    ## Original Data Axes # Note we ignore any roll of the map CRLN=0
+    ## Original Data Axes # Note we ignore any roll of the map from CRLN=0
     lons = np.linspace(0,360,synmap.meta['naxis1'])
     lats = np.linspace(-90,90,synmap.meta['naxis2'])
 
@@ -90,7 +97,8 @@ def interp_CAR2CEA(synmap) :
     header_interpolated = copy.copy(header)
     header_interpolated['ctype1'] = "CRLN-CEA"
     header_interpolated['ctype2'] = "CRLT-CEA"
-    # Hack to stop ADAPT GenericMap subclass overriding ctypes
+    # Hack to stop ADAPT GenericMap subclass overriding ctypes - this
+    # makes the output a raw GenericMap (no subclass). 
     header_interpolated['model'] = header.get('model',"")+"-CEA"
     
     return sunpy.map.Map(data_interpolated,header_interpolated)
