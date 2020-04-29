@@ -117,8 +117,8 @@ class FieldLine:
 
     Parameters
     ----------
-    coords : astropy.coordinates.SkyCoord
-        Field line coordinates.
+    x, y, z :
+        Field line coordinates in cartesian coordinates.
     output : Output
         The PFSS output through which this field line was traced.
 
