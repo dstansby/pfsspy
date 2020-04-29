@@ -117,3 +117,6 @@ doc/source/auto_examples/*
 
 # MacOS
 *.DS_store
+
+*.fts
+*.fts.gz
