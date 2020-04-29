@@ -121,11 +121,6 @@ class FieldLine:
         Field line coordinates in cartesian coordinates.
     output : Output
         The PFSS output through which this field line was traced.
-
-    Attributes
-    ----------
-    coords : astropy.coordinates.SkyCoord
-        Field line coordinates.
     """
     def __init__(self, x, y, z, output):
         self._x = np.array(x)
@@ -141,6 +136,9 @@ class FieldLine:
 
     @property
     def coords(self):
+        """
+        Field line `~astropy.coordinates.SkyCoord`.
+        """
         r, lat, lon = coord.cartesian_to_spherical(
             self._x, self._y, self._z)
         r *= const.R_sun
