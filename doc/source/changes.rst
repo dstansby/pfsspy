@@ -64,6 +64,12 @@ To convert from the old x, y, z array used for seeds, do::
 
 Note that the latitude must be in the range :math:`[-\pi/2, \pi/2]`.
 
+GONG and ADAPT map sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+pfsspy now comes with built in `sunpy` map sources for GONG and ADAPT synoptic
+maps, which automatically fix some non-compliant FITS header values. To use
+these, just import ``pfsspy`` and load the .FITS files as normal with sunpy.
+
 Using `~pfsspy.fieldline.FieldLine` objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The input to `~pfsspy.fieldline.FieldLine` objects is now a set of
