@@ -4,9 +4,15 @@ Tracer performance
 A quick script to compare the performance of the python and fortran tracers.
 """
 import timeit
+
+import astropy.units as u
+import astropy.coordinates
 import numpy as np
-import pfsspy
 import matplotlib.pyplot as plt
+import sunpy.map
+
+import pfsspy
+
 
 ###############################################################################
 # Create a dipole map
@@ -25,6 +31,7 @@ def dipole_Br(r, theta):
 
 
 br = dipole_Br(1, theta).T
+br = sunpy.map.Map(br, pfsspy.carr_cea_wcs_header('2010-01-01', br.shape))
 pfss_input = pfsspy.Input(br, nr, rss)
 pfss_output = pfsspy.pfss(pfss_input)
 print('Computed PFSS solution')
@@ -40,10 +47,16 @@ times = [[], []]
 for nseed in nseeds:
     print(nseed)
     seeds = np.repeat(seed0, nseed, axis=0)
+    r, lat, lon = pfsspy.coords.cart2sph(seeds[:, 0], seeds[:, 1], seeds[:, 2])
+    r = r * astropy.constants.R_sun
+    lat = (lat - np.pi / 2) * u.rad
+    lon = lon * u.rad
+    seeds = astropy.coordinates.SkyCoord(lon, lat, r, frame=pfss_output.coordinate_frame)
+
     for i, tracer in enumerate(tracers):
         if nseed > 64 and i == 0:
             continue
-        # tracer.trace(seeds, pfss_output)
+
         t = timeit.timeit(lambda: tracer.trace(seeds, pfss_output), number=1)
         times[i].append(t)
 
