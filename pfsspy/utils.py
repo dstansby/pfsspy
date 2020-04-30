@@ -90,13 +90,14 @@ def interp_CAR2CEA(synmap) :
     ## Create interpolator function 
     synmap_interpolator = interpolate.RectBivariateSpline(lons,lats,data.T)
 
-    ## Perform inteprolation
+    ## Perform interpolation
     data_interpolated = synmap_interpolator(lons,lats_interp).T
 
     ## Adjust Header
     header_interpolated = copy.copy(header)
     header_interpolated['ctype1'] = "CRLN-CEA"
     header_interpolated['ctype2'] = "CRLT-CEA"
+    header_interpolated['cdelt2'] = np.diff(sinlats)[0]*180/np.pi 
     # Hack to stop ADAPT GenericMap subclass overriding ctypes - this
     # makes the output a raw GenericMap (no subclass). 
     header_interpolated['model'] = header.get('model',"")+"-CEA"
