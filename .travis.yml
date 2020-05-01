@@ -5,6 +5,7 @@ matrix:
     - python: 3.6
     - python: 3.7
     - python: 3.8
+      env: NUMBA="python -m pip install numba"
 
 before_install:
 # Install conda
@@ -21,7 +22,7 @@ before_install:
 # Have to install numpy first to make streamtracer work
 - python -m pip install numpy
 - python -m pip install -r requirements/test.txt
-- python -m pip install numba
+- $NUMBA
 
 install:
 - python -m pip install -e .
