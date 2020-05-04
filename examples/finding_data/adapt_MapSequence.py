@@ -1,8 +1,8 @@
 """
-Pares ADAPT Ensemble
-====================
+Parsing ADAPT Ensemble .fits files
+==================================
 
-* Parse an adapt FITS file as a `sunpy.map.MapSequence`. 
+Parse an ADAPT FITS file into a `sunpy.map.MapSequence`. 
 """
 
 ###############################################################################
