@@ -69,6 +69,7 @@ class Input:
             raise ValueError('br must be a SunPy Map')
 
         self._validate_cea(br.meta)
+        self._validate_cdelts(br)
 
         self._map_in = br
         self.dtime = br.date
@@ -91,6 +92,32 @@ class Input:
             if proj != 'CEA':
                 raise ValueError(f'Projection type in CTYPE{i} keyword '
                                  f'must be CEA (got "{proj}")')
+
+    @staticmethod
+    def _validate_cdelts(br):
+        """
+        Check that the synoptic map covers the whole Sun.
+        """
+        shape = br.data.shape
+
+        dphi = br.meta['cdelt1']
+        phi = shape[1] * dphi
+        try:
+            np.testing.assert_almost_equal(phi, 360, decimal=1)
+        except AssertionError:
+            raise ValueError('Number of points in phi direction times '
+                             'CDELT1 must be close to 360 degrees. '
+                             f'Instead got {dphi} x {shape[0]} = {phi}')
+
+        dtheta = br.meta['cdelt2']
+        theta = shape[0] * dtheta * np.pi / 2
+        try:
+            np.testing.assert_almost_equal(theta, 180, decimal=1)
+        except AssertionError:
+            raise ValueError('Number of points in theta direction times '
+                             'CDELT2 times pi/2 must be close to '
+                             '180 degrees. '
+                             f'Instead got {dtheta} x {shape[0]} * pi/2 = {theta}')
 
     @property
     def map(self):
