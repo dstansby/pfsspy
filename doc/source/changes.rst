@@ -3,13 +3,16 @@ Changelog
 
 0.5.1
 -----
-- Fixed calculations in `pfsspy.carr_cea_wcs_header`, and clarified in the
+- Fixed some calculations in `pfsspy.carr_cea_wcs_header`, and clarified in the
   docstring that the input shape must be in ``[nlon, nlat]`` order.
 - Added validation to `pfsspy.Input` to check that the inputted map covers the
   whole solar surface.
 - Removed ghost cells from `pfsspy.Output.bc`. This changes the shape of the
   returned arrays by one along some axes.
 - Corrected the shape of `pfsspy.Output.bg` in the docstring.
+- Added an example showing how to load ADAPT ensemble maps into a
+  `~sunpy.map.CompositeMap`
+- Sped up field line expansion factor calculations.
 
 0.5.0
 -----
