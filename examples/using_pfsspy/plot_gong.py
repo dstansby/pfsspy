@@ -87,6 +87,29 @@ plt.colorbar()
 ax.set_title('Source surface magnetic field')
 set_axes_lims(ax)
 
+###############################################################################
+# It is also easy to plot the magnetic field at an arbitrary height within
+# the PFSS solution.
+
+# Get the radial magnetic field at a given height
+ridx = 15
+br = output.bc[0][:, :, ridx]
+# Create a sunpy Map object using output WCS
+br = sunpy.map.Map(br.T, output.source_surface_br.wcs)
+# Get the radial coordinate
+r = np.exp(output.grid.rc[ridx])
+
+# Create the figure and axes
+fig = plt.figure()
+ax = plt.subplot(projection=br)
+
+# Plot the source surface map
+br.plot(cmap='RdBu')
+# Plot formatting
+plt.colorbar()
+ax.set_title('$B_{r}$ ' + f'at r={r:.2f}' + '$r_{\\odot}$')
+set_axes_lims(ax)
+
 
 ###############################################################################
 # Finally, using the 3D magnetic field solution we can trace some field lines.
@@ -118,4 +141,4 @@ for field_line in field_lines:
 ax.set_title('PFSS solution')
 plt.show()
 
-# sphinx_gallery_thumbnail_number = 3
+# sphinx_gallery_thumbnail_number = 4
