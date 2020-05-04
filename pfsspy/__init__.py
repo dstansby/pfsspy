@@ -293,8 +293,7 @@ class Output:
         # Get radial component at the top
         br = self.bc[0][:, :, -1]
         # Remove extra ghost cells off the edge of the grid
-        br = br[1:-1, 1:-1].T
-        m = sunpy.map.Map((br, self._wcs_header()))
+        m = sunpy.map.Map((br.T, self._wcs_header()))
         vlim = np.max(np.abs(br))
         m.plot_settings['cmap'] = _MAG_CMAP
         m.plot_settings['vmin'] = -vlim
@@ -442,7 +441,8 @@ class Output:
         for i in range(self.grid.nphi + 1):
             bp[i, :, :] = bp[i, :, :] / Sbp
 
-        return br, -bs, bp
+        # Slice to remove ghost cells
+        return br[1:-1, 1:-1, :], -bs[1:-1, :, 1:-1], bp[:, 1:-1, 1:-1]
 
     @property
     @functools.lru_cache(maxsize=1)
@@ -453,8 +453,9 @@ class Output:
         Returns
         -------
         numpy.ndarray
-            A (nphi, ns, nrho, 3) shaped array. The last index gives the
-            corodinate axis, 0 for Bphi, 1 for Bs, 2 for Brho.
+            A ``(nphi + 1, ns + 1, nrho + 1, 3)`` shaped array.
+            The last index gives the corodinate axis, 0 for Bphi, 1 for Bs, 2
+            for Brho.
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Weighted average to grid points:
