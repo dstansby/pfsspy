@@ -209,16 +209,12 @@ class Output:
     ----------
     alr :
         Vector potential * grid spacing in radial direction.
-
     als :
         Vector potential * grid spacing in elevation direction.
-
     alp :
         Vector potential * grid spacing in azimuth direction.
-
     grid : Grid
         Grid that the output was caclulated on.
-
     input_map : sunpy.map.GenericMap
         The input map.
     '''
