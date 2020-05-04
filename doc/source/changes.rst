@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5.1
+-----
+- Fixed calculations in `pfsspy.carr_cea_wcs_header`, and clarified in the
+  docstring that the input shape must be in ``[nlon, nlat]`` order.
+- Added validation to `pfsspy.Input` to check that the inputted map covers the
+  whole solar surface.
+
 0.5.0
 -----
 
