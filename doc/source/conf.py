@@ -17,11 +17,8 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 import sys
-# from sunpy_sphinx_theme.conf import *
-# import unittest.mock as mock
+from sphinx_gallery.sorting import ExplicitOrder
 
-# from sunpy_sphinx_theme import get_html_theme_path
-# html_theme_path = get_html_theme_path()
 # -- Project information -----------------------------------------------------
 
 project = 'pfsspy'
@@ -56,6 +53,9 @@ napoleon_google_docstring = False
 sphinx_gallery_conf = {
     'examples_dirs': '../../examples',
     'gallery_dirs': 'auto_examples',
+    'subsection_order': ExplicitOrder(['../../examples/using_pfsspy',
+                                       '../../examples/finding_data',
+                                       '../../examples/pfsspy_info'])
 }
 
 
