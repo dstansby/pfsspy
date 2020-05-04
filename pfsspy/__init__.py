@@ -469,6 +469,11 @@ class Output:
         out.flags.writeable = False
         return out
 
+    @property
+    @functools.lru_cache(maxsize=1)
+    def _modbg(self):
+        return np.linalg.norm(self.bg, axis=-1)
+
     def _common_b(self):
         """
         Common code needed to calculate magnetic field from vector potential.

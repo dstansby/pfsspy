@@ -6,6 +6,8 @@ import astropy.units as u
 import numpy as np
 import scipy.interpolate
 
+from pfsspy import coords
+
 import functools
 
 
@@ -42,6 +44,13 @@ class FieldLines:
         Field line connectivities. ``1`` for open, ``0`` for closed.
         """
         return np.abs(self.polarities)
+
+    @property
+    def expansion_factors(self):
+        """
+        Expansion factors. Set to NaN for closed field lines.
+        """
+        return np.array([fline.expansion_factor for fline in self.field_lines])
 
     @property
     def open_field_lines(self):
@@ -227,36 +236,31 @@ class FieldLine:
         -------
         exp_fact : float
             Field line expansion factor.
-            If field line is closed, returns np.nan.
         """
-
         import scipy.interpolate
 
         if not self.is_open:
             return np.nan
-        # Extract ends of magnetic field line, and get them in spherical coords
-        foot1 = coord.SkyCoord(self.coords[0], representation_type='spherical')
-        foot2 = coord.SkyCoord(self.coords[-1], representation_type='spherical')
-        if foot1.radius > foot2.radius:
-            solar_foot = foot2
-            source_foot = foot1
-        else:
-            solar_foot = foot1
-            source_foot = foot2
 
-        def interp(map, coord):
-            phi = coord.lon
-            s = np.sin(coord.lat)
-            interpolator = scipy.interpolate.RectBivariateSpline(
-                self._output.grid.pg, self._output.grid.sg, map)
-            return interpolator(phi, s)
+        if self._r[0] > self._r[-1]:
+            solar_foot = -1
+            source_foot = 0
+        else:
+            solar_foot = 0
+            source_foot = -1
+
+        def interp(map, idx):
+            x, y, z = self._x[idx], self._y[idx], self._z[idx]
+            rho, s, phi = coords.cart2strum(x, y, z)
+            interpolator = scipy.interpolate.RegularGridInterpolator(
+                (self._output.grid.pg, self._output.grid.sg), map, method='linear')
+            return interpolator((phi, s))
 
         # Get output magnetic field, and calculate |B|
-        bg = self._output.bg
-        modb = np.linalg.norm(bg, axis=-1)
+        modb = self._output._modbg
         # Interpolate at each end of field line
-        b_solar = interp(modb[:, :, 0], solar_foot)[0, 0]
-        b_source = interp(modb[:, :, -1], source_foot)[0, 0]
+        b_solar = interp(modb[:, :, 0], solar_foot)
+        b_source = interp(modb[:, :, -1], source_foot)
         expansion_factor = ((1**2 * b_solar) /
                             (self._output.grid.rss**2 * b_source))
         return expansion_factor
