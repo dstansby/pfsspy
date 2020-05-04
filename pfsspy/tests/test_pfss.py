@@ -112,9 +112,9 @@ def test_shape(zero_map):
     for comp in (br, bs, bp):
         assert np.all(comp == 0)
 
-    assert br.shape == (nphi + 2, ns + 2, nr + 1)
-    assert bs.shape == (nphi + 2, ns + 1, nr + 2)
-    assert bp.shape == (nphi + 1, ns + 2, nr + 2)
+    assert br.shape == (nphi, ns, nr + 1)
+    assert bs.shape == (nphi, ns + 1, nr)
+    assert bp.shape == (nphi + 1, ns, nr)
 
     bg = out.bg
     assert np.all(bg == 0)
