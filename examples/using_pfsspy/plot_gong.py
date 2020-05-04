@@ -107,7 +107,7 @@ ax = plt.subplot(projection=br)
 br.plot(cmap='RdBu')
 # Plot formatting
 plt.colorbar()
-ax.set_title(f'Magnetic field at r={r:.2f}' + '$r_{\\odot}$')
+ax.set_title('$B_{r}$ ' + f'at r={r:.2f}' + '$r_{\\odot}$')
 set_axes_lims(ax)
 
 
@@ -141,4 +141,4 @@ for field_line in field_lines:
 ax.set_title('PFSS solution')
 plt.show()
 
-# sphinx_gallery_thumbnail_number = 3
+# sphinx_gallery_thumbnail_number = 4
