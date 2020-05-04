@@ -69,6 +69,7 @@ class Input:
             raise ValueError('br must be a SunPy Map')
 
         self._validate_cea(br.meta)
+        self._validate_cdelts(br)
 
         self._map_in = br
         self.dtime = br.date
@@ -92,6 +93,32 @@ class Input:
                 raise ValueError(f'Projection type in CTYPE{i} keyword '
                                  f'must be CEA (got "{proj}")')
 
+    @staticmethod
+    def _validate_cdelts(br):
+        """
+        Check that the synoptic map covers the whole Sun.
+        """
+        shape = br.data.shape
+
+        dphi = br.meta['cdelt1']
+        phi = shape[1] * dphi
+        try:
+            np.testing.assert_almost_equal(phi, 360, decimal=1)
+        except AssertionError:
+            raise ValueError('Number of points in phi direction times '
+                             'CDELT1 must be close to 360 degrees. '
+                             f'Instead got {dphi} x {shape[0]} = {phi}')
+
+        dtheta = br.meta['cdelt2']
+        theta = shape[0] * dtheta * np.pi / 2
+        try:
+            np.testing.assert_almost_equal(theta, 180, decimal=1)
+        except AssertionError:
+            raise ValueError('Number of points in theta direction times '
+                             'CDELT2 times pi/2 must be close to '
+                             '180 degrees. '
+                             f'Instead got {dtheta} x {shape[0]} * pi/2 = {theta}')
+
     @property
     def map(self):
         """
@@ -107,8 +134,9 @@ def carr_cea_wcs_header(dtime, shape):
 
     dtime : datetime, None
         Datetime to associate with the map.
-    data : [ntheta, nphi]
-        Map data. First entry is latitude, second entry is longitude.
+    shape : tuple
+        Map shape. The first entry should be number of points in longitude, the
+        second in latitude.
 
     References
     ----------
@@ -125,16 +153,16 @@ def carr_cea_wcs_header(dtime, shape):
     # Construct header
     header = sunpy.map.make_fitswcs_header(
         shape, frame_out,
-        scale=[180 / shape[0],
-               360 / shape[1]] * u.deg / u.pix,
-        reference_pixel=[(shape[1] / 2) + 0.5, (shape[0] / 2) + 0.5] * u.pix,
+        scale=[360 / shape[0],
+               180 / shape[1]] * u.deg / u.pix,
+        reference_pixel=[(shape[0] / 2) + 0.5, (shape[1] / 2) + 0.5] * u.pix,
         projection_code="CEA")
 
     # Fill in these missing values
     header['PV1_1'] = 1
     header['PV2_1'] = 1
     # Fix CELT for lat axis
-    header['CDELT2'] = (180 / np.pi) * (2 / shape[0])
+    header['CDELT2'] = (180 / np.pi) * (2 / shape[1])
     # pop out the time if it isn't supplied
     if dtime is None:
         header.pop('date-obs')

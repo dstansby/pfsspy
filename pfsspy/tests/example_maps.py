@@ -12,9 +12,9 @@ def zero_map():
     nphi = 20
     nr = 10
     rss = 2.5
-    br = np.zeros((ns, nphi))
+    br = np.zeros((nphi, ns))
     header = pfsspy.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
-    input_map = Map((br, header))
+    input_map = Map((br.T, header))
 
     input = pfsspy.Input(input_map, nr, rss)
     output = pfsspy.pfss(input)
@@ -33,9 +33,9 @@ def dipole_map():
     def dipole_Br(r, theta):
         return 2 * np.sin(theta) / r**3
 
-    br = dipole_Br(1, theta).T
+    br = dipole_Br(1, theta)
     header = pfsspy.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
-    return Map((br, header))
+    return Map((br.T, header))
 
 
 @pytest.fixture
