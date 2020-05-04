@@ -133,7 +133,7 @@ def test_header_generation():
     dtime = None
     ntheta = 180
     nphi = 360
-    shape = [ntheta, nphi]
+    shape = [nphi, ntheta]
     header = pfsspy.carr_cea_wcs_header(dtime, shape)
     assert header['LONPOLE'] == 0
     assert header['CTYPE1'] == 'CRLN-CEA'
