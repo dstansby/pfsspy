@@ -7,6 +7,9 @@ Changelog
   docstring that the input shape must be in ``[nlon, nlat]`` order.
 - Added validation to `pfsspy.Input` to check that the inputted map covers the
   whole solar surface.
+- Removed ghost cells from `pfsspy.Output.bc`. This changes the shape of the
+  returned arrays by one along some axes.
+- Corrected the shape of `pfsspy.Output.bg` in the docstring.
 
 0.5.0
 -----
