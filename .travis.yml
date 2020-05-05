@@ -5,7 +5,10 @@ matrix:
     - python: 3.6
     - python: 3.7
     - python: 3.8
-      env: NUMBA="python -m pip install numba"
+      env: EXTRAS="python -m pip install numba"
+    # Test against master versions of astropy and sunpy
+    - python: 3.8
+      env: EXTRAS="python -m pip install --upgrade git+https://github.com/astropy/astropy git+https://github.com/sunpy/sunpy"
 
 before_install:
 # Install conda
@@ -22,7 +25,7 @@ before_install:
 # Have to install numpy first to make streamtracer work
 - python -m pip install numpy
 - python -m pip install -r requirements/test.txt
-- $NUMBA
+- $EXTRAS
 
 install:
 - python -m pip install -e .
