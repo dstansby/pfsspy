@@ -7,3 +7,7 @@
 [![CircleCI](https://circleci.com/gh/dstansby/pfsspy.svg?style=svg)](https://circleci.com/gh/dstansby/pfsspy)
 
 Potential Field Source Surface model package for Python. This package is based on original code by Anthony Yeates, which can be found at https://github.com/antyeates1983/pfss.
+
+Code of conduct
+---------------
+This is a community package; please follow the [SunPy code of conduct](https://docs.sunpy.org/en/latest/code_of_conduct.html) when interacting with others within the pfsspy community.
