@@ -19,6 +19,11 @@ def roll_to_CRLN(synmap) :
         rolled to align Carrington Longitude 0 with LH edge
 
     """
+
+    ## Check Map is Synoptic Type
+    assert synmap.meta['CTYPE1'].startswith("CRLN"), \
+           "Not synoptic map, FITS header CTYPE1 is not CRLN type"
+
     data,header = synmap.data,synmap.meta
     rolled_header = copy.copy(header)
 
