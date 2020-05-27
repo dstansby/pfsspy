@@ -26,6 +26,9 @@ def test_gong_source(gong_map):
     m = sunpy.map.Map(gong_map)
     assert isinstance(m, pfsspy.map.GongSynopticMap)
 
+    # Check round-trip is robust against sunpy changes to the meta
+    m = sunpy.map.Map(m.data, m.meta)
+
 
 @pytest.fixture
 def adapt_map():
@@ -41,6 +44,7 @@ def adapt_map():
                 g.write(f.read())
 
     return 'adapt20200101.fts'
+
 
 def test_adapt_map(adapt_map):
     import sunpy.io
