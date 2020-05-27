@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.5.2
+-----
+- Fixed a bug in the GONG synoptic map source where a map failed to load once
+  it had already been loaded once.
+
 0.5.1
 -----
 - Fixed some calculations in `pfsspy.carr_cea_wcs_header`, and clarified in the
