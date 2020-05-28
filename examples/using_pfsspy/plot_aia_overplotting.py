@@ -112,6 +112,9 @@ plt.colorbar()
 
 ax.plot_coord(seeds, color='black', marker='o', linewidth=0, markersize=2)
 
+# Set the axes limits. These limits have to be in pixel values
+ax.set_xlim(0, 180)
+ax.set_ylim(45, 135)
 ax.set_title('Field line footpoints')
 ax.set_ylim(bottom=0)
 
@@ -136,8 +139,9 @@ plt.colorbar()
 for fline in flines:
     ax.plot_coord(fline.coords, color='black', linewidth=1)
 
-# ax.set_xlim(55, 65)
-# ax.set_ylim(0.1, 0.25)
+# Set the axes limits. These limits have to be in pixel values
+ax.set_xlim(0, 180)
+ax.set_ylim(45, 135)
 ax.set_title('Photospheric field and traced field lines')
 ###############################################################################
 # Plot the AIA map, along with the traced magnetic field lines. Inside the
@@ -145,7 +149,6 @@ ax.set_title('Photospheric field and traced field lines')
 # and then plotted on top of the map.
 fig = plt.figure()
 ax = plt.subplot(1, 1, 1, projection=aia)
-transform = ax.get_transform('world')
 aia.plot(ax)
 for fline in flines:
     ax.plot_coord(fline.coords, alpha=0.8, linewidth=1, color='black')
