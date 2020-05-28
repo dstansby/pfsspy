@@ -82,8 +82,9 @@ aia.plot(ax)
 
 
 ###############################################################################
-# Now we construct a 10 x 10 grid of footpoitns to trace some magnetic field
-# lines from.
+# Now we construct a 5 x 5 grid of footpoitns to trace some magnetic field
+# lines from. These coordinates are defined in the native Carrington
+# coordinates of the input magnetogram.
 
 # Create 5 points spaced between sin(lat)={0.1, 0.2}
 s = np.linspace(0.1, 0.2, 5)
