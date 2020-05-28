@@ -84,8 +84,17 @@ aia.plot(ax)
 ###############################################################################
 # Now we construct a 10 x 10 grid of footpoitns to trace some magnetic field
 # lines from.
-s, phi = np.meshgrid(np.linspace(0.1, 0.2, 5),
-                     np.deg2rad(np.linspace(55, 65, 5)))
+
+# Create 5 points spaced between sin(lat)={0.1, 0.2}
+s = np.linspace(0.1, 0.2, 5)
+# Create 5 points spaced between long={55, 65} degrees
+phi = np.deg2rad(np.linspace(55, 65, 5))
+print(f's = {s}')
+print(f'phi = {phi}')
+# Make a 2D grid from these 1D points
+s, phi = np.meshgrid(s, phi)
+
+# Now convert the points to a coordinate object
 lat = np.arcsin(s) * u.rad
 lon = phi * u.rad
 seeds = SkyCoord(lon.ravel(), lat.ravel(), 1.01 * const.R_sun,
