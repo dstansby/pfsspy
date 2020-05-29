@@ -81,33 +81,44 @@ def interp_CAR2CEA(synmap) :
         raise TypeError(f"Header 'ctype2' {lat_type} not recognized, "\
                         +"map may not be synoptic map")
 
-    ## Original Data Axes # Note we ignore any roll of the map from CRLN=0
-    lons = np.linspace(0,360,synmap.meta['naxis1'])
-    lats = np.linspace(-90,90,synmap.meta['naxis2'])
+    # Get spacing of cell centers of original map
+    dlo,dla = synmap.meta['cdelt1'],synmap.meta['cdelt2'] #delta_lon,delta_lat
+
+    ## Original Coordinates of *Cell Centers*  # Note we ignore any roll of the map from CRLN=0
+    lons = np.linspace(0+dlo/2,360-dlo/2,synmap.meta['naxis1'])
+    lats = np.linspace(-90+dla/2,90-dla/2,synmap.meta['naxis2'])
 
     ## Get data and header
     data,header = synmap.data,synmap.meta
 
+    # Calculate cell spacing of y-axis of desired CEA map
+    dsl = 2.0/synmap.meta['naxis2'] # delta_sinlat
+
     ## Array of lats to interpolate to for CEA Binning
-    sinlats = np.linspace(-1,1,synmap.meta['naxis2'])
+    sinlats = np.linspace(-1+dsl/2,1-dsl/2,synmap.meta['naxis2'])
     lats_interp = np.degrees(np.arcsin(sinlats))
 
     ## Create interpolator function 
     synmap_interpolator = interpolate.RectBivariateSpline(lons,lats,data.T)
 
     ## Perform interpolation
-    data_interpolated = synmap_interpolator(lons,lats_interp).T
+    data_interp = synmap_interpolator(lons,lats_interp).T
 
     ## Adjust Header
-    header_interpolated = copy.copy(header)
-    header_interpolated['ctype1'] = "CRLN-CEA"
-    header_interpolated['ctype2'] = "CRLT-CEA"
-    header_interpolated['cdelt2'] = np.diff(sinlats)[0]*180/np.pi 
+    header_interp = copy.copy(header)
+    header_interp['ctype1'] = "CRLN-CEA"
+    header_interp['ctype2'] = "CRLT-CEA"
+    header_interp['cdelt2'] = np.diff(sinlats)[0]*180/np.pi 
+
+    # CRVAL2 only needs to be adjusted if it is not initially 0.0
+    if header_interp['crval2'] != 0.0 : 
+        header_interp['crval2'] = header_interp['crpix2']*header_interp['cdelt2'] - sinlats[0]
+
     # Hack to stop ADAPT GenericMap subclass overriding ctypes - this
     # makes the output a raw GenericMap (no subclass). 
-    header_interpolated['model'] = header.get('model',"")+"-CEA"
+    header_interp['model'] = header.get('model',"")+"-CEA"
     
-    return sunpy.map.Map(data_interpolated,header_interpolated)
+    return sunpy.map.Map(data_interp,header_interp)
 
 def load_adapt(adapt_path) :
     """ Parse adapt .fts file as a `sunpy.map.MapSequence`
