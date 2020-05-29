@@ -16,7 +16,7 @@ def roll_to_CRLN(synmap) :
     -------
     synmap_rolled : `sunpy.map.GenericMap` 
         a `sunpy.map.GenericMap` instance with it's data appropriately 
-        rolled to align Carrington Longitude 0 with LH edge
+        rolled to align Carrington Longitude 0 with LH edge of pixel 1
 
     """
 
@@ -27,18 +27,73 @@ def roll_to_CRLN(synmap) :
     data,header = synmap.data,synmap.meta
     rolled_header = copy.copy(header)
 
-    # Identify reference pixel and calculate what it's longitude
-    # should be after the roll
-    rolled_crval1 = (header['CRPIX1']-0.5)*header['CDELT1']
 
-    # Calculate longitude roll needed
-    roll_lng = rolled_crval1 - header['CRVAL1']
-
-    # Convert to integer pixels
-    roll_px = int(roll_lng*header['CDELT1'])
+    # Determine if CR0 is initially aligned with a pixel edge, if not 
+    # interpolate to make this true. Note pixel edges are located at 
+    # half integers in the FITS standard 
     
-    rolled_data = np.roll(data,int(roll_px),axis=1)
-    rolled_header['CRVAL1'] = (header['CRPIX1']-0.5)*header['CDELT1']
+    # Pull out header values which need to be mutable :
+    crval1 = header['CRVAL1']
+
+    # First calculate initial position of CR0 in pixel units
+    CR0PIX_init = header['CRPIX1'] - crval1/header['CDELT1']
+    # ensure  pixel value of CR0 is in the range [0.5, NAXIS1 + 0.5]
+    CR0PIX_init = (CR0PIX_init - 0.5) % header['NAXIS1'] + 0.5
+
+    # If CR0 not on pixel edge, perform interpolation of data to a grid where
+    # CR0 is enforced to be on a pixel edge
+    if not np.isclose(CR0PIX_init % 1.0, 0.5) :
+        ## Coordinates are position of pixel **centers**
+        lonpx = np.linspace(0,header['NAXIS1']+1,header['NAXIS1']+2)
+        latpx = np.linspace(1,header['NAXIS2'],header['NAXIS2'])
+        ## To account for the periodic boundary, we agument the original
+        ## data with the left hand most column appended to the right, 
+        ## and vice versa
+        data_aug = np.append(data[:,-1][:,None],
+                            np.append(data,data[:,0][:,None],axis=1),
+                            axis=1)
+        interpolator = interpolate.RectBivariateSpline(lonpx,latpx,data_aug.T)
+
+        ## Interpolate to new lonpx such that CR0 is located at 
+        ## the **next edge ABOVE it's initial value**
+        shift = (CR0PIX_init + 0.5) % 1.0
+        lonpx_interp = np.linspace(1-shift,header['NAXIS1']-shift,header['NAXIS1'])
+        data_ = interpolator(lonpx_interp,latpx).T
+
+        # update crval1 to reflect interpolation
+        crval1 -= (1-shift)
+
+        # Assert CR0 is now on pixel edge :
+        CR0PIX = header['CRPIX1'] - crval1/header['CDELT1']
+        CR0PIX = (CR0PIX - 0.5) % header['NAXIS1'] + 0.5
+        assert np.isclose(CR0PIX % 1.0, 0.5), f"CR0 not on pixel edge (pixel coord = {CR0PIX})"
+
+    else : data_ = data.copy()
+
+    # The roll we need is such that 0 longitude is at pixel position 0.5
+    # which is the LH edge of pixel 1.0. 
+    # 
+    # Our transformation should maintain naxis1 and cdelt1
+    #
+    # Calculate the new value of crval1 such that carrington 0 is located
+    # at the LH edge of pixel 1. We need to add 0.5*cdelt1 to crpix1*cdelt1
+    # to achieve this. crval1 = crpix1*cdelt1 would place 0 at the center of
+    # pixel 1.
+    #
+    crval1_rolled = (header["CRPIX1"]-0.5)*header['CDELT1']
+    
+    # Calculate longitude roll needed
+    roll_lng = crval1_rolled - crval1
+
+    # Convert to pixel units
+    roll_px = roll_lng/header['CDELT1']
+
+    # Roll the data array by int(roll_px) to get 
+    rolled_data = np.roll(data_,int(roll_px),axis=1)
+
+    ## Our transformation changes only "CRVAL1"
+    #  "CRPIX1" and "NAXIS1" are unchanged    
+    rolled_header['CRVAL1'] = crval1_rolled
 
     return sunpy.map.Map(rolled_data,rolled_header)
 
