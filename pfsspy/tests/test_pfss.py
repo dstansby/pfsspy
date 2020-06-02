@@ -3,11 +3,14 @@ import astropy.coordinates as coord
 import astropy.units as u
 from astropy.tests.helper import quantity_allclose
 
+from packaging import version
+
 import pytest
 
 import matplotlib
 import numpy as np
 import pfsspy
+import sunpy
 import sunpy.map
 import sunpy.util.exceptions
 
@@ -144,8 +147,13 @@ def test_header_generation():
     np.testing.assert_almost_equal(
         header['CDELT2'], (180 / np.pi) * (2 / ntheta))
 
-    assert header['CRPIX1'] == (nphi / 2) + 0.5
-    assert header['CRPIX2'] == (ntheta / 2) + 0.5
+    if version.parse(sunpy.__version__) < version.parse("2"):
+        assert header['CRPIX1'] == (nphi / 2) + 0.5
+        assert header['CRPIX2'] == (ntheta / 2) + 0.5
+    else:
+        # Add one to account for FITS 1-based indexing
+        assert header['CRPIX1'] == (nphi / 2) + 0.5 + 1
+        assert header['CRPIX2'] == (ntheta / 2) + 0.5 + 1
     assert header['CRVAL1'] == 0
     assert header['CRVAL2'] == 0
     assert header['CUNIT1'] == 'deg'
