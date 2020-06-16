@@ -36,29 +36,6 @@ def adapt_map():
 
     return 'adapt20200101.fts'
 
-def test_roll_to_CRLN(gong_map) :
-    m = sunpy.map.Map(gong_map)
-
-    # Test rolling raw map
-    rolled = pfsspy.utils.roll_to_CRLN(m)
-    assert rolled.data.shape == m.data.shape, "Rolled map shape has changed"
-    assert rolled.meta["CRVAL1"] == 180., "CRLN0 not at left edge of map"
-
-    # Test rolling map with non integer offset
-    test_dat = m.data.copy()
-    test_header = m.meta.copy()
-    test_header["CRVAL1"] += 0.1
-    rolled_non_int = pfsspy.utils.roll_to_CRLN(sunpy.map.Map(test_dat,test_header))
-    assert rolled_non_int.data.shape == m.data.shape, "Rolled map shape has changed"
-    assert rolled_non_int.meta["CRVAL1"] == 180., "CRLN0 not at left edge of map"
-
-def test_interp_CAR2CEA(adapt_map) :
-    m = pfsspy.utils.load_adapt(adapt_map)[0]
-    interped = pfsspy.utils.interp_CAR2CEA(m)
-    assert interped.meta['CTYPE1'] == "CRLN-CEA", "Not CEA Projection"
-    assert interped.meta['CTYPE2'] == "CRLT-CEA", "Not CEA Projection"
-    assert np.isclose(interped.meta['naxis2']*interped.meta['cdelt2']*np.pi/180,2.0), 'SinLat range is not 2.0'
-
 def test_load_adapt(adapt_map) :
     adaptMapSequence = pfsspy.utils.load_adapt(adapt_map)
     assert isinstance(adaptMapSequence,sunpy.map.MapSequence)
