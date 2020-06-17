@@ -62,6 +62,14 @@ for usage examples see
 
    auto_examples/index
 
+for various helper functions for working with synoptic maps:
+
+.. toctree::
+   :maxdepth: 2
+
+   utils
+
+
 for the helper modules (behind the scense!) see
 
 .. toctree::
