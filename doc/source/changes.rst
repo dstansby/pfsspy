@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.6.0
+-----
+- The ``.al`` property of `pfsspy.Output` is now private, as it is not intended
+  for user access. If you *really* want to access it, use ``._al`` (but this is
+  now private API and there is no guarantee it will stay or return the same thing
+  in the future).
+
 0.5.2
 -----
 - Fixed a bug in the GONG synoptic map source where a map failed to load once
