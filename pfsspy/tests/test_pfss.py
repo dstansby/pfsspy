@@ -100,7 +100,7 @@ def test_shape(zero_map):
     ns = input.grid.ns
 
     out = pfsspy.pfss(input)
-    alr, als, alp = out.al
+    alr, als, alp = out._al
     for comp in (alr, als, alp):
         assert np.all(comp == 0)
 
@@ -126,7 +126,7 @@ def test_input_output(dipole_result):
     _, out = dipole_result
     out.save('test.npz')
     new_out = pfsspy.load_output('test.npz')
-    assert (new_out.al[0] == out.al[0]).all()
+    assert (new_out._al[0] == out._al[0]).all()
 
 
 def test_header_generation():
