@@ -219,6 +219,11 @@ class Output:
         Grid that the output was caclulated on.
     input_map : sunpy.map.GenericMap
         The input map.
+
+    Notes
+    -----
+    Instances of this class are intended to be created by `pyfsspy.pfss`, and
+    not by users.
     '''
     def __init__(self, alr, als, alp, grid, input_map=None):
         self._alr = alr
@@ -415,7 +420,7 @@ class Output:
         return xout
 
     @property
-    def al(self):
+    def _al(self):
         """
         Vector potential times cell edge lenghts.
 
@@ -499,7 +504,7 @@ class Output:
         rg = self.grid.rg
         sg = self.grid.sg
 
-        alr, als, alp = self.al
+        alr, als, alp = self._al
 
         rc = np.linspace(-0.5 * dr, np.log(rss) + 0.5 * dr, nr + 2)
         rrc = np.exp(rc)
