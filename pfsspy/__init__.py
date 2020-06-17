@@ -18,6 +18,8 @@ import pfsspy.tracing
 import pfsspy.fieldline
 # Import here to register map sources
 import pfsspy.map
+# Utility Functions
+import pfsspy.utils
 
 from .grid import Grid
 
