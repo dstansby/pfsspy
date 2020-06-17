@@ -9,10 +9,9 @@ from astropy import units as u
 
 
 def load_adapt(adapt_path):
-    """ Parse adapt .fts file as a `sunpy.map.MapSequence`
+    """
+    Parse adapt .fts file as a `sunpy.map.MapSequence`
 
-    Description
-    -----------
     ADAPT magnetograms contain 12 realizations and their data
     attribute consists of a 3D data cube where each slice is
     the data corresponding to a separate realization of the
@@ -23,14 +22,11 @@ def load_adapt(adapt_path):
     Parameters
     ----------
     adapt_path : `str`
-        filepath corresponding to an ADAPT .fts file
+        Filepath corresponding to an ADAPT .fts file
 
     Returns
     -------
     adaptMapSequence : `sunpy.map.MapSequence`
-        a `sunpy.map.MapSequence` instance containing a
-        `sunpy.map.Map` instance for each ADAPT realization.
-
     """
     adapt_fits = sunpy.io.fits.read(adapt_path)
     assert adapt_fits[0].header.get('MODEL') == 'ADAPT', \

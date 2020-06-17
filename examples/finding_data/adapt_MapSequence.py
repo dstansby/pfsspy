@@ -32,24 +32,25 @@ adapt_fname = example_adapt_map()
 adapt_fits = sunpy.io.fits.read(adapt_fname)
 
 ###############################################################################
-# `adapt_fits` is a list of `HDPair` objects. The first of these contains the
-# 12 realizations data and a header with sufficient information to build the
-# `MapSequence`. We unpack this `HDPair` into a list of `(data,header)` tuples
-# where `data` are the different adapt realizations.
+# ``adapt_fits`` is a list of ``HDPair`` objects. The first of these contains
+# the 12 realizations data and a header with sufficient information to build
+# the `~sunpy.map.MapSequence`. We unpack this ``HDPair`` into a list of
+# ``(data,header)`` tuples where ``data`` are the different adapt realizations.
 data_header_pairs = [(map_slice, adapt_fits[0].header)
 				     for map_slice in adapt_fits[0].data]
 
 
 ###############################################################################
-# Next, pass this list of tuples as the argument to sunpy.map.Map to create the
-# map sequence :
+# Next, pass this list of tuples as the argument to `sunpy.map.Map` to create
+# the map sequence :
 adaptMapSequence = sunpy.map.Map(data_header_pairs, sequence=True)
 
 ###############################################################################
-# `adapt_map_sequence` is now a list of our individual adapt realizations. Note
-# the `.peek()` and `.plot()` methods of `MapSequence` returns instances of
-# `sunpy.visualization.MapSequenceAnimator` and
-# `matplotlib.animation.FuncAnimation1` instances. Here, we generate a static
+# ``adapt_map_sequence`` is now a list of our individual adapt realizations.
+# Note the ``.peek()` and ``.plot()`` methods of `~sunpy.map.MapSequence`
+# returns instances of
+# ``sunpy.visualization.MapSequenceAnimator`` and
+# ``matplotlib.animation.FuncAnimation1``. Here, we generate a static
 # plot accessing the individual maps in turn :
 fig = plt.figure(figsize=(7, 8))
 gs = gridspec.GridSpec(4, 3, figure=fig)
