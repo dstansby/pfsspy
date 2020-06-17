@@ -144,8 +144,9 @@ def test_header_generation():
     np.testing.assert_almost_equal(
         header['CDELT2'], (180 / np.pi) * (2 / ntheta))
 
-    assert header['CRPIX1'] == (nphi / 2) + 0.5
-    assert header['CRPIX2'] == (ntheta / 2) + 0.5
+    # Extra + 1s are for FITS counting from 1 indexing
+    assert header['CRPIX1'] == (nphi / 2) + 0.5 + 1
+    assert header['CRPIX2'] == (ntheta / 2) + 0.5 + 1
     assert header['CRVAL1'] == 0
     assert header['CRVAL2'] == 0
     assert header['CUNIT1'] == 'deg'
