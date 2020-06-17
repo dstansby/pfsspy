@@ -13,7 +13,7 @@ def zero_map():
     nr = 10
     rss = 2.5
     br = np.zeros((nphi, ns))
-    header = pfsspy.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
+    header = pfsspy.utils.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
     input_map = Map((br.T, header))
 
     input = pfsspy.Input(input_map, nr, rss)
@@ -34,7 +34,7 @@ def dipole_map():
         return 2 * np.sin(theta) / r**3
 
     br = dipole_Br(1, theta)
-    header = pfsspy.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
+    header = pfsspy.utils.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
     return Map((br.T, header))
 
 
