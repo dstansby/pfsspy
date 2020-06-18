@@ -52,7 +52,7 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-header = pfsspy.carr_cea_wcs_header(Time('2020-1-1'), br.shape)
+header = pfsspy.utils.carr_cea_wcs_header(Time('2020-1-1'), br.shape)
 input_map = sunpy.map.Map((br.T, header))
 input = pfsspy.Input(input_map, nrho, rss)
 
