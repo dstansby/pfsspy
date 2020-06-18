@@ -129,30 +129,6 @@ def test_input_output(dipole_result):
     assert (new_out._al[0] == out._al[0]).all()
 
 
-def test_header_generation():
-    dtime = None
-    ntheta = 180
-    nphi = 360
-    shape = [nphi, ntheta]
-    header = pfsspy.carr_cea_wcs_header(dtime, shape)
-    assert header['LONPOLE'] == 0
-    assert header['CTYPE1'] == 'CRLN-CEA'
-    assert header['CTYPE2'] == 'CRLT-CEA'
-    assert header['PV1_1'] == 1
-    assert header['PV2_1'] == 1
-    assert header['CDELT1'] == 360 / nphi
-    np.testing.assert_almost_equal(
-        header['CDELT2'], (180 / np.pi) * (2 / ntheta))
-
-    # Extra + 1s are for FITS counting from 1 indexing
-    assert header['CRPIX1'] == (nphi / 2) + 0.5 + 1
-    assert header['CRPIX2'] == (ntheta / 2) + 0.5 + 1
-    assert header['CRVAL1'] == 0
-    assert header['CRVAL2'] == 0
-    assert header['CUNIT1'] == 'deg'
-    assert header['CUNIT2'] == 'deg'
-
-
 def test_wrong_projection_error(dipole_map):
     dipole_map.meta['ctype1'] = 'HGLN-CAR'
     with pytest.raises(ValueError, match='must be CEA'):
