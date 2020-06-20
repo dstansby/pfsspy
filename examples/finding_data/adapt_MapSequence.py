@@ -7,15 +7,16 @@ Parse an ADAPT FITS file into a `sunpy.map.MapSequence`.
 
 ###############################################################################
 # Necessary imports
-from adapt_helpers import example_adapt_map
 import sunpy.map
 import sunpy.io
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
+from pfsspy.sample_data import get_adapt_map
+
 ###############################################################################
 # Load an example ADAPT fits file, utility stored in adapt_helpers.py
-adapt_fname = example_adapt_map()
+adapt_fname = get_adapt_map()
 
 ###############################################################################
 # ADAPT synoptic magnetograms contain 12 realizations of synoptic magnetograms

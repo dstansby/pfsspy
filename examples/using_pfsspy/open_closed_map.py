@@ -21,7 +21,7 @@ import sunpy.map
 import pfsspy
 from pfsspy import coords
 from pfsspy import tracing
-from gong_helpers import get_gong_map
+from pfsspy.sample_data import get_gong_map
 
 
 ###############################################################################

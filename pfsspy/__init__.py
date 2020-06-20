@@ -20,6 +20,8 @@ import pfsspy.fieldline
 import pfsspy.map
 # Utility Functions
 import pfsspy.utils
+# Sample data
+import pfsspy.sample_data
 
 from .grid import Grid
 
