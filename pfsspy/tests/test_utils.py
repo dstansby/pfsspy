@@ -6,7 +6,7 @@ import pytest
 
 import pfsspy
 from pfsspy import utils
-from .example_maps import adapt_map
+from .example_maps import adapt_map, dipole_map
 
 
 def test_load_adapt(adapt_map):
