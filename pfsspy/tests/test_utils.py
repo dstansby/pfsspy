@@ -5,6 +5,9 @@ import sunpy.map
 import pytest
 
 import pfsspy
+from pfsspy import utils
+from .example_maps import dipole_map
+
 
 @pytest.fixture
 def gong_map():
@@ -20,6 +23,7 @@ def gong_map():
                 g.write(f.read())
 
     return '190310t0014gong.fits'
+
 
 @pytest.fixture
 def adapt_map():
@@ -37,10 +41,11 @@ def adapt_map():
     return 'adapt20200101.fts'
 
 
-def test_load_adapt(adapt_map) :
-    adaptMapSequence = pfsspy.utils.load_adapt(adapt_map)
-    assert isinstance(adaptMapSequence,sunpy.map.MapSequence)
-    for map_ in adaptMapSequence : assert map_.meta['model'] == "ADAPT"
+def test_load_adapt(adapt_map):
+    adaptMapSequence = utils.load_adapt(adapt_map)
+    assert isinstance(adaptMapSequence, sunpy.map.MapSequence)
+    for map_ in adaptMapSequence:
+        assert map_.meta['model'] == "ADAPT"
 
 
 def test_header_generation():
@@ -65,3 +70,9 @@ def test_header_generation():
     assert header['CRVAL2'] == 0
     assert header['CUNIT1'] == 'deg'
     assert header['CUNIT2'] == 'deg'
+
+
+@pytest.mark.parametrize('error', [True, False])
+def test_validation(dipole_map, error):
+    assert utils.is_cea_map(dipole_map, error)
+    assert utils.is_full_sun_synoptic_map(dipole_map, error)
