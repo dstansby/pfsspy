@@ -1,7 +1,9 @@
-import pytest
+from astropy.time import Time
 import numpy as np
 from sunpy.map import Map
-from astropy.time import Time
+from sunpy.data import manager
+import pytest
+
 import pfsspy
 
 
@@ -46,3 +48,19 @@ def dipole_result(dipole_map):
     input = pfsspy.Input(dipole_map, nr, rss)
     output = pfsspy.pfss(input)
     return input, output
+
+
+@pytest.fixture
+def gong_map():
+    """
+    Automatically download and unzip a sample GONG synoptic map.
+    """
+    return pfsspy.sample_data.get_gong_map()
+
+
+@pytest.fixture
+def adapt_map():
+    """
+    Automatically download and unzip a sample GONG synoptic map.
+    """
+    return pfsspy.sample_data.get_adapt_map()

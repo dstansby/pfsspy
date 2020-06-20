@@ -22,7 +22,7 @@ import sunpy.io.fits
 import pfsspy
 import pfsspy.coords as coords
 import pfsspy.tracing as tracing
-from gong_helpers import get_gong_map
+from pfsspy.sample_data import get_gong_map
 
 
 ###############################################################################
