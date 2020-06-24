@@ -84,15 +84,11 @@ class OpenFieldLines(FieldLines):
         """
         Coordinates of the source suface footpoints.
         """
-        source_surface_feet = [fline.source_surface_footpoint for
-                               fline in self.field_lines]
+        x = np.array([fline._x[fline._ss_coord_index] for fline in self.field_lines])
+        y = np.array([fline._y[fline._ss_coord_index] for fline in self.field_lines])
+        z = np.array([fline._z[fline._ss_coord_index] for fline in self.field_lines])
 
-        if len(source_surface_feet) == 1:
-            source_surface_feet = source_surface_feet[0]
-        else:
-            source_surface_feet = coord.concatenate(source_surface_feet)
-
-        return source_surface_feet
+        return FieldLine._coords(x, y, z, self.field_lines[0]._output)
 
     @property
     @functools.lru_cache()
@@ -100,14 +96,11 @@ class OpenFieldLines(FieldLines):
         """
         Coordinates of the solar footpoints.
         """
-        solar_feet = [fline.solar_footpoint for fline in self.field_lines]
+        x = np.array([fline._x[fline._solar_coord_index] for fline in self.field_lines])
+        y = np.array([fline._y[fline._solar_coord_index] for fline in self.field_lines])
+        z = np.array([fline._z[fline._solar_coord_index] for fline in self.field_lines])
 
-        if len(solar_feet) == 1:
-            solar_feet = solar_feet[0]
-        else:
-            solar_feet = coord.concatenate(solar_feet)
-
-        return solar_feet
+        return FieldLine._coords(x, y, z, self.field_lines[0]._output)
 
 
 class ClosedFieldLines(FieldLines):
@@ -148,12 +141,15 @@ class FieldLine:
         """
         Field line `~astropy.coordinates.SkyCoord`.
         """
-        r, lat, lon = coord.cartesian_to_spherical(
-            self._x, self._y, self._z)
+        return self._coords(self._x, self._y, self._z, self._output)
+
+    @staticmethod
+    def _coords(x, y, z, output):
+        r, lat, lon = coord.cartesian_to_spherical(x, y, z)
         r *= const.R_sun
-        lon += self._output._lon0 + 180 * u.deg
+        lon += output._lon0 + 180 * u.deg
         coords = coord.SkyCoord(
-            lon, lat, r, frame=self._output.coordinate_frame)
+            lon, lat, r, frame=output.coordinate_frame)
         return coords
 
     @property
@@ -195,10 +191,7 @@ class FieldLine:
         method returns the field line pointing out from the solar surface in
         this case.
         """
-        if self.polarity == 1 or not self.is_open:
-            return self.coords[0]
-        else:
-            return self.coords[-1]
+        return self.coords[self._solar_coord_index]
 
     @property
     def source_surface_footpoint(self):
@@ -218,10 +211,22 @@ class FieldLine:
         method returns the field line pointing out from the solar surface in
         this case.
         """
+        return self.coords[self._ss_coord_index]
+
+    @property
+    def _ss_coord_index(self):
+        """
+        Return 0 or -1 depending on which end of the coordinate array is the
+        source surface footpoint.
+        """
         if self.polarity == 1 or not self.is_open:
-            return self.coords[-1]
+            return -1
         else:
-            return self.coords[0]
+            return 0
+
+    @property
+    def _solar_coord_index(self):
+        return -1 - self._ss_coord_index
 
     @property
     @functools.lru_cache()
@@ -242,12 +247,8 @@ class FieldLine:
         if not self.is_open:
             return np.nan
 
-        if self._r[0] > self._r[-1]:
-            solar_foot = -1
-            source_foot = 0
-        else:
-            solar_foot = 0
-            source_foot = -1
+        solar_foot = self._solar_coord_index
+        source_foot = self._ss_coord_index
 
         def interp(map, idx):
             x, y, z = self._x[idx], self._y[idx], self._z[idx]
