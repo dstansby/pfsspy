@@ -16,6 +16,9 @@ class GongSynopticMap(sunpy.map.GenericMap):
                 # that value (see Thompson 2005)
                 header['CDELT2'] = 180 / np.pi * header['CDELT2']
                 header['KEYCOMMENTS']['CDELT2'] = '180 / pi * sine-lat step'
+            if 'time-obs' in header:
+                header['date-obs'] = (header['date-obs'] + ' ' +
+                                      header.pop('time-obs'))
         super().__init__(data, header, **kwargs)
 
     @classmethod
