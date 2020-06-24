@@ -32,12 +32,14 @@ class GongSynopticMap(sunpy.map.GenericMap):
 
 class ADAPTMap(sunpy.map.GenericMap):
     def __init__(self, data, header, **kwargs):
-        header['date-obs'] = header['maptime']
-        if not ((header['cunit2'] == 'deg') &
-                (header['naxis2']*header['cdelt2'] == 180)) :
-            raise AssertionError("Latitude metadata doesn't add to 180deg")
-        header['ctype1'] = 'CRLN-CAR'
-        header['ctype2'] = 'CRLT-CAR'
+        if 'date-obs' not in header:
+            header['date-obs'] = header['maptime']
+        # Fix CTYPE
+        if header['ctype1'] == 'Long':
+            header['ctype1'] = 'CRLN-CAR'
+        if header['ctype2'] == 'Lat':
+            header['ctype2'] = 'CRLT-CAR'
+
         super().__init__(data, header, **kwargs)
 
     @classmethod

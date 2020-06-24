@@ -2,6 +2,7 @@
 
 graphviz
 pillow
+reproject
 sphinx-automodapi>=0.10
 sphinx_rtd_theme
 sphinx-gallery

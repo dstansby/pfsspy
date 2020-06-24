@@ -55,6 +55,7 @@ sphinx_gallery_conf = {
     'gallery_dirs': 'auto_examples',
     'subsection_order': ExplicitOrder(['../../examples/using_pfsspy',
                                        '../../examples/finding_data',
+                                       '../../examples/utils',
                                        '../../examples/pfsspy_info'])
 }
 

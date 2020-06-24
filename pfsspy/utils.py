@@ -31,9 +31,12 @@ def load_adapt(adapt_path):
     adaptMapSequence : `sunpy.map.MapSequence`
     """
     adapt_fits = sunpy.io.fits.read(adapt_path)
-    assert adapt_fits[0].header.get('MODEL') == 'ADAPT', \
-        f"{os.path.basename(adapt_path)} header['MODEL'] is not 'ADAPT' "
-    data_header_pairs = [(map_slice, adapt_fits[0].header)
+    header = adapt_fits[0].header
+    if header['MODEL'] != 'ADAPT':
+        raise ValueError(f"{os.path.basename(adapt_path)} header['MODEL'] "
+                         "is not 'ADAPT'.")
+
+    data_header_pairs = [(map_slice, header)
                          for map_slice in adapt_fits[0].data]
     adaptMapSequence = sunpy.map.Map(data_header_pairs, sequence=True)
     return adaptMapSequence
@@ -81,6 +84,21 @@ def carr_cea_wcs_header(dtime, shape):
     return header
 
 
+def _get_projection(m, i):
+    return m.meta[f'ctype{i}'][5:8]
+
+
+def _check_projection(m, proj_code, error=False):
+    for i in ('1', '2'):
+        proj = _get_projection(m, i)
+        if proj != proj_code:
+            if error:
+                raise ValueError(f'Projection type in CTYPE{i} keyword '
+                                 f'must be {proj_code} (got "{proj}")')
+            return False
+    return True
+
+
 def is_cea_map(m, error=False):
     """
     Returns `True` if *m* is in a cylindrical-equal-area projeciton.
@@ -88,16 +106,21 @@ def is_cea_map(m, error=False):
     Parameters
     ----------
     error : bool
-        If `True`, raise an error if *m* is not a CEA projection
+        If `True`, raise an error if *m* is not a CEA projection.
     """
-    for i in ('1', '2'):
-        proj = m.meta[f'ctype{i}'][5:8]
-        if proj != 'CEA':
-            if error:
-                raise ValueError(f'Projection type in CTYPE{i} keyword '
-                                 f'must be CEA (got "{proj}")')
-            return False
-    return True
+    return _check_projection(m, 'CEA', error=error)
+
+
+def is_car_map(m, error=False):
+    """
+    Returns `True` if *m* is in a plate Careé projeciton.
+
+    Parameters
+    ----------
+    error : bool
+        If `True`, raise an error if *m* is not a CAR projection.
+    """
+    return _check_projection(m, 'CAR', error=error)
 
 
 def is_full_sun_synoptic_map(m, error=False):
@@ -110,6 +133,8 @@ def is_full_sun_synoptic_map(m, error=False):
         If `True`, raise an error if *m* does not span the whole solar surface.
     """
     shape = m.data.shape
+    if _get_projection(m, 1) != 'CEA':
+        raise NotImplementedError('is_full_sun_synoptic_map is only implemented for CEA projections.')
 
     dphi = m.meta['cdelt1']
     phi = shape[1] * dphi
@@ -131,3 +156,45 @@ def is_full_sun_synoptic_map(m, error=False):
         return False
 
     return True
+
+
+def car_to_cea(m):
+    """
+    Reproject a plate-carée map in to a cylindrical-equal-area map.
+
+    The solver used in pfsspy requires a magnetic field map with values
+    equally spaced in sin(lat) (ie. a CEA projection), but some maps are
+    provided equally spaced in lat (ie. a CAR projection). This function
+    reprojects a CAR map into a CEA map so it can be used with pfsspy.
+
+    Parameters
+    ----------
+    m : sunpy.map.GenericMap
+        Input map
+
+    Returns
+    -------
+    output_map : sunpy.map.GenericMap
+        Re-projected map. All metadata is preserved, apart from CTYPE{1,2} and
+        CDELT2 which are updated to account for the new projection.
+    """
+    from astropy.wcs import WCS
+    from reproject import reproject_interp
+    # Check input map is valid
+    # is_full_sun_synoptic_map(m, error=True)
+    is_car_map(m, error=True)
+
+    header_out = m.wcs.to_header()
+    header_out['CTYPE1'] = header_out['CTYPE1'][:5] + 'CEA'
+    header_out['CTYPE2'] = header_out['CTYPE2'][:5] + 'CEA'
+    header_out['CDELT2'] = 180 / np.pi * 2 / m.data.shape[0]
+    wcs_out = WCS(header_out)
+    wcs_out.heliographic_observer = m.wcs.heliographic_observer
+    data_out = reproject_interp(m, wcs_out, shape_out=m.data.shape,
+                                return_footprint=False)
+
+    meta_out = m.meta.copy()
+    for key in ['CTYPE1', 'CTYPE2', 'CDELT2']:
+        meta_out[key] = header_out[key]
+    m_out = sunpy.map.Map(data_out, header_out)
+    return m_out
