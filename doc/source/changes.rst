@@ -6,6 +6,8 @@ Changelog
 - Improved descriptions in the AIA overplotting example.
 - Fixed the 'date-obs' keyword in GONG metadata. Previously this just stored
   the date and not the time; now both the date and time are properly stored.
+- Drastically sped up the calculation of source surface and solar surface
+  magnetic field footpoints.
 
 0.5.2
 -----
