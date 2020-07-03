@@ -9,3 +9,4 @@ sphinx>2
 bs4
 drms
 zeep
+importlib_metadata
