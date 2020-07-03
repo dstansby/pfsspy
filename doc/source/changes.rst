@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.5.3
+-----
+- Improved descriptions in the AIA overplotting example.
+
 0.5.2
 -----
 - Fixed a bug in the GONG synoptic map source where a map failed to load once
