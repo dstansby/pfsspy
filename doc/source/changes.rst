@@ -4,6 +4,8 @@ Changelog
 0.5.3
 -----
 - Improved descriptions in the AIA overplotting example.
+- Fixed the 'date-obs' keyword in GONG metadata. Previously this just stored
+  the date and not the time; now both the date and time are properly stored.
 
 0.5.2
 -----
