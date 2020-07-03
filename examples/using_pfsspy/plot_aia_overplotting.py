@@ -82,12 +82,22 @@ aia.plot(ax)
 
 
 ###############################################################################
-# Now we construct a 10 x 10 grid of footpoitns to trace some magnetic field
-# lines from.
-s, phi = np.meshgrid(np.linspace(0.1, 0.2, 5),
-                     np.deg2rad(np.linspace(55, 65, 5)))
+# Now we construct a 5 x 5 grid of footpoitns to trace some magnetic field
+# lines from. These coordinates are defined in the native Carrington
+# coordinates of the input magnetogram.
+
+# Create 5 points spaced between sin(lat)={0.1, 0.2}
+s = np.linspace(0.1, 0.2, 5)
+# Create 5 points spaced between long={55, 65} degrees
+phi = np.linspace(55, 65, 5)
+print(f's = {s}')
+print(f'phi = {phi}')
+# Make a 2D grid from these 1D points
+s, phi = np.meshgrid(s, phi)
+
+# Now convert the points to a coordinate object
 lat = np.arcsin(s) * u.rad
-lon = phi * u.rad
+lon = phi * u.deg
 seeds = SkyCoord(lon.ravel(), lat.ravel(), 1.01 * const.R_sun,
                  frame=gong_map.coordinate_frame)
 
@@ -102,6 +112,9 @@ plt.colorbar()
 
 ax.plot_coord(seeds, color='black', marker='o', linewidth=0, markersize=2)
 
+# Set the axes limits. These limits have to be in pixel values
+ax.set_xlim(0, 180)
+ax.set_ylim(45, 135)
 ax.set_title('Field line footpoints')
 ax.set_ylim(bottom=0)
 
@@ -126,8 +139,9 @@ plt.colorbar()
 for fline in flines:
     ax.plot_coord(fline.coords, color='black', linewidth=1)
 
-# ax.set_xlim(55, 65)
-# ax.set_ylim(0.1, 0.25)
+# Set the axes limits. These limits have to be in pixel values
+ax.set_xlim(0, 180)
+ax.set_ylim(45, 135)
 ax.set_title('Photospheric field and traced field lines')
 ###############################################################################
 # Plot the AIA map, along with the traced magnetic field lines. Inside the
@@ -135,7 +149,6 @@ ax.set_title('Photospheric field and traced field lines')
 # and then plotted on top of the map.
 fig = plt.figure()
 ax = plt.subplot(1, 1, 1, projection=aia)
-transform = ax.get_transform('world')
 aia.plot(ax)
 for fline in flines:
     ax.plot_coord(fline.coords, alpha=0.8, linewidth=1, color='black')
