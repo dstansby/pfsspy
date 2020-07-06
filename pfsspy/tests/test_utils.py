@@ -50,6 +50,9 @@ def test_car_reproject(adapt_map):
     adapt_map = utils.load_adapt(adapt_map)[0]
     adapt_reproj = utils.car_to_cea(adapt_map)
 
+    assert np.all(np.isfinite(adapt_map.data))
+    assert np.all(np.isfinite(adapt_reproj.data))
+
     assert adapt_reproj.data.shape == adapt_map.data.shape
     for i in [1, 2]:
         assert adapt_reproj.meta[f'CTYPE{i}'][5:8] == 'CEA'
