@@ -158,7 +158,7 @@ def is_full_sun_synoptic_map(m, error=False):
     return True
 
 
-def car_to_cea(m):
+def car_to_cea(m, method='adaptive'):
     """
     Reproject a plate-carée map in to a cylindrical-equal-area map.
 
@@ -171,15 +171,30 @@ def car_to_cea(m):
     ----------
     m : sunpy.map.GenericMap
         Input map
+    method : str
+        Reprojection method to use. Can be ``'adaptive'`` (default),
+        ``'interp'``, or ``'exact'``. See :mod:`reproject` for a description
+        of the different methods.
 
     Returns
     -------
     output_map : sunpy.map.GenericMap
         Re-projected map. All metadata is preserved, apart from CTYPE{1,2} and
         CDELT2 which are updated to account for the new projection.
+
+    See also
+    --------
+    :mod:`reproject` for the methods that perform the reprojection.
     """
     from astropy.wcs import WCS
-    from reproject import reproject_interp
+    from reproject import reproject_interp, reproject_exact, reproject_adaptive
+    methods = {'adaptive': reproject_adaptive,
+               'interp': reproject_interp,
+               'exact': reproject_exact}
+    if method not in methods:
+        raise ValueError(f'method must be one of {methods.keys()} '
+                         f'(got {method})')
+    reproject = methods[method]
     # Check input map is valid
     # is_full_sun_synoptic_map(m, error=True)
     is_car_map(m, error=True)
@@ -190,8 +205,8 @@ def car_to_cea(m):
     header_out['CDELT2'] = 180 / np.pi * 2 / m.data.shape[0]
     wcs_out = WCS(header_out)
     wcs_out.heliographic_observer = m.observer_coordinate
-    data_out = reproject_interp(m, wcs_out, shape_out=m.data.shape,
-                                return_footprint=False)
+    data_out = reproject(m, wcs_out, shape_out=m.data.shape,
+                         return_footprint=False)
 
     meta_out = m.meta.copy()
     for key in ['CTYPE1', 'CTYPE2', 'CDELT2']:

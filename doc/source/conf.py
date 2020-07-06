@@ -205,4 +205,5 @@ intersphinx_mapping = {'https://docs.python.org/3/': None,
                        'https://docs.sunpy.org/en/stable': None,
                        'https://numpy.org/doc/stable': None,
                        'https://streamtracer.readthedocs.io/en/stable': None,
-                       'https://docs.scipy.org/doc/scipy/reference': None}
+                       'https://docs.scipy.org/doc/scipy/reference': None,
+                       'https://reproject.readthedocs.io/en/stable/': None}
