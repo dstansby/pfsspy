@@ -44,3 +44,15 @@ def test_header_generation():
 def test_validation(dipole_map, error):
     assert utils.is_cea_map(dipole_map, error)
     assert utils.is_full_sun_synoptic_map(dipole_map, error)
+
+
+def test_car_reproject(adapt_map):
+    adapt_map = utils.load_adapt(adapt_map)[0]
+    adapt_reproj = utils.car_to_cea(adapt_map)
+
+    assert adapt_reproj.data.shape == adapt_map.data.shape
+    for i in [1, 2]:
+        assert adapt_reproj.meta[f'CTYPE{i}'][5:8] == 'CEA'
+
+    with pytest.raises(ValueError, match='method must be one of'):
+        utils.car_to_cea(adapt_map, method='gibberish')
