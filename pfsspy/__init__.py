@@ -512,6 +512,55 @@ class Output:
         self._common_b_cache = br, bs, bp, Sbr, Sbs, Sbp
         return self._common_b_cache
 
+    def get_Bvec(self,skycoord,coords_type="cartesian") :
+        """
+        Input
+        =====
+        skycoord : astropy.SkyCoord 
+        An arbitary point or set of points (length N >= 1) 
+        in the PFSS model domain (1Rs < r < Rss)
+
+        Output
+        ======
+        bvec : ndarray (ndarray.shape = (N,3), units nT) 
+        Magnetic field vectors at the requested locations 
+
+        Keyword Arguments
+        =================
+        coords_type : str
+        Either "cartesian" or "spherical" depending on desired
+        output type. 
+        Cartesian -> Bx,By,Bz. 
+        Spherical -> Br, B_\theta, B_\phi 
+        (physics convention : https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/3D_Spherical.svg/240px-3D_Spherical.svg.png)
+        """
+        # Assert skycoord is type astropy.coordinates.SkyCoord
+        assert isinstance(skycoord,coord.SkyCoord)
+
+        # Ensure representation type is spherical for input to interpolator
+        skycoord.representation_type="spherical"
+
+        # Check coord_type is cartesian or spherical
+        assert coords_type in ["cartesian","spherical"]
+        
+        # Check skycoord coordinate system is Carrington Frame
+
+
+        # Do interpolation (returns cartesian vector)
+        bvecs = self._brgi(np.array(
+                            [skycoord.lon.to("rad").value,
+                             np.sin(skycoord.lat).value,
+                             np.log(skycoord.radius.to("R_sun").value)
+                            ]).T
+                            )
+        
+        # Convert to spherical if requested
+        if coords_type == "spherical" : 
+            bvecs = np.array(coords.cart2sph(bvecs[:,0],
+                                             bvecs[:,1],
+                                             bvecs[:,2])).T
+        return bvecs*u.nT
+
 
 def _eigh(A):
     return np.linalg.eigh(A)
