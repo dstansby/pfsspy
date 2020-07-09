@@ -532,7 +532,7 @@ class Output:
         Either "cartesian" or "spherical" depending on desired
         output type :
             Cartesian -> Bx,By,Bz. 
-            Spherical -> Br, B_\theta, B_\phi 
+            Spherical -> Br, B_theta, B_phi 
             (physics convention : https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/3D_Spherical.svg/240px-3D_Spherical.svg.png)
         """
 

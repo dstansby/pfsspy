@@ -138,3 +138,28 @@ def test_wrong_projection_error(dipole_map):
 def test_non_map_input():
     with pytest.raises(ValueError, match='br must be a SunPy Map'):
         pfsspy.Input(np.random.rand(2, 2), 1, 1)
+
+def test_bvec_interpolator(dipole_result) :
+    _, out = dipole_result
+    test_coord = coord.SkyCoord(
+        x = np.array([0.5,0.75,1]) * out.grid.rss*u.R_sun,
+        y = np.zeros(3) * u.R_sun,
+        z = np.zeros(3) * u.R_sun,
+        frame = out.coordinate_frame,  
+        representation_type="cartesian" 
+    )
+    b_cart = out.get_Bvec(test_coord)
+    b_sph = out.get_Bvec(test_coord,out_type="spherical")
+
+    # Check the output shape matches is [N,3] whre
+    # N is the length of test_coord, the unit is nT
+    assert b_cart.shape == (len(test_coord),3)
+    assert b_sph.shape == (len(test_coord),3)
+    assert b_cart.unit == u.nT
+
+    # The test coordinates are all located at 
+    # rhat = [1,0,0], thetahat = [0,0,1], phihat = [0,1,0]
+    # Use this to sanity check the rotation to spherical coordinates
+    assert np.all(b_sph[:,0] == b_cart[:,0])
+    assert np.all(b_sph[:,1] == -b_cart[:,2])
+    assert np.all(b_sph[:,2] == b_cart[:,1])
