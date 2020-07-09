@@ -566,9 +566,19 @@ class Output:
         
         # Convert to spherical if requested
         if out_type == "spherical" : 
-            bvecs = np.array(coords.cart2sph(bvecs[:,0],
-                                             bvecs[:,1],
-                                             bvecs[:,2])).T
+            # Generate vector of 3x3 rotation matrices
+            M = np.array([
+                [ np.cos(skycoord.lat).value*np.cos(skycoord.lon).value,
+                  np.cos(skycoord.lat).value*np.sin(skycoord.lon).value,
+                  np.sin(skycoord.lat).value],
+                [ np.sin(skycoord.lat).value*np.cos(skycoord.lon).value,
+                  np.sin(skycoord.lat).value*np.sin(skycoord.lon).value,
+                 -np.cos(skycoord.lat).value],               
+                [-np.sin(skycoord.lon).value,
+                  np.cos(skycoord.lon).value,
+                  np.zeros(len(skycoord))],                 
+            ])
+            bvecs = np.array([np.dot(M_.T,v) for M_,v in zip(M.T,bvecs)])    
         return bvecs*u.nT
 
 
