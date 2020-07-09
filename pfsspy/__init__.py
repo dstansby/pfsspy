@@ -1,5 +1,6 @@
 import distutils.version
 import functools
+import warnings
 
 import astropy
 import astropy.coordinates as coord
@@ -512,7 +513,7 @@ class Output:
         self._common_b_cache = br, bs, bp, Sbr, Sbs, Sbp
         return self._common_b_cache
 
-    def get_Bvec(self,skycoord,coords_type="cartesian") :
+    def get_Bvec(self,skycoord,out_type="cartesian") :
         """
         Input
         =====
@@ -529,22 +530,31 @@ class Output:
         =================
         coords_type : str
         Either "cartesian" or "spherical" depending on desired
-        output type. 
-        Cartesian -> Bx,By,Bz. 
-        Spherical -> Br, B_\theta, B_\phi 
-        (physics convention : https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/3D_Spherical.svg/240px-3D_Spherical.svg.png)
+        output type :
+            Cartesian -> Bx,By,Bz. 
+            Spherical -> Br, B_\theta, B_\phi 
+            (physics convention : https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/3D_Spherical.svg/240px-3D_Spherical.svg.png)
         """
+
         # Assert skycoord is type astropy.coordinates.SkyCoord
-        assert isinstance(skycoord,coord.SkyCoord)
+        if not isinstance(skycoord,coord.SkyCoord) :
+            raise ValueError("parameter skycoord must be of type astropy.coordinates.SkyCoord")
 
         # Ensure representation type is spherical for input to interpolator
         skycoord.representation_type="spherical"
 
         # Check coord_type is cartesian or spherical
-        assert coords_type in ["cartesian","spherical"]
+        if not out_type in ["cartesian","spherical"] :
+            raise ValueError("keyword argument out_type must be 'cartesian' or 'spherical'")
         
-        # Check skycoord coordinate system is Carrington Frame
+        # Raise warning if input skycoord obstime does not match
+        # self.coordinate_frame.obstime
+        if np.any(self.coordinate_frame.obstime.to_datetime()
+                  != skycoord.obstime.to_datetime()) :
+            warnings.warn("The obstime of one of more input coordinates do not match the pfss model obstime.")
 
+        # Convert SkyCoord to pfsspy.Output coordinate frame
+        skycoord.transform_to(self.coordinate_frame)
 
         # Do interpolation (returns cartesian vector)
         bvecs = self._brgi(np.array(
@@ -555,7 +565,7 @@ class Output:
                             )
         
         # Convert to spherical if requested
-        if coords_type == "spherical" : 
+        if out_type == "spherical" : 
             bvecs = np.array(coords.cart2sph(bvecs[:,0],
                                              bvecs[:,1],
                                              bvecs[:,2])).T
