@@ -358,6 +358,12 @@ class Output:
     def bc(self):
         """
         B on the centres of the cell faces.
+
+        Returns
+        -------
+        br
+        btheta
+        bphi
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Remove area factors:
@@ -432,10 +438,12 @@ class Output:
 
         alr, als, alp = self._al
 
+        # Centre of cells in rho (including ghost cells)
         rc = np.linspace(-0.5 * dr, np.log(rss) + 0.5 * dr, nr + 2)
         rrc = np.exp(rc)
         thc = np.zeros(ns + 2) - 1
         thc[1:-1] = np.arccos(sc)
+        # Centre of cells in phi (including ghost cells)
         pc = np.linspace(-0.5 * dp, 2 * np.pi + 0.5 * dp, nphi + 2)
 
         # Required face normals:
@@ -465,28 +473,28 @@ class Output:
         Sbs = np.zeros((ns + 1, nr + 2))
         for k in range(nr + 2):
             for j in range(1, ns):
-                Sbs[j,k] = 0.5*np.exp(2*rc[k] - dr)*dp*(np.exp(2*dr)-1)*np.sqrt(1 - sg[j]**2)
-            Sbs[0,k] = Sbs[1,k]
-            Sbs[-1,k] = Sbs[-2,k]
-        Sbp = np.zeros((ns+2,nr+2))
-        for k in range(nr+2):
-            for j in range(1,ns+1):
-                Sbp[j,k] = 0.5*np.exp(2*rc[k] - dr)*(np.exp(2*dr) - 1)*(np.arcsin(sg[j]) - np.arcsin(sg[j-1]))
-            Sbp[0,k] = Sbp[1,k]
-            Sbp[-1,k] = Sbp[-2,k]
+                Sbs[j, k] = 0.5 * np.exp(2 * rc[k] - dr) * dp * (np.exp(2 * dr) - 1) * np.sqrt(1 - sg[j]**2)
+            Sbs[0, k] = Sbs[1, k]
+            Sbs[-1, k] = Sbs[-2, k]
+        Sbp = np.zeros((ns + 2, nr + 2))
+        for k in range(nr + 2):
+            for j in range(1, ns + 1):
+                Sbp[j, k] = 0.5 * np.exp(2 * rc[k] - dr) * (np.exp(2 * dr) - 1) * (np.arcsin(sg[j]) - np.arcsin(sg[j - 1]))
+            Sbp[0, k] = Sbp[1, k]
+            Sbp[-1, k] = Sbp[-2, k]
 
         # Compute br*Sbr, bs*Sbs, bp*Sbp at cell centres by Stokes theorem:
-        br = np.zeros((nphi+2,ns+2,nr+1))
-        bs = np.zeros((nphi+2,ns+1,nr+2))
-        bp = np.zeros((nphi+1,ns+2,nr+2))
-        br[1:-1,1:-1,:] = als[1:,:,:] - als[:-1,:,:] + alp[:,:-1,:] - alp[:,1:,:]
-        bs[1:-1,:,1:-1] = alp[:,:,1:] - alp[:,:,:-1]
-        bp[:,1:-1,1:-1] = als[:,:,:-1] - als[:,:,1:]
+        br = np.zeros((nphi + 2, ns + 2, nr + 1))
+        bs = np.zeros((nphi + 2, ns + 1, nr + 2))
+        bp = np.zeros((nphi + 1, ns + 2, nr + 2))
+        br[1:-1, 1:-1, :] = als[1:, :, :] - als[:-1, :, :] + alp[:,:-1,:] - alp[:,1:,:]
+        bs[1:-1, :, 1:-1] = alp[:, :, 1:] - alp[:, :, :-1]
+        bp[:, 1:-1, 1:-1] = als[:, :, :-1] - als[:, :, 1:]
 
         # Fill ghost values with boundary conditions:
         # - zero-gradient at outer boundary:
-        bs[1:-1,:,-1] = 2*bs[1:-1,:,-2] - bs[1:-1,:,-3]
-        bp[:,1:-1,-1] = 2*bp[:,1:-1,-2] - bp[:,1:-1,-3]
+        bs[1:-1, :, -1] = 2 * bs[1:-1, :, -2] - bs[1:-1, :, -3]
+        bp[:, 1:-1, -1] = 2 * bp[:, 1:-1, -2] - bp[:, 1:-1, -3]
         # - periodic in phi:
         bs[0,:,:] = bs[-2,:,:]
         bs[-1,:,:] = bs[1,:,:]
@@ -609,8 +617,8 @@ def pfss(input):
     # - create off-diagonal part of the matrix:
     A = np.zeros((ns, ns))
     for j in range(ns - 1):
-        A[j, j+1] = -Vg[j+1]
-        A[j+1, j] = A[j, j+1]
+        A[j, j + 1] = -Vg[j + 1]
+        A[j + 1, j] = A[j, j + 1]
     # - term required for m-dependent part of matrix:
     mu = np.fft.fftfreq(nphi)
     mu = 4 * np.sin(np.pi * mu)**2
@@ -645,6 +653,7 @@ def pfss(input):
     psi = np.real(np.fft.ifft(psi, axis=2))
 
     # Hence compute vector potential [note index order, for netcdf]:
+    # (note that alr is zero by definition)
     alr = np.zeros((nphi + 1, ns + 1, nr))
     als = np.zeros((nphi + 1, ns, nr + 1))
     alp = np.zeros((nphi, ns + 1, nr + 1))
