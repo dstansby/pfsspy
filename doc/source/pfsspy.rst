@@ -1,5 +1,10 @@
-.. automodapi:: pfsspy
-   :no-inheritance-diagram:
+API reference
+=============
 
+.. automodapi:: pfsspy
+
+.. automodapi:: pfsspy.grid
 
 .. automodapi:: pfsspy.fieldline
+
+.. automodapi:: pfsspy.tracing

@@ -3,11 +3,22 @@ import numpy as np
 
 
 class Grid:
-    """
-    Grid on which the solution is calculated.
+    r"""
+    Grid on which the pfsspy solution is calculated.
 
-    The grid is evenly spaced in (cos(theta), phi, log(r)).
-    See :mod:`pfsspy.coords` for more information.
+    Notes
+    -----
+    The PFSS solution is calculated on a "strumfric" grid defined by
+
+    - :math:`\rho = \log (r)`
+    - :math:`s = \cos (\theta )`
+    - :math:`\phi`
+
+    where :math:`r, \theta, \phi` are spherical cooridnates that have ranges
+
+    - :math:`1 < r < r_{ss}`
+    - :math:`0 < \theta < \pi`
+    - :math:`0 < \phi < 2\pi`
     """
     def __init__(self, ns, nphi, nr, rss):
         self.ns = ns

@@ -52,7 +52,6 @@ For the main user-facing code and a changelog see
    :maxdepth: 1
 
    pfsspy
-   tracing
    changes
 
 for usage examples see
@@ -68,14 +67,6 @@ for various helper functions for working with synoptic maps:
    :maxdepth: 2
 
    utils
-
-
-for the helper modules (behind the scense!) see
-
-.. toctree::
-   :maxdepth: 2
-
-   helpers
 
 and for a quick reference guide to synoptic map FITS conventions see
 
