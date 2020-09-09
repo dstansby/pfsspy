@@ -135,6 +135,13 @@ def test_wrong_projection_error(dipole_map):
         pfsspy.Input(dipole_map, 5, 2.5)
 
 
+def test_nan_value(dipole_map):
+    dipole_map.data[0, 0] = np.nan
+    with pytest.raises(
+            ValueError, match='At least one value in the input is NaN'):
+        pfsspy.Input(dipole_map, 5, 2.5)
+
+
 def test_non_map_input():
     with pytest.raises(ValueError, match='br must be a SunPy Map'):
         pfsspy.Input(np.random.rand(2, 2), 1, 1)

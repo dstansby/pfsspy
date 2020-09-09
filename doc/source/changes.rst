@@ -3,11 +3,17 @@ Changelog
 
 0.6.0
 -----
+
+Breaking changes
+~~~~~~~~~~~~~~~~
 - The ``.al`` property of `pfsspy.Output` is now private, as it is not intended
   for user access. If you *really* want to access it, use ``._al`` (but this is
   now private API and there is no guarantee it will stay or return the same thing
   in the future).
-  
+- A `ValueError` is now raised if any of the input data to `pfsspy.Input` is
+  non-finite or NaN. Previously the pfss computation would run fine, but the
+  output would consist entirely of NaNs.
+
 0.5.3
 -----
 - Improved descriptions in the AIA overplotting example.
