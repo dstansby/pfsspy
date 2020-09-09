@@ -61,7 +61,7 @@ output = pfsspy.pfss(input)
 
 r = const.R_sun
 # Number of steps in cos(latitude)
-nsteps = 30
+nsteps = 90
 lon_1d = np.linspace(0, 2 * np.pi, nsteps * 2 + 1)
 lat_1d = np.arcsin(np.linspace(-1, 1, nsteps + 1))
 lon, lat = np.meshgrid(lon_1d, lat_1d, indexing='ij')
