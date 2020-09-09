@@ -56,14 +56,10 @@ solution, importing various magnetic field data sources, and ...
 ecosystem. Input magnetic field maps are via. [@sunpy], and makes use of the
 coordinate and unit handling built into [@astropy].
 
+![Caption for example figure.\label{fig:example}](pfsspy.pdf)
+
 *Used in these publications*
 *Particularly helpful for these upcoming missions*
-
-# Figures
-
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
 
 # Acknowledgements
 
