@@ -3,6 +3,7 @@ Custom `sunpy.map.GenericMap` sub-classes for different magnetogram sources.
 """
 import numpy as np
 import sunpy.map
+from astropy.time import Time
 
 
 class GongSynopticMap(sunpy.map.GenericMap):
@@ -19,6 +20,7 @@ class GongSynopticMap(sunpy.map.GenericMap):
             if 'time-obs' in header:
                 header['date-obs'] = (header['date-obs'] + ' ' +
                                       header.pop('time-obs'))
+                header['date-obs'] = Time(header['date-obs']).isot
         super().__init__(data, header, **kwargs)
 
     @classmethod

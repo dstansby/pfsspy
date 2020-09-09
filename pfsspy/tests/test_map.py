@@ -13,6 +13,8 @@ def test_gong_source(gong_map):
     # Check round-trip is robust against sunpy changes to the meta
     m = sunpy.map.Map(m.data, m.meta)
     assert m.date.isot == '2019-03-10T00:14:00.000'
+    # Construct a WCS to check no warnings are thrown
+    m.wcs
 
 
 def test_adapt_map(adapt_map):
