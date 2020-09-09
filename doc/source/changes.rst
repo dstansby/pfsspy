@@ -29,7 +29,7 @@ Breaking changes
 
 0.5.1
 -----
-- Fixed some calculations in `pfsspy.carr_cea_wcs_header`, and clarified in the
+- Fixed some calculations in ``pfsspy.carr_cea_wcs_header``, and clarified in the
   docstring that the input shape must be in ``[nlon, nlat]`` order.
 - Added validation to `pfsspy.Input` to check that the inputted map covers the
   whole solar surface.
@@ -51,7 +51,7 @@ the following changes have been made:
 `pfsspy.Input` now *must* take a `sunpy.map.GenericMap` as an
 input boundary condition (as opposed to a numpy array). To convert a numpy array
 to a `~sunpy.map.GenericMap`, the helper function
-:func:`pfsspy.carr_cea_wcs_header` can be used::
+``pfsspy.carr_cea_wcs_header`` can be used::
 
   map_date = datetime(...)
   br = np.array(...)
@@ -113,7 +113,7 @@ Tracing seeds
 ~~~~~~~~~~~~~
 `pfsspy.tracing.Tracer` no longer has a ``transform_seeds`` helper method, which
 has been replaced by `~pfsspy.tracing.Tracer.coords_to_xyz` and
-`~pfsspy.tracing.Tracer.xyz_to_coords`. These new methods convert
+``pfsspy.tracing.Tracer.xyz_to_coords``. These new methods convert
 between `~astropy.coordinates.SkyCoord` objects, and Cartesian xyz coordinates
 of the internal magnetic field grid.
 
@@ -241,7 +241,7 @@ Changes to `~pfsspy.Output`
 
 - Added more explanatory comments to the examples
 - Corrected the dipole solution calculation
-- Added :func:`pfsspy.coords.sph2cart` to transform from spherical to cartesian
+- Added ``pfsspy.coords.sph2cart`` to transform from spherical to cartesian
   coordinates.
 
 0.1.3

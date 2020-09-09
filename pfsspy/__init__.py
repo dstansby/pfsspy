@@ -46,13 +46,16 @@ if (distutils.version.LooseVersion(astropy.__version__) <
 _MAG_CMAP = 'RdBu'
 
 
+__all__ = ['Input', 'Output', 'load_output', 'pfss']
+
+
 class Input:
     r"""
     Input to PFSS modelling.
 
     .. warning::
         The input must be on a regularly spaced grid in :math:`\phi` and
-        :math:`s = \cos (\theta)`. See :mod:`pfsspy.coords` for more
+        :math:`s = \cos (\theta)`. See `pfsspy.grid` for more
         information on the coordinate system.
 
     Parameters
@@ -152,7 +155,7 @@ class Output:
 
     Notes
     -----
-    Instances of this class are intended to be created by `pyfsspy.pfss`, and
+    Instances of this class are intended to be created by `pfsspy.pfss`, and
     not by users.
     '''
     def __init__(self, alr, als, alp, grid, input_map=None):
