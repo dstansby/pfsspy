@@ -29,8 +29,6 @@ bibliography: paper.bib
 Magnetic fields play a crucial role in the dynamics and evolution of our Sun
 and other stars.
 
-
-# The PFSS model
 A common method used to model the magnetic field of the Sun and other stars is
 the potential field source surface (PFSS) model [@Altschuler1969; @Schatten1969].
 The PFSS equations assume that there is zero electrical current in the domain of
@@ -54,12 +52,19 @@ solution, importing various magnetic field data sources, and ...
 
 `pfsspy` is designed to integrate with other packages in the astronomical Python
 ecosystem. Input magnetic field maps are via. [@sunpy], and makes use of the
-coordinate and unit handling built into [@astropy].
+coordinate and unit handling built into [@astropy]. This makes it easy to combine
+magnetic fields and field lines calculated in `pfsspy` with other data sources.
+As an example, figure \autoref{fig:example} shows magnetic field lines overplotted
+on an image of a large active region on the Sun.
 
-![Caption for example figure.\label{fig:example}](pfsspy.pdf)
+![An image of the Sun taken by SDO/AIA at 193 angstroms, with magnetic field lines calculated by pfsspy overplotted in white.\label{fig}](pfsspy.pdf)
 
-*Used in these publications*
-*Particularly helpful for these upcoming missions*
+The solar physics community has already made use of `pfsspy` in a number of
+works, from interpreting observations from Parker Solar Probe [@Badman2020],
+interpreting observations of coronal mass ejections [@Maguire2020], and drawing
+links between the Sun and the solar wind [@Stansby2020]. We hope that it provides
+a useful resource for the community in the future.
+
 
 # Acknowledgements
 
