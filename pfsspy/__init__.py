@@ -71,6 +71,10 @@ class Input:
     def __init__(self, br, nr, rss):
         if not isinstance(br, sunpy.map.GenericMap):
             raise ValueError('br must be a SunPy Map')
+        if np.any(~np.isfinite(br.data)):
+            raise ValueError('At least one value in the input is NaN or '
+                             'non-finite. The input must consist solely of '
+                             'finite values.')
 
         pfsspy.utils.is_cea_map(br, error=True)
         pfsspy.utils.is_full_sun_synoptic_map(br, error=True)
