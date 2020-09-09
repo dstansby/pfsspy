@@ -1,0 +1,72 @@
+---
+title: 'pfsspy: A Python package for potential field source surface modelling'
+tags:
+  - Python
+  - astronomy
+authors:
+  - name: David Stansby
+    orcid: 0000-0003-0872-7098
+    affiliation: 1
+  - name: Anthony Yeates
+    orcid: 0000-0002-2728-4053
+    affiliation: 2
+  - name: Samuel Badman
+    affiliation: "3, 4"
+affiliations:
+ - name: Mullard Space Science Laboratory, University College London, Holmbury St. Mary, Surrey RH5 6NT, UK
+   index: 1
+ - name: Department of Mathematical Sciences, Durham University, Durham, DH1 3LE, UK
+   index: 2
+ - name: Physics Department, University of California, Berkeley, CA 94720-7300, USA
+   index: 3
+ - name: Space Sciences Laboratory, University of California, Berkeley, CA 94720-7450, USA
+   index: 4
+date: 9 September 2020
+bibliography: paper.bib
+---
+
+# Summary
+Magnetic fields play a crucial role in the dynamics and evolution of our Sun
+and other stars.
+
+
+# The PFSS model
+A common method used to model the magnetic field of the Sun and other stars is
+the potential field source surface (PFSS) model [@Altschuler1969; @Schatten1969].
+The PFSS equations assume that there is zero electrical current in the domain of
+interest, leading to the equations
+\begin{equation}
+	\nabla \cdot \mathbf{B} = 0
+\end{equation}
+\begin{equation}
+	\nabla \times \mathbf{B} = 0
+\end{equation}
+These are solved in a spherical shell between 1 solar radius (1$R_{\odot}$) and
+a configurable outer radius called the 'source surface' ($R_{ss}$). Boundary
+conditions are given by the radial component of $\mathbf{B}$ on inner boundary
+and the imposed condition of a purely radial field on the outer boundary at $R_{ss}$.
+
+# pfsspy
+
+`pfsspy` is a Python package for solving the PFSS equations, and carrying out
+other common related tasks such as tracing magnetic field lines through the
+solution, importing various magnetic field data sources, and ...
+
+`pfsspy` is designed to integrate with other packages in the astronomical Python
+ecosystem. Input magnetic field maps are via. [@sunpy], and makes use of the
+coordinate and unit handling built into [@astropy].
+
+*Used in these publications*
+*Particularly helpful for these upcoming missions*
+
+# Figures
+
+Figures can be included like this:
+![Caption for example figure.\label{fig:example}](figure.png)
+and referenced from text using \autoref{fig:example}.
+
+# Acknowledgements
+
+David Stansby acknowledges STFC grants ... and ... for financial support.
+
+# References
