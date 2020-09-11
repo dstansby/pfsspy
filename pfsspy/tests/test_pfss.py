@@ -1,23 +1,46 @@
+import pathlib
+
 import astropy.constants as const
 import astropy.coordinates as coord
 import astropy.units as u
 from astropy.tests.helper import quantity_allclose
+from astropy.wcs.wcs import FITSFixedWarning
 
 import pytest
 
 import matplotlib
 import numpy as np
-import pfsspy
+
 import sunpy.map
 import sunpy.util.exceptions
 
+import pfsspy
 import pfsspy.coords
 from pfsspy import tracing
 
-from .example_maps import dipole_map, zero_map, dipole_result
+from .example_maps import dipole_map, zero_map, dipole_result, gong_map
 matplotlib.use('Agg')
 
 R_sun = const.R_sun
+test_data = pathlib.Path(__file__).parent / 'data'
+
+
+def test_pfss(gong_map):
+    # Regression test to check that the output of pfss doesn't change
+    m = sunpy.map.Map(gong_map)
+    # Resample to lower res for easier comparisons
+    m = m.resample([30, 15] * u.pix)
+    m = sunpy.map.Map(m.data - np.mean(m.data), m.meta)
+    expected = np.loadtxt(test_data / 'br_in.txt')
+    np.testing.assert_equal(m.data, expected)
+
+    pfss_in = pfsspy.Input(m, 50, 2)
+    pfss_out = pfsspy.pfss(pfss_in)
+
+    br = pfss_out.source_surface_br.data
+    expected = np.loadtxt(test_data / 'br_out.txt')
+    # atol is emperically set for tests to pass on CI
+    np.testing.assert_allclose(br, expected, atol=1e-13, rtol=0)
 
 
 def test_expansion_factor(dipole_result):
