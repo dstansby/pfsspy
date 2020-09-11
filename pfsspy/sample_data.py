@@ -7,10 +7,10 @@ from sunpy.data import manager
 
 
 @manager.require('gong_map',
-                 'https://gong2.nso.edu/oQR/zqs/201903/mrzqs190310/'
-                 'mrzqs190310t0014c2215_333.fits.gz',
-                 '712c7543fa1d964d03e73523ec2256766348d'
-                 'b3a2dd5a8406e2f0d711b666cb6')
+                 'https://gong2.nso.edu/oQR/zqs/202009/mrzqs200901/'
+                 'mrzqs200901t1304c2234_022.fits.gz',
+                 '9272fcb09131a7b0b51c088f61c75a8923b76f32309dd1c'
+                 '5596b484469dfbb79')
 def get_gong_map():
     """
     Automatically download and unzip a sample GONG synoptic map.
