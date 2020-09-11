@@ -5,7 +5,6 @@ import astropy.constants as const
 import astropy.coordinates as astrocoords
 import astropy.units as u
 import numpy as np
-import sunpy.coordinates.frames as frames
 
 import pfsspy
 import pfsspy.fieldline as fieldline

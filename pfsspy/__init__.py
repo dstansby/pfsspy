@@ -327,9 +327,6 @@ class Output:
         import scipy.integrate
 
         direction = np.sign(dt)
-        dt = np.abs(dt)
-        t = 0.0
-        xout = np.atleast_2d(start_point.copy())
 
         def finish_integration(t, coord):
             r = np.linalg.norm(coord)
@@ -595,7 +592,6 @@ def pfss(input):
     nr = input.grid.nr
     ns = input.grid.ns
     nphi = input.grid.nphi
-    rss = input.grid.rss
 
     # Coordinates:
     ds = input.grid.ds

@@ -1,13 +1,13 @@
-import sunpy.map
-import sunpy.io
-import numpy as np
 import os
-import warnings
-import copy
-from scipy import interpolate
-from astropy import units as u
-import astropy.time
+
+import numpy as np
+
 import astropy.coordinates as coord
+import astropy.time
+from astropy import units as u
+
+import sunpy.io
+import sunpy.map
 
 
 def load_adapt(adapt_path):
