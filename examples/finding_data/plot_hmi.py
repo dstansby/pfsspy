@@ -19,7 +19,6 @@ For more information on the maps, see the `synoptic maps page`_ on the JSOC site
 
 ###############################################################################
 # First import the required modules
-import pfsspy
 from sunpy.net import Fido, attrs as a
 import sunpy.map
 

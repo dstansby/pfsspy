@@ -7,8 +7,6 @@ Creating an open/closed field map on the solar surface.
 
 ###############################################################################
 # First, import required modules
-import os
-
 import astropy.units as u
 import astropy.constants as const
 from astropy.coordinates import SkyCoord
@@ -19,7 +17,6 @@ import numpy as np
 import sunpy.map
 
 import pfsspy
-from pfsspy import coords
 from pfsspy import tracing
 from pfsspy.sample_data import get_gong_map
 

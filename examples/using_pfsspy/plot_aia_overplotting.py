@@ -20,7 +20,6 @@ import sunpy.map
 import sunpy.io.fits
 
 import pfsspy
-import pfsspy.coords as coords
 import pfsspy.tracing as tracing
 from pfsspy.sample_data import get_gong_map
 

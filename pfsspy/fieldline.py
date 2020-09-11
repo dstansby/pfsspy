@@ -1,10 +1,8 @@
 import astropy.coordinates as coord
 import astropy.constants as const
-import sunpy.coordinates.frames as frames
 import astropy.units as u
 
 import numpy as np
-import scipy.interpolate
 
 from pfsspy import coords
 
