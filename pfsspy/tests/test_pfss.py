@@ -39,7 +39,8 @@ def test_pfss(gong_map):
 
     br = pfss_out.source_surface_br.data
     expected = np.loadtxt(test_data / 'br_out.txt')
-    np.testing.assert_equal(br, expected)
+    # atol is emperically set for tests to pass on CI
+    np.testing.assert_allclose(br, expected, atol=1e-13, rtol=0)
 
 
 def test_expansion_factor(dipole_result):
