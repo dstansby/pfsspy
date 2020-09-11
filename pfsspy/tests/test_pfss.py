@@ -121,6 +121,12 @@ def test_shape(zero_map):
     assert bg.shape == (nphi + 1, ns + 1, nr + 1, 3)
 
 
+def test_monopole_warning(dipole_map):
+    dipole_map = sunpy.map.Map(dipole_map.data + 1, dipole_map.meta)
+    with pytest.warns(UserWarning, match='Input data has a non-zero mean'):
+        pfsspy.Input(dipole_map, 20, 2)
+
+
 def test_input_output(dipole_result):
     # Smoke test of saving/loading files
     _, out = dipole_result

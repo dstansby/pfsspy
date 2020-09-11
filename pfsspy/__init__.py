@@ -1,5 +1,6 @@
 import distutils.version
 import functools
+import warnings
 
 import astropy
 import astropy.coordinates as coord
@@ -78,6 +79,10 @@ class Input:
             raise ValueError('At least one value in the input is NaN or '
                              'non-finite. The input must consist solely of '
                              'finite values.')
+        if np.mean(br.data) > 1e-10:
+            warnings.warn('Input data has a non-zero mean. '
+                          'pfsspy will ignore this non-zero monopole term '
+                          'when calculating the PFSS solution.')
 
         pfsspy.utils.is_cea_map(br, error=True)
         pfsspy.utils.is_full_sun_synoptic_map(br, error=True)
@@ -531,7 +536,13 @@ def _eigh(A):
 
 def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir):
     for l in range(ns):
-        # - sum c_{lm} + d_{lm}
+        # Ignore the l=0 and m=0 term; for a globally divergence free field
+        # this term is zero anyway, but numerically it may be small which
+        # causes numerical issues when solving for c, d
+        if l == 0 and m == 0:
+            continue
+        # - sum (c_{lm} + d_{lm}) * lam_{l}
+        # lam[l] is small so this blows up
         cdlm = np.dot(Q[:, l], brt[:, m]) / lam[l]
         # - ratio c_{lm}/d_{lm} [numerically safer this way up]
         ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
@@ -575,10 +586,6 @@ def pfss(input):
     (equally spaced in :math:`\rho = \ln(r/r_{sun})`,
     :math:`s= \cos(\theta)`, and :math:`p=\phi`).
 
-    The output should have zero current to machine precision,
-    when computed with the DuMFriC staggered discretization.
-
-
     Parameters
     ----------
     input : :class:`Input`
@@ -587,6 +594,15 @@ def pfss(input):
     Returns
     -------
     out : :class:`Output`
+
+    Notes
+    -----
+    In order to avoid numerical issues, the monopole term (which should be zero
+    for a physical magnetic field anyway) is explicitly excluded from the
+    solution.
+
+    The output should have zero current to machine precision,
+    when computed with the DuMFriC staggered discretization.
     """
     br0 = input.br
     nr = input.grid.nr
