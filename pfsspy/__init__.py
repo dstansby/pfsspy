@@ -1,5 +1,6 @@
 import distutils.version
 import functools
+import warnings
 
 import astropy
 import astropy.coordinates as coord
@@ -78,6 +79,10 @@ class Input:
             raise ValueError('At least one value in the input is NaN or '
                              'non-finite. The input must consist solely of '
                              'finite values.')
+        if np.mean(br.data) > 1e-10:
+            warnings.warn('Input data has a non-zero mean. '
+                          'pfsspy will ignore this non-zero monopole term '
+                          'when calculating the PFSS solution.')
 
         pfsspy.utils.is_cea_map(br, error=True)
         pfsspy.utils.is_full_sun_synoptic_map(br, error=True)
