@@ -1,7 +1,6 @@
 ---
 title: 'pfsspy: A Python package for potential field source surface modelling'
 tags:
-tags:
   - Python
   - Astronomy
   - Solar physics
@@ -13,7 +12,7 @@ authors:
     orcid: 0000-0002-2728-4053
     affiliation: 2
   - name: Samuel Badman
-    affiliation: "3,4"
+    affiliation: "3, 4"
 affiliations:
  - name: Mullard Space Science Laboratory, University College London, Holmbury St. Mary, Surrey RH5 6NT, UK
    index: 1
