@@ -44,8 +44,8 @@ and the imposed condition of a purely radial field on the source surface.
 Historically, the most widely used software package for performing PFSS extrapolations
 within the solar physics community is `pfsspack`^[https://www.lmsal.com/~derosa/pfsspack/]. This forms part of the larger `SolarSoft`
 library for solar physics [@Freeland1998], written in the proprietary Interactive Data Language (IDL) programming
-language. As more solar physicists use python instead of IDL [@Bobra2020], there is a need to provide similar functionality
-within solar physics python ecosystem, a niche that `pfsspy` fills.
+language. As Python has become a major programming language within the solar physics and wider astronomy community [@Bobra2020], there is a need to provide similar functionality
+within the Python ecosystem, a niche that `pfsspy` fills.
 
 
 # pfsspy
@@ -53,23 +53,24 @@ within solar physics python ecosystem, a niche that `pfsspy` fills.
 other common related tasks such as tracing magnetic field lines through the
 solution, importing various magnetic field data sources, and visualising all of this data.
 
-`pfsspy` is designed to closely integrate with other packages in the astronomical and solar physics Python
-ecosystem. Coordinate aware input and output maps are created with the SunPy package [@Mumford2020a; @TheSunPyCommunity2020], and the package is fully integrated with the coordinate and unit frameworks present in astropy [@TheAstropyCollaboration2018]. This makes it easy to combine
+`pfsspy` is designed to closely integrate with other  packages in the astronomical and solar physics Python
+ecosystems. Coordinate aware input and output maps are created with the SunPy package [@Mumford2020a; @TheSunPyCommunity2020], and `pfsspy` is fully integrated with the coordinate and unit frameworks present in astropy [@TheAstropyCollaboration2018]. This makes it easy to combine
 magnetic fields and field lines calculated in `pfsspy` with other data sources.
-As an example, figure \autoref{fig:example} shows magnetic field lines overplotted
-on an image of a large active region on the Sun.
+As an example, figure \autoref{fig} shows magnetic field lines overplotted
+on an extreme-ultraviolet image of a large active region on the Sun.
 
 ![An image of the Sun taken by SDO/AIA at 193 angstroms, with magnetic field lines traced through a PFSS solution overplotted in white. The PFSS solution and field line tracing were done with `pfsspy`, with a Global Oscillations Network Group (GONG) photospheric magnetogram as input and a source surface at 2.5 solar radii.\label{fig}](pfsspy.pdf)
 
 The solar physics community has already made use of `pfsspy` in a number of
 works, from interpreting observations from Parker Solar Probe [@Bale2019; @Badman2020],
-interpreting observations of coronal mass ejections [@Maguire2020], and drawing
+investigating the structure of coronal mass ejections [@Maguire2020], and drawing
 links between the Sun and the solar wind [@Stansby2020]. We hope that it continues to provide
 a useful resource for the community in the future.
 
 
 # Acknowledgements
 
-David Stansby acknowledges STFC grants ... and ... for financial support.
+David Stansby acknowledges STFC grants ST/N504336/1 and ST/S000240/1 for
+financial support.
 
 # References
