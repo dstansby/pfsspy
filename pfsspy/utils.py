@@ -132,12 +132,20 @@ def is_full_sun_synoptic_map(m, error=False):
     error : bool
         If `True`, raise an error if *m* does not span the whole solar surface.
     """
-    shape = m.data.shape
-    if _get_projection(m, 1) != 'CEA':
-        raise NotImplementedError('is_full_sun_synoptic_map is only implemented for CEA projections.')
+    projection = _get_projection(m, 1)
+    checks = {'CEA': _is_full_sun_cea,
+              'CAR': _is_full_sun_car}
+    if projection not in checks.keys():
+        raise NotImplementedError('is_full_sun_synoptic_map is only '
+                                  'implemented for '
+                                  f'{[key for key in checks.keys()]} '
+                                  'projections.')
+    return checks[projection](m, error)
 
+
+def _is_full_sun_car(m, error=False):
     dphi = m.meta['cdelt1']
-    phi = shape[1] * dphi
+    phi = m.data.shape[1] * dphi
     if not np.allclose(phi, 360, atol=0.1):
         if error:
             raise ValueError('Number of points in phi direction times '
@@ -146,7 +154,28 @@ def is_full_sun_synoptic_map(m, error=False):
         return False
 
     dtheta = m.meta['cdelt2']
-    theta = shape[0] * dtheta * np.pi / 2
+    theta = m.data.shape[0] * dtheta
+    if not np.allclose(theta, 180, atol=0.1):
+        if error:
+            raise ValueError('Number of points in theta direction times '
+                             'CDELT2 must be close to 180 degrees. '
+                             f'Instead got {dtheta} x {shape[0]} = {theta}')
+        return False
+    return True
+
+
+def _is_full_sun_cea(m, error=False):
+    dphi = m.meta['cdelt1']
+    phi = m.data.shape[1] * dphi
+    if not np.allclose(phi, 360, atol=0.1):
+        if error:
+            raise ValueError('Number of points in phi direction times '
+                             'CDELT1 must be close to 360 degrees. '
+                             f'Instead got {dphi} x {shape[0]} = {phi}')
+        return False
+
+    dtheta = m.meta['cdelt2']
+    theta = m.data.shape[0] * dtheta * np.pi / 2
     if not np.allclose(theta, 180, atol=0.1):
         if error:
             raise ValueError('Number of points in theta direction times '
@@ -154,11 +183,10 @@ def is_full_sun_synoptic_map(m, error=False):
                              '180 degrees. '
                              f'Instead got {dtheta} x {shape[0]} * pi/2 = {theta}')
         return False
-
     return True
 
 
-def car_to_cea(m, method='interp'):
+def car_to_cea(m, method='adaptive'):
     """
     Reproject a plate-carée map in to a cylindrical-equal-area map.
 
@@ -172,9 +200,10 @@ def car_to_cea(m, method='interp'):
     m : sunpy.map.GenericMap
         Input map
     method : str
-        Reprojection method to use. Can be ``'interp'`` (default),
-        ``'adaptive'``, or ``'exact'``. See :mod:`reproject` for a description
-        of the different methods.
+        Reprojection method to use. Can be ``'adaptive'`` (default),
+        ``'exact'``, or ``'interp'`` (fastest). See :mod:`reproject` for a
+        description of the different methods. Note that different methods will
+        give different results, and not all will conserve flux.
 
     Returns
     -------
@@ -196,7 +225,7 @@ def car_to_cea(m, method='interp'):
                          f'(got {method})')
     reproject = methods[method]
     # Check input map is valid
-    # is_full_sun_synoptic_map(m, error=True)
+    is_full_sun_synoptic_map(m, error=True)
     is_car_map(m, error=True)
 
     header_out = m.wcs.to_header()
