@@ -47,6 +47,8 @@ def carr_cea_wcs_header(dtime, shape):
     Create a Carrington WCS header for a Cylindrical Equal Area (CEA)
     projection. See [1]_ for information on how this is constructed.
 
+    Parameters
+    ----------
     dtime : datetime, None
         Datetime to associate with the map.
     shape : tuple
@@ -105,6 +107,7 @@ def is_cea_map(m, error=False):
 
     Parameters
     ----------
+    m : sunpy.map.GenericMap
     error : bool
         If `True`, raise an error if *m* is not a CEA projection.
     """
@@ -117,6 +120,7 @@ def is_car_map(m, error=False):
 
     Parameters
     ----------
+    m : sunpy.map.GenericMap
     error : bool
         If `True`, raise an error if *m* is not a CAR projection.
     """
@@ -129,6 +133,7 @@ def is_full_sun_synoptic_map(m, error=False):
 
     Parameters
     ----------
+    m : sunpy.map.GenericMap
     error : bool
         If `True`, raise an error if *m* does not span the whole solar surface.
     """
