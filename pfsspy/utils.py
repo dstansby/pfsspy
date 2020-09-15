@@ -191,7 +191,7 @@ def _is_full_sun_cea(m, error=False):
     return True
 
 
-def car_to_cea(m, method='adaptive'):
+def car_to_cea(m, method='interp'):
     """
     Reproject a plate-carée map in to a cylindrical-equal-area map.
 
@@ -205,8 +205,8 @@ def car_to_cea(m, method='adaptive'):
     m : sunpy.map.GenericMap
         Input map
     method : str
-        Reprojection method to use. Can be ``'adaptive'`` (default),
-        ``'exact'``, or ``'interp'`` (fastest). See :mod:`reproject` for a
+        Reprojection method to use. Can be ``'interp'`` (default),
+        ``'exact'``, or ``'adaptive'``. See :mod:`reproject` for a
         description of the different methods. Note that different methods will
         give different results, and not all will conserve flux.
 
