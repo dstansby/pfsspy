@@ -56,7 +56,7 @@ solution, importing various magnetic field data sources, and visualising all of 
 `pfsspy` is designed to closely integrate with other  packages in the astronomical and solar physics Python
 ecosystems. Coordinate aware input and output maps are created with the SunPy package [@Mumford2020a; @TheSunPyCommunity2020], and `pfsspy` is fully integrated with the coordinate and unit frameworks present in astropy [@TheAstropyCollaboration2018]. This makes it easy to combine
 magnetic fields and field lines calculated in `pfsspy` with other data sources.
-As an example, figure \autoref{fig} shows magnetic field lines overplotted
+As an example, \autoref{fig} shows magnetic field lines overplotted
 on an extreme-ultraviolet image of a large active region on the Sun.
 
 ![An image of the Sun taken by SDO/AIA at 193 angstroms, with magnetic field lines traced through a PFSS solution overplotted in white. The PFSS solution and field line tracing were done with `pfsspy`, with a Global Oscillations Network Group (GONG) photospheric magnetogram as input and a source surface at 2.5 solar radii.\label{fig}](pfsspy.pdf)
