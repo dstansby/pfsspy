@@ -41,17 +41,16 @@ a configurable outer radius called the 'source surface'. Boundary
 conditions are given by the user specified radial component of $\mathbf{B}$ on inner boundary
 and the imposed condition of a purely radial field on the source surface.
 
-Historically, the most widely used software package for performing PFSS extrapolations
-within the solar physics community is `pfsspack`^[https://www.lmsal.com/~derosa/pfsspack/]. This forms part of the larger `SolarSoft`
-library for solar physics [@Freeland1998], written in the proprietary Interactive Data Language (IDL) programming
-language. As Python has become a major programming language within the solar physics and wider astronomy community [@Bobra2020], there is a need to provide similar functionality
-within the Python ecosystem, a niche that `pfsspy` fills.
+Historically, either custom implementations or the `pfsspack`^[https://www.lmsal.com/~derosa/pfsspack/, which forms part of the larger `SolarSoft`
+library for solar physics [@Freeland1998], written in Interactive Data Language (IDL).] library have been used to perform PFSS extrapolations. As Python has become a major programming language within the solar physics and wider astronomy community [@Bobra2020], there is a need to provide well documented and tested functionality to perform PFSS extrapolations within the Python ecosystem, a niche that `pfsspy` fills.
 
 
 # pfsspy
 `pfsspy` is a Python package for solving the PFSS equations, and carrying out
 other common related tasks such as tracing magnetic field lines through the
 solution, importing various magnetic field data sources, and visualising all of this data.
+
+## Design
 
 `pfsspy` is designed to closely integrate with other  packages in the astronomical and solar physics Python
 ecosystems. Coordinate aware input and output maps are created with the SunPy package [@Mumford2020a; @TheSunPyCommunity2020], and `pfsspy` is fully integrated with the coordinate and unit frameworks present in astropy [@TheAstropyCollaboration2018]. This makes it easy to combine
