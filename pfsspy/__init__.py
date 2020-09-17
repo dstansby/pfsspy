@@ -529,27 +529,65 @@ class Output:
         self._common_b_cache = br, bs, bp, Sbr, Sbs, Sbp
         return self._common_b_cache
 
-    def get_Bvec(self,skycoord,out_type="cartesian") :
-        """
-        Input
-        =====
-        skycoord : astropy.SkyCoord 
-        An arbitary point or set of points (length N >= 1) 
-        in the PFSS model domain (1Rs < r < Rss)
+    def get_Bvec(self,skycoord,out_type="spherical") :
+        """Evaluate magnetic vectors in pfss model
 
-        Output
-        ======
+        Method which takes an arbitrary astropy SkyCoord and
+        returns a numpy array containing magnetic field vectors
+        evaluated from the parent pfsspy.Output pfss model at
+        the locations specified by the SkyCoords
+
+        Parameters
+        ----------
+        skycoord : `astropy.SkyCoord` 
+            An arbitary point or set of points (length N >= 1) 
+            in the PFSS model domain (1Rs < r < Rss)
+
+        out_type : str, optional
+            Takes values 'spherical' (default) or 'cartesian'
+            and specifies whether the output vector is in 
+            spherical coordinates (B_r,B_theta,B_phi) or
+            cartesian (B_x,B_y,B_z)
+
+        Returns
+        -------
         bvec : ndarray (ndarray.shape = (N,3), units nT) 
         Magnetic field vectors at the requested locations 
 
-        Keyword Arguments
-        =================
-        coords_type : str
-        Either "cartesian" or "spherical" depending on desired
-        output type :
-            Cartesian -> Bx,By,Bz. 
-            Spherical -> Br, B_theta, B_phi 
-            (physics convention : https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/3D_Spherical.svg/240px-3D_Spherical.svg.png)
+        Notes
+        -----
+        The output coordinate system is defined by the input 
+        magnetogram with x-z plane equivalent to the plane 
+        containing the Carrington meridian (0 deg longitude)
+
+        The spherical coordinates follow the physics convention:
+        https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/3D_Spherical.svg/240px-3D_Spherical.svg.png)
+        Therefore the polar angle (theta) is the co-latitude, rather
+        than the latitude, with range 0 (north pole) to 180 degrees
+        (south pole)
+
+        The conversion which relates the spherical and cartesian 
+        coordinates is as follows:
+
+        .. math::
+            \begin{pmatrix}
+                B_R \\
+                B_\theta \\
+                B_\phi \\
+            \end{pmatrix} =
+            \begin{pmatrix}
+                \sin\theta \cos\phi & \sin\theta \sin\phi & \cos\theta \\
+                \cos\theta \cos\phi & \cos\theta \sin\phi & -\sin\theta \\
+                -\sin\phi & \cos\phi & 0
+            \end{pmatrix}
+            \begin{pmatrix}
+                B_x \\
+                B_y \\
+                B_z \\
+            \end{pmatrix}  
+
+        The above (3x3) matrix may be inverted to retrieve the
+        inverse transformation (cartesian from spherical)
         """
 
         # Assert skycoord is type astropy.coordinates.SkyCoord

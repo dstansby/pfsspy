@@ -187,7 +187,7 @@ def test_bvec_interpolator(dipole_result) :
         frame = out.coordinate_frame,  
         representation_type="cartesian" 
     )
-    b_cart = out.get_Bvec(test_coord)
+    b_cart = out.get_Bvec(test_coord,out_type="cartesian")
     b_sph = out.get_Bvec(test_coord,out_type="spherical")
 
     # Check the output shape matches is [N,3] whre
