@@ -25,6 +25,8 @@ matplotlib.use('Agg')
 R_sun = const.R_sun
 test_data = pathlib.Path(__file__).parent / 'data'
 
+from datetime import datetime,timedelta
+
 
 def test_pfss(gong_map):
     # Regression test to check that the output of pfss doesn't change
