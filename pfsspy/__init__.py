@@ -571,9 +571,10 @@ class Output:
         coordinates is as follows:
 
         .. math::
-            B_R =  sin\theta cos\phi B_x + sin\theta sin\phi B_y + cos\theta B_z \\
-            B_\theta = cos\theta cos\phi B_x + cos\theta sin\phi B_y - sin\theta B_z \\
-            B_\phi = -sin\phi B_x cos\phi B_y \\
+
+            B_R = sin\\theta cos\phi B_x + sin\\theta sin\phi B_y + cos\\theta B_z \\
+            B_\\theta = cos\\theta cos\phi B_x + cos\\theta sin\phi B_y - sin\\theta B_z \\
+            B_\phi = -sin\phi B_x + cos\phi B_y 
 
         The above equations may be written as a (3x3) matrix and 
         inverted to retrieve the inverse transformation (cartesian from spherical)
