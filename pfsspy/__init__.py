@@ -551,8 +551,9 @@ class Output:
 
         Returns
         -------
-        bvec : ndarray (ndarray.shape = (N,3), units nT) 
-        Magnetic field vectors at the requested locations 
+        bvec : ndarray 
+            Magnetic field vectors at the requested locations
+            ndarray.shape = (N,3), units nT) 
 
         Notes
         -----
@@ -570,24 +571,12 @@ class Output:
         coordinates is as follows:
 
         .. math::
-            \begin{pmatrix}
-                B_R \\
-                B_\theta \\
-                B_\phi \\
-            \end{pmatrix} =
-            \begin{pmatrix}
-                \sin\theta \cos\phi & \sin\theta \sin\phi & \cos\theta \\
-                \cos\theta \cos\phi & \cos\theta \sin\phi & -\sin\theta \\
-                -\sin\phi & \cos\phi & 0
-            \end{pmatrix}
-            \begin{pmatrix}
-                B_x \\
-                B_y \\
-                B_z \\
-            \end{pmatrix}  
+            B_R =  sin\theta cos\phi B_x + sin\theta sin\phi B_y + cos\theta B_z \\
+            B_\theta = cos\theta cos\phi B_x + cos\theta sin\phi B_y - sin\theta B_z \\
+            B_\phi = -sin\phi B_x cos\phi B_y \\
 
-        The above (3x3) matrix may be inverted to retrieve the
-        inverse transformation (cartesian from spherical)
+        The above equations may be written as a (3x3) matrix and 
+        inverted to retrieve the inverse transformation (cartesian from spherical)
         """
 
         # Assert skycoord is type astropy.coordinates.SkyCoord
