@@ -20,7 +20,6 @@ import sunpy.map
 import sunpy.io.fits
 
 import pfsspy
-import pfsspy.coords as coords
 import pfsspy.tracing as tracing
 from pfsspy.sample_data import get_gong_map
 
@@ -46,10 +45,10 @@ gong_map = sunpy.map.Map(gong_map.data - np.mean(gong_map.data), gong_map.meta)
 if not os.path.exists('AIA20190310.fits'):
     import urllib.request
     urllib.request.urlretrieve(
-        'http://jsoc2.stanford.edu/data/aia/synoptic/2019/03/10/H0000/AIA20190310_0000_0193.fits',
-        'AIA20190310.fits')
+        'http://jsoc2.stanford.edu/data/aia/synoptic/2020/09/01/H1300/AIA20200901_1300_0193.fits',
+        'aia_map.fits')
 
-aia = sunpy.map.Map('AIA20190310.fits')
+aia = sunpy.map.Map('aia_map.fits')
 dtime = aia.date
 
 ###############################################################################
@@ -86,10 +85,10 @@ aia.plot(ax)
 # lines from. These coordinates are defined in the native Carrington
 # coordinates of the input magnetogram.
 
-# Create 5 points spaced between sin(lat)={0.1, 0.2}
-s = np.linspace(0.1, 0.2, 5)
-# Create 5 points spaced between long={55, 65} degrees
-phi = np.linspace(55, 65, 5)
+# Create 5 points spaced between sin(lat)={0.35, 0.55}
+s = np.linspace(0.35, 0.55, 5)
+# Create 5 points spaced between long={60, 100} degrees
+phi = np.linspace(60, 100, 5)
 print(f's = {s}')
 print(f'phi = {phi}')
 # Make a 2D grid from these 1D points
@@ -113,8 +112,8 @@ plt.colorbar()
 ax.plot_coord(seeds, color='black', marker='o', linewidth=0, markersize=2)
 
 # Set the axes limits. These limits have to be in pixel values
-ax.set_xlim(0, 180)
-ax.set_ylim(45, 135)
+# ax.set_xlim(0, 180)
+# ax.set_ylim(45, 135)
 ax.set_title('Field line footpoints')
 ax.set_ylim(bottom=0)
 
@@ -140,8 +139,8 @@ for fline in flines:
     ax.plot_coord(fline.coords, color='black', linewidth=1)
 
 # Set the axes limits. These limits have to be in pixel values
-ax.set_xlim(0, 180)
-ax.set_ylim(45, 135)
+# ax.set_xlim(0, 180)
+# ax.set_ylim(45, 135)
 ax.set_title('Photospheric field and traced field lines')
 ###############################################################################
 # Plot the AIA map, along with the traced magnetic field lines. Inside the
@@ -151,10 +150,10 @@ fig = plt.figure()
 ax = plt.subplot(1, 1, 1, projection=aia)
 aia.plot(ax)
 for fline in flines:
-    ax.plot_coord(fline.coords, alpha=0.8, linewidth=1, color='black')
+    ax.plot_coord(fline.coords, alpha=0.8, linewidth=1, color='white')
 
-ax.set_xlim(500, 900)
-ax.set_ylim(400, 800)
+# ax.set_xlim(500, 900)
+# ax.set_ylim(400, 800)
 plt.show()
 
 # sphinx_gallery_thumbnail_number = 5

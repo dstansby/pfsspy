@@ -47,13 +47,16 @@ if (distutils.version.LooseVersion(astropy.__version__) <
 _MAG_CMAP = 'RdBu'
 
 
+__all__ = ['Input', 'Output', 'load_output', 'pfss']
+
+
 class Input:
     r"""
     Input to PFSS modelling.
 
     .. warning::
         The input must be on a regularly spaced grid in :math:`\phi` and
-        :math:`s = \cos (\theta)`. See :mod:`pfsspy.coords` for more
+        :math:`s = \cos (\theta)`. See `pfsspy.grid` for more
         information on the coordinate system.
 
     Parameters
@@ -72,6 +75,14 @@ class Input:
     def __init__(self, br, nr, rss):
         if not isinstance(br, sunpy.map.GenericMap):
             raise ValueError('br must be a SunPy Map')
+        if np.any(~np.isfinite(br.data)):
+            raise ValueError('At least one value in the input is NaN or '
+                             'non-finite. The input must consist solely of '
+                             'finite values.')
+        if np.mean(br.data) > 1e-10:
+            warnings.warn('Input data has a non-zero mean. '
+                          'pfsspy will ignore this non-zero monopole term '
+                          'when calculating the PFSS solution.')
 
         pfsspy.utils.is_cea_map(br, error=True)
         pfsspy.utils.is_full_sun_synoptic_map(br, error=True)
@@ -149,7 +160,7 @@ class Output:
 
     Notes
     -----
-    Instances of this class are intended to be created by `pyfsspy.pfss`, and
+    Instances of this class are intended to be created by `pfsspy.pfss`, and
     not by users.
     '''
     def __init__(self, alr, als, alp, grid, input_map=None):
@@ -321,9 +332,6 @@ class Output:
         import scipy.integrate
 
         direction = np.sign(dt)
-        dt = np.abs(dt)
-        t = 0.0
-        xout = np.atleast_2d(start_point.copy())
 
         def finish_integration(t, coord):
             r = np.linalg.norm(coord)
@@ -359,6 +367,12 @@ class Output:
     def bc(self):
         """
         B on the centres of the cell faces.
+
+        Returns
+        -------
+        br
+        btheta
+        bphi
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Remove area factors:
@@ -433,10 +447,12 @@ class Output:
 
         alr, als, alp = self._al
 
+        # Centre of cells in rho (including ghost cells)
         rc = np.linspace(-0.5 * dr, np.log(rss) + 0.5 * dr, nr + 2)
         rrc = np.exp(rc)
         thc = np.zeros(ns + 2) - 1
         thc[1:-1] = np.arccos(sc)
+        # Centre of cells in phi (including ghost cells)
         pc = np.linspace(-0.5 * dp, 2 * np.pi + 0.5 * dp, nphi + 2)
 
         # Required face normals:
@@ -466,28 +482,28 @@ class Output:
         Sbs = np.zeros((ns + 1, nr + 2))
         for k in range(nr + 2):
             for j in range(1, ns):
-                Sbs[j,k] = 0.5*np.exp(2*rc[k] - dr)*dp*(np.exp(2*dr)-1)*np.sqrt(1 - sg[j]**2)
-            Sbs[0,k] = Sbs[1,k]
-            Sbs[-1,k] = Sbs[-2,k]
-        Sbp = np.zeros((ns+2,nr+2))
-        for k in range(nr+2):
-            for j in range(1,ns+1):
-                Sbp[j,k] = 0.5*np.exp(2*rc[k] - dr)*(np.exp(2*dr) - 1)*(np.arcsin(sg[j]) - np.arcsin(sg[j-1]))
-            Sbp[0,k] = Sbp[1,k]
-            Sbp[-1,k] = Sbp[-2,k]
+                Sbs[j, k] = 0.5 * np.exp(2 * rc[k] - dr) * dp * (np.exp(2 * dr) - 1) * np.sqrt(1 - sg[j]**2)
+            Sbs[0, k] = Sbs[1, k]
+            Sbs[-1, k] = Sbs[-2, k]
+        Sbp = np.zeros((ns + 2, nr + 2))
+        for k in range(nr + 2):
+            for j in range(1, ns + 1):
+                Sbp[j, k] = 0.5 * np.exp(2 * rc[k] - dr) * (np.exp(2 * dr) - 1) * (np.arcsin(sg[j]) - np.arcsin(sg[j - 1]))
+            Sbp[0, k] = Sbp[1, k]
+            Sbp[-1, k] = Sbp[-2, k]
 
         # Compute br*Sbr, bs*Sbs, bp*Sbp at cell centres by Stokes theorem:
-        br = np.zeros((nphi+2,ns+2,nr+1))
-        bs = np.zeros((nphi+2,ns+1,nr+2))
-        bp = np.zeros((nphi+1,ns+2,nr+2))
-        br[1:-1,1:-1,:] = als[1:,:,:] - als[:-1,:,:] + alp[:,:-1,:] - alp[:,1:,:]
-        bs[1:-1,:,1:-1] = alp[:,:,1:] - alp[:,:,:-1]
-        bp[:,1:-1,1:-1] = als[:,:,:-1] - als[:,:,1:]
+        br = np.zeros((nphi + 2, ns + 2, nr + 1))
+        bs = np.zeros((nphi + 2, ns + 1, nr + 2))
+        bp = np.zeros((nphi + 1, ns + 2, nr + 2))
+        br[1:-1, 1:-1, :] = als[1:, :, :] - als[:-1, :, :] + alp[:,:-1,:] - alp[:,1:,:]
+        bs[1:-1, :, 1:-1] = alp[:, :, 1:] - alp[:, :, :-1]
+        bp[:, 1:-1, 1:-1] = als[:, :, :-1] - als[:, :, 1:]
 
         # Fill ghost values with boundary conditions:
         # - zero-gradient at outer boundary:
-        bs[1:-1,:,-1] = 2*bs[1:-1,:,-2] - bs[1:-1,:,-3]
-        bp[:,1:-1,-1] = 2*bp[:,1:-1,-2] - bp[:,1:-1,-3]
+        bs[1:-1, :, -1] = 2 * bs[1:-1, :, -2] - bs[1:-1, :, -3]
+        bp[:, 1:-1, -1] = 2 * bp[:, 1:-1, -2] - bp[:, 1:-1, -3]
         # - periodic in phi:
         bs[0,:,:] = bs[-2,:,:]
         bs[-1,:,:] = bs[1,:,:]
@@ -588,7 +604,13 @@ def _eigh(A):
 
 def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir):
     for l in range(ns):
-        # - sum c_{lm} + d_{lm}
+        # Ignore the l=0 and m=0 term; for a globally divergence free field
+        # this term is zero anyway, but numerically it may be small which
+        # causes numerical issues when solving for c, d
+        if l == 0 and m == 0:
+            continue
+        # - sum (c_{lm} + d_{lm}) * lam_{l}
+        # lam[l] is small so this blows up
         cdlm = np.dot(Q[:, l], brt[:, m]) / lam[l]
         # - ratio c_{lm}/d_{lm} [numerically safer this way up]
         ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
@@ -632,10 +654,6 @@ def pfss(input):
     (equally spaced in :math:`\rho = \ln(r/r_{sun})`,
     :math:`s= \cos(\theta)`, and :math:`p=\phi`).
 
-    The output should have zero current to machine precision,
-    when computed with the DuMFriC staggered discretization.
-
-
     Parameters
     ----------
     input : :class:`Input`
@@ -644,12 +662,20 @@ def pfss(input):
     Returns
     -------
     out : :class:`Output`
+
+    Notes
+    -----
+    In order to avoid numerical issues, the monopole term (which should be zero
+    for a physical magnetic field anyway) is explicitly excluded from the
+    solution.
+
+    The output should have zero current to machine precision,
+    when computed with the DuMFriC staggered discretization.
     """
     br0 = input.br
     nr = input.grid.nr
     ns = input.grid.ns
     nphi = input.grid.nphi
-    rss = input.grid.rss
 
     # Coordinates:
     ds = input.grid.ds
@@ -678,8 +704,8 @@ def pfss(input):
     # - create off-diagonal part of the matrix:
     A = np.zeros((ns, ns))
     for j in range(ns - 1):
-        A[j, j+1] = -Vg[j+1]
-        A[j+1, j] = A[j, j+1]
+        A[j, j + 1] = -Vg[j + 1]
+        A[j + 1, j] = A[j, j + 1]
     # - term required for m-dependent part of matrix:
     mu = np.fft.fftfreq(nphi)
     mu = 4 * np.sin(np.pi * mu)**2
@@ -714,6 +740,7 @@ def pfss(input):
     psi = np.real(np.fft.ifft(psi, axis=2))
 
     # Hence compute vector potential [note index order, for netcdf]:
+    # (note that alr is zero by definition)
     alr = np.zeros((nphi + 1, ns + 1, nr))
     als = np.zeros((nphi + 1, ns, nr + 1))
     alp = np.zeros((nphi, ns + 1, nr + 1))

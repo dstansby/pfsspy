@@ -1,7 +1,5 @@
 import pathlib
 
-from datetime import datetime,timedelta
-
 import astropy.constants as const
 import astropy.coordinates as coord
 import astropy.units as u
@@ -21,10 +19,29 @@ import pfsspy
 import pfsspy.coords
 from pfsspy import tracing
 
-from .example_maps import dipole_map, zero_map, dipole_result
+from .example_maps import dipole_map, zero_map, dipole_result, gong_map
 matplotlib.use('Agg')
 
 R_sun = const.R_sun
+test_data = pathlib.Path(__file__).parent / 'data'
+
+
+def test_pfss(gong_map):
+    # Regression test to check that the output of pfss doesn't change
+    m = sunpy.map.Map(gong_map)
+    # Resample to lower res for easier comparisons
+    m = m.resample([30, 15] * u.pix)
+    m = sunpy.map.Map(m.data - np.mean(m.data), m.meta)
+    expected = np.loadtxt(test_data / 'br_in.txt')
+    np.testing.assert_equal(m.data, expected)
+
+    pfss_in = pfsspy.Input(m, 50, 2)
+    pfss_out = pfsspy.pfss(pfss_in)
+
+    br = pfss_out.source_surface_br.data
+    expected = np.loadtxt(test_data / 'br_out.txt')
+    # atol is emperically set for tests to pass on CI
+    np.testing.assert_allclose(br, expected, atol=1e-13, rtol=0)
 
 
 def test_expansion_factor(dipole_result):
@@ -128,6 +145,12 @@ def test_shape(zero_map):
     assert bg.shape == (nphi + 1, ns + 1, nr + 1, 3)
 
 
+def test_monopole_warning(dipole_map):
+    dipole_map = sunpy.map.Map(dipole_map.data + 1, dipole_map.meta)
+    with pytest.warns(UserWarning, match='Input data has a non-zero mean'):
+        pfsspy.Input(dipole_map, 20, 2)
+
+
 def test_input_output(dipole_result):
     # Smoke test of saving/loading files
     _, out = dipole_result
@@ -139,6 +162,13 @@ def test_input_output(dipole_result):
 def test_wrong_projection_error(dipole_map):
     dipole_map.meta['ctype1'] = 'HGLN-CAR'
     with pytest.raises(ValueError, match='must be CEA'):
+        pfsspy.Input(dipole_map, 5, 2.5)
+
+
+def test_nan_value(dipole_map):
+    dipole_map.data[0, 0] = np.nan
+    with pytest.raises(
+            ValueError, match='At least one value in the input is NaN'):
         pfsspy.Input(dipole_map, 5, 2.5)
 
 

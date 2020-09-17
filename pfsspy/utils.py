@@ -1,13 +1,13 @@
-import sunpy.map
-import sunpy.io
-import numpy as np
 import os
-import warnings
-import copy
-from scipy import interpolate
-from astropy import units as u
-import astropy.time
+
+import numpy as np
+
 import astropy.coordinates as coord
+import astropy.time
+from astropy import units as u
+
+import sunpy.io
+import sunpy.map
 
 
 def load_adapt(adapt_path):
@@ -31,9 +31,12 @@ def load_adapt(adapt_path):
     adaptMapSequence : `sunpy.map.MapSequence`
     """
     adapt_fits = sunpy.io.fits.read(adapt_path)
-    assert adapt_fits[0].header.get('MODEL') == 'ADAPT', \
-        f"{os.path.basename(adapt_path)} header['MODEL'] is not 'ADAPT' "
-    data_header_pairs = [(map_slice, adapt_fits[0].header)
+    header = adapt_fits[0].header
+    if header['MODEL'] != 'ADAPT':
+        raise ValueError(f"{os.path.basename(adapt_path)} header['MODEL'] "
+                         "is not 'ADAPT'.")
+
+    data_header_pairs = [(map_slice, header)
                          for map_slice in adapt_fits[0].data]
     adaptMapSequence = sunpy.map.Map(data_header_pairs, sequence=True)
     return adaptMapSequence
@@ -44,6 +47,8 @@ def carr_cea_wcs_header(dtime, shape):
     Create a Carrington WCS header for a Cylindrical Equal Area (CEA)
     projection. See [1]_ for information on how this is constructed.
 
+    Parameters
+    ----------
     dtime : datetime, None
         Datetime to associate with the map.
     shape : tuple
@@ -81,23 +86,45 @@ def carr_cea_wcs_header(dtime, shape):
     return header
 
 
+def _get_projection(m, i):
+    return m.meta[f'ctype{i}'][5:8]
+
+
+def _check_projection(m, proj_code, error=False):
+    for i in ('1', '2'):
+        proj = _get_projection(m, i)
+        if proj != proj_code:
+            if error:
+                raise ValueError(f'Projection type in CTYPE{i} keyword '
+                                 f'must be {proj_code} (got "{proj}")')
+            return False
+    return True
+
+
 def is_cea_map(m, error=False):
     """
-    Returns `True` if *m* is in a cylindrical-equal-area projeciton.
+    Returns `True` if *m* is in a cylindrical equal area projeciton.
 
     Parameters
     ----------
+    m : sunpy.map.GenericMap
     error : bool
-        If `True`, raise an error if *m* is not a CEA projection
+        If `True`, raise an error if *m* is not a CEA projection.
     """
-    for i in ('1', '2'):
-        proj = m.meta[f'ctype{i}'][5:8]
-        if proj != 'CEA':
-            if error:
-                raise ValueError(f'Projection type in CTYPE{i} keyword '
-                                 f'must be CEA (got "{proj}")')
-            return False
-    return True
+    return _check_projection(m, 'CEA', error=error)
+
+
+def is_car_map(m, error=False):
+    """
+    Returns `True` if *m* is in a plate carée projeciton.
+
+    Parameters
+    ----------
+    m : sunpy.map.GenericMap
+    error : bool
+        If `True`, raise an error if *m* is not a CAR projection.
+    """
+    return _check_projection(m, 'CAR', error=error)
 
 
 def is_full_sun_synoptic_map(m, error=False):
@@ -106,13 +133,24 @@ def is_full_sun_synoptic_map(m, error=False):
 
     Parameters
     ----------
+    m : sunpy.map.GenericMap
     error : bool
         If `True`, raise an error if *m* does not span the whole solar surface.
     """
-    shape = m.data.shape
+    projection = _get_projection(m, 1)
+    checks = {'CEA': _is_full_sun_cea,
+              'CAR': _is_full_sun_car}
+    if projection not in checks.keys():
+        raise NotImplementedError('is_full_sun_synoptic_map is only '
+                                  'implemented for '
+                                  f'{[key for key in checks.keys()]} '
+                                  'projections.')
+    return checks[projection](m, error)
 
+
+def _is_full_sun_car(m, error=False):
     dphi = m.meta['cdelt1']
-    phi = shape[1] * dphi
+    phi = m.data.shape[1] * dphi
     if not np.allclose(phi, 360, atol=0.1):
         if error:
             raise ValueError('Number of points in phi direction times '
@@ -121,7 +159,28 @@ def is_full_sun_synoptic_map(m, error=False):
         return False
 
     dtheta = m.meta['cdelt2']
-    theta = shape[0] * dtheta * np.pi / 2
+    theta = m.data.shape[0] * dtheta
+    if not np.allclose(theta, 180, atol=0.1):
+        if error:
+            raise ValueError('Number of points in theta direction times '
+                             'CDELT2 must be close to 180 degrees. '
+                             f'Instead got {dtheta} x {shape[0]} = {theta}')
+        return False
+    return True
+
+
+def _is_full_sun_cea(m, error=False):
+    dphi = m.meta['cdelt1']
+    phi = m.data.shape[1] * dphi
+    if not np.allclose(phi, 360, atol=0.1):
+        if error:
+            raise ValueError('Number of points in phi direction times '
+                             'CDELT1 must be close to 360 degrees. '
+                             f'Instead got {dphi} x {shape[0]} = {phi}')
+        return False
+
+    dtheta = m.meta['cdelt2']
+    theta = m.data.shape[0] * dtheta * np.pi / 2
     if not np.allclose(theta, 180, atol=0.1):
         if error:
             raise ValueError('Number of points in theta direction times '
@@ -129,5 +188,62 @@ def is_full_sun_synoptic_map(m, error=False):
                              '180 degrees. '
                              f'Instead got {dtheta} x {shape[0]} * pi/2 = {theta}')
         return False
-
     return True
+
+
+def car_to_cea(m, method='interp'):
+    """
+    Reproject a plate-carée map in to a cylindrical-equal-area map.
+
+    The solver used in pfsspy requires a magnetic field map with values
+    equally spaced in sin(lat) (ie. a CEA projection), but some maps are
+    provided equally spaced in lat (ie. a CAR projection). This function
+    reprojects a CAR map into a CEA map so it can be used with pfsspy.
+
+    Parameters
+    ----------
+    m : sunpy.map.GenericMap
+        Input map
+    method : str
+        Reprojection method to use. Can be ``'interp'`` (default),
+        ``'exact'``, or ``'adaptive'``. See :mod:`reproject` for a
+        description of the different methods. Note that different methods will
+        give different results, and not all will conserve flux.
+
+    Returns
+    -------
+    output_map : sunpy.map.GenericMap
+        Re-projected map. All metadata is preserved, apart from CTYPE{1,2} and
+        CDELT2 which are updated to account for the new projection.
+
+    See also
+    --------
+    :mod:`reproject` for the methods that perform the reprojection.
+    """
+    from astropy.wcs import WCS
+    from reproject import reproject_interp, reproject_exact, reproject_adaptive
+    methods = {'adaptive': reproject_adaptive,
+               'interp': reproject_interp,
+               'exact': reproject_exact}
+    if method not in methods:
+        raise ValueError(f'method must be one of {methods.keys()} '
+                         f'(got {method})')
+    reproject = methods[method]
+    # Check input map is valid
+    is_full_sun_synoptic_map(m, error=True)
+    is_car_map(m, error=True)
+
+    header_out = m.wcs.to_header()
+    header_out['CTYPE1'] = header_out['CTYPE1'][:5] + 'CEA'
+    header_out['CTYPE2'] = header_out['CTYPE2'][:5] + 'CEA'
+    header_out['CDELT2'] = 180 / np.pi * 2 / m.data.shape[0]
+    wcs_out = WCS(header_out, fix=False)
+    wcs_out.heliographic_observer = m.observer_coordinate
+    data_out = reproject(m, wcs_out, shape_out=m.data.shape,
+                         return_footprint=False)
+
+    meta_out = m.meta.copy()
+    for key in ['CTYPE1', 'CTYPE2', 'CDELT2']:
+        meta_out[key] = header_out[key]
+    m_out = sunpy.map.Map(data_out, header_out)
+    return m_out

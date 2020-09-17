@@ -1,7 +1,8 @@
 .. image:: ../../logo/logo_rectangle.svg
 
 pfsspy is a python package for carrying out Potential Field Source Surface
-modelling. For more information on the actually PFSS calculation see
+modelling, a commonly used magnetic field model of the Sun and other stars.
+For more information on the actually PFSS calculation see
 `this document <https://github.com/antyeates1983/pfss/blob/master/pfss-manual.pdf>`_.
 
 .. note::
@@ -52,7 +53,6 @@ For the main user-facing code and a changelog see
    :maxdepth: 1
 
    pfsspy
-   tracing
    changes
 
 for usage examples see
@@ -68,14 +68,6 @@ for various helper functions for working with synoptic maps:
    :maxdepth: 2
 
    utils
-
-
-for the helper modules (behind the scense!) see
-
-.. toctree::
-   :maxdepth: 2
-
-   helpers
 
 and for a quick reference guide to synoptic map FITS conventions see
 

@@ -55,6 +55,7 @@ sphinx_gallery_conf = {
     'gallery_dirs': 'auto_examples',
     'subsection_order': ExplicitOrder(['../../examples/using_pfsspy',
                                        '../../examples/finding_data',
+                                       '../../examples/utils',
                                        '../../examples/pfsspy_info'])
 }
 
@@ -200,8 +201,9 @@ epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/3/': None,
-                       'http://docs.astropy.org/en/stable': None,
+                       'https://docs.astropy.org/en/stable': None,
                        'https://docs.sunpy.org/en/stable': None,
-                       'https://docs.scipy.org/doc/numpy': None,
+                       'https://numpy.org/doc/stable': None,
                        'https://streamtracer.readthedocs.io/en/stable': None,
-                       'https://docs.scipy.org/doc/scipy/reference': None}
+                       'https://docs.scipy.org/doc/scipy/reference': None,
+                       'https://reproject.readthedocs.io/en/stable/': None}

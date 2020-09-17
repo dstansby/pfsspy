@@ -1,24 +1,5 @@
 r"""
 Helper functions for coordinate transformations used in the PFSS domain.
-
-The PFSS solution is calculated on a "strumfric" grid defined by
-
-- :math:`\rho = \log (r)`
-- :math:`s = \cos (\theta )`
-- :math:`\phi`
-
-where :math:`r, \theta, \phi` are spherical cooridnates that have ranges
-
-- :math:`1 < r < r_{ss}`
-- :math:`0 < \theta < \pi`
-- :math:`0 < \phi < 2\pi`
-
-The transformation between cartesian coordinates used by the tracer and the
-above coordinates is given by
-
-- :math:`x = r\sin (\theta) \cos (\phi)`
-- :math:`y = r\sin (\theta) \sin (\phi)`
-- :math:`z = r \cos (\theta)`
 """
 
 import numpy as np
