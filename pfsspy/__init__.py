@@ -529,6 +529,100 @@ class Output:
         self._common_b_cache = br, bs, bp, Sbr, Sbs, Sbp
         return self._common_b_cache
 
+    def get_Bvec(self,skycoord,out_type="spherical") :
+        """Evaluate magnetic vectors in pfss model
+
+        Method which takes an arbitrary astropy SkyCoord and
+        returns a numpy array containing magnetic field vectors
+        evaluated from the parent pfsspy.Output pfss model at
+        the locations specified by the SkyCoords
+
+        Parameters
+        ----------
+        skycoord : `astropy.SkyCoord` 
+            An arbitary point or set of points (length N >= 1) 
+            in the PFSS model domain (1Rs < r < Rss)
+
+        out_type : str, optional
+            Takes values 'spherical' (default) or 'cartesian'
+            and specifies whether the output vector is in 
+            spherical coordinates (B_r,B_theta,B_phi) or
+            cartesian (B_x,B_y,B_z)
+
+        Returns
+        -------
+        bvec : ndarray 
+            Magnetic field vectors at the requested locations
+            ndarray.shape = (N,3), units nT) 
+
+        Notes
+        -----
+        The output coordinate system is defined by the input 
+        magnetogram with x-z plane equivalent to the plane 
+        containing the Carrington meridian (0 deg longitude)
+
+        The spherical coordinates follow the physics convention:
+        https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/3D_Spherical.svg/240px-3D_Spherical.svg.png)
+        Therefore the polar angle (theta) is the co-latitude, rather
+        than the latitude, with range 0 (north pole) to 180 degrees
+        (south pole)
+
+        The conversion which relates the spherical and cartesian 
+        coordinates is as follows:
+
+        .. math:: B_R = sin\\theta cos\\phi B_x + sin\\theta sin\\phi B_y + cos\\theta B_z 
+        .. math:: B_\\theta = cos\\theta cos\\phi B_x + cos\\theta sin\\phi B_y - sin\\theta B_z 
+        .. math:: B_\\phi = -sin\\phi B_x + cos\\phi B_y 
+
+        The above equations may be written as a (3x3) matrix and 
+        inverted to retrieve the inverse transformation (cartesian from spherical)
+        """
+
+        # Assert skycoord is type astropy.coordinates.SkyCoord
+        if not isinstance(skycoord,coord.SkyCoord) :
+            raise ValueError("parameter skycoord must be of type astropy.coordinates.SkyCoord")
+
+        # Ensure representation type is spherical for input to interpolator
+        skycoord.representation_type="spherical"
+
+        # Check coord_type is cartesian or spherical
+        if not out_type in ["cartesian","spherical"] :
+            raise ValueError("keyword argument out_type must be 'cartesian' or 'spherical'")
+        
+        # Raise warning if input skycoord obstime does not match
+        # self.coordinate_frame.obstime
+        if np.any(self.coordinate_frame.obstime.to_datetime()
+                  != skycoord.obstime.to_datetime()) :
+            warnings.warn("The obstime of one of more input coordinates do not match the pfss model obstime.")
+
+        # Convert SkyCoord to pfsspy.Output coordinate frame
+        skycoord.transform_to(self.coordinate_frame)
+
+        # Do interpolation (returns cartesian vector)
+        bvecs = self._brgi(np.array(
+                            [skycoord.lon.to("rad").value,
+                             np.sin(skycoord.lat).value,
+                             np.log(skycoord.radius.to("R_sun").value)
+                            ]).T
+                            )
+        
+        # Convert to spherical if requested
+        if out_type == "spherical" : 
+            # Generate vector of 3x3 rotation matrices
+            M = np.array([
+                [ np.cos(skycoord.lat).value*np.cos(skycoord.lon).value,
+                  np.cos(skycoord.lat).value*np.sin(skycoord.lon).value,
+                  np.sin(skycoord.lat).value],
+                [ np.sin(skycoord.lat).value*np.cos(skycoord.lon).value,
+                  np.sin(skycoord.lat).value*np.sin(skycoord.lon).value,
+                 -np.cos(skycoord.lat).value],               
+                [-np.sin(skycoord.lon).value,
+                  np.cos(skycoord.lon).value,
+                  np.zeros(len(skycoord))],                 
+            ])
+            bvecs = np.array([np.dot(M_.T,v) for M_,v in zip(M.T,bvecs)])    
+        return bvecs*u.nT
+
 
 def _eigh(A):
     return np.linalg.eigh(A)
