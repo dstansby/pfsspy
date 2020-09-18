@@ -62,13 +62,6 @@ for usage examples see
 
    auto_examples/index
 
-for various helper functions for working with synoptic maps:
-
-.. toctree::
-   :maxdepth: 2
-
-   utils
-
 and for a quick reference guide to synoptic map FITS conventions see
 
 .. toctree::
