@@ -223,6 +223,25 @@ class Output:
         return self.input_map.date
 
     @property
+    def bunit(self):
+        """
+        `~astropy.units.Unit` of the input map data.
+        """
+        # Note that this can be removed once pfsspy depends on sunpy>=2.1, see
+        # https://github.com/sunpy/sunpy/pull/4451
+        unit_str = self.input_map.meta.get('bunit', None)
+        if unit_str is None:
+            return
+
+        unit = u.Unit(unit_str, format='fits', parse_strict='silent')
+        if isinstance(unit, u.UnrecognizedUnit):
+            warnings.warn(f'Could not parse unit string "{unit_str}" as a valid FITS unit.\n'
+                          'See https://fits.gsfc.nasa.gov/fits_standard.html '
+                          'for the FITS unit standards.')
+            unit = None
+        return unit
+
+    @property
     def source_surface_br(self):
         """
         Br on the source surface.
@@ -539,26 +558,26 @@ class Output:
 
         Parameters
         ----------
-        skycoord : `astropy.SkyCoord` 
-            An arbitary point or set of points (length N >= 1) 
+        skycoord : `astropy.SkyCoord`
+            An arbitary point or set of points (length N >= 1)
             in the PFSS model domain (1Rs < r < Rss)
 
         out_type : str, optional
             Takes values 'spherical' (default) or 'cartesian'
-            and specifies whether the output vector is in 
+            and specifies whether the output vector is in
             spherical coordinates (B_r,B_theta,B_phi) or
             cartesian (B_x,B_y,B_z)
 
         Returns
         -------
-        bvec : ndarray 
+        bvec : ndarray
             Magnetic field vectors at the requested locations
-            ndarray.shape = (N,3), units nT) 
+            ndarray.shape = (N,3), units nT)
 
         Notes
         -----
-        The output coordinate system is defined by the input 
-        magnetogram with x-z plane equivalent to the plane 
+        The output coordinate system is defined by the input
+        magnetogram with x-z plane equivalent to the plane
         containing the Carrington meridian (0 deg longitude)
 
         The spherical coordinates follow the physics convention:
@@ -567,14 +586,14 @@ class Output:
         than the latitude, with range 0 (north pole) to 180 degrees
         (south pole)
 
-        The conversion which relates the spherical and cartesian 
+        The conversion which relates the spherical and cartesian
         coordinates is as follows:
 
-        .. math:: B_R = sin\\theta cos\\phi B_x + sin\\theta sin\\phi B_y + cos\\theta B_z 
-        .. math:: B_\\theta = cos\\theta cos\\phi B_x + cos\\theta sin\\phi B_y - sin\\theta B_z 
-        .. math:: B_\\phi = -sin\\phi B_x + cos\\phi B_y 
+        .. math:: B_R = sin\\theta cos\\phi B_x + sin\\theta sin\\phi B_y + cos\\theta B_z
+        .. math:: B_\\theta = cos\\theta cos\\phi B_x + cos\\theta sin\\phi B_y - sin\\theta B_z
+        .. math:: B_\\phi = -sin\\phi B_x + cos\\phi B_y
 
-        The above equations may be written as a (3x3) matrix and 
+        The above equations may be written as a (3x3) matrix and
         inverted to retrieve the inverse transformation (cartesian from spherical)
         """
 
@@ -588,7 +607,7 @@ class Output:
         # Check coord_type is cartesian or spherical
         if not out_type in ["cartesian","spherical"] :
             raise ValueError("keyword argument out_type must be 'cartesian' or 'spherical'")
-        
+
         # Raise warning if input skycoord obstime does not match
         # self.coordinate_frame.obstime
         if np.any(self.coordinate_frame.obstime.to_datetime()
@@ -605,9 +624,9 @@ class Output:
                              np.log(skycoord.radius.to("R_sun").value)
                             ]).T
                             )
-        
+
         # Convert to spherical if requested
-        if out_type == "spherical" : 
+        if out_type == "spherical" :
             # Generate vector of 3x3 rotation matrices
             M = np.array([
                 [ np.cos(skycoord.lat).value*np.cos(skycoord.lon).value,
@@ -615,13 +634,15 @@ class Output:
                   np.sin(skycoord.lat).value],
                 [ np.sin(skycoord.lat).value*np.cos(skycoord.lon).value,
                   np.sin(skycoord.lat).value*np.sin(skycoord.lon).value,
-                 -np.cos(skycoord.lat).value],               
+                 -np.cos(skycoord.lat).value],
                 [-np.sin(skycoord.lon).value,
                   np.cos(skycoord.lon).value,
-                  np.zeros(len(skycoord))],                 
+                  np.zeros(len(skycoord))],
             ])
-            bvecs = np.array([np.dot(M_.T,v) for M_,v in zip(M.T,bvecs)])    
-        return bvecs*u.nT
+            bvecs = np.array([np.dot(M_.T,v) for M_,v in zip(M.T,bvecs)])
+        if self.bunit is not None:
+            bvecs *= self.bunit
+        return bvecs
 
 
 def _eigh(A):

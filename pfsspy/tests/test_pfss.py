@@ -25,7 +25,7 @@ matplotlib.use('Agg')
 R_sun = const.R_sun
 test_data = pathlib.Path(__file__).parent / 'data'
 
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 
 
 def test_pfss(gong_map):
@@ -44,6 +44,14 @@ def test_pfss(gong_map):
     expected = np.loadtxt(test_data / 'br_out.txt')
     # atol is emperically set for tests to pass on CI
     np.testing.assert_allclose(br, expected, atol=1e-13, rtol=0)
+
+
+def test_bunit(gong_map):
+    # Regression test to check that the output of pfss doesn't change
+    m = sunpy.map.Map(gong_map)
+    pfss_in = pfsspy.Input(m, 50, 2)
+    pfss_out = pfsspy.pfss(pfss_in)
+    assert pfss_out.bunit == u.G
 
 
 def test_expansion_factor(dipole_result):
@@ -178,14 +186,15 @@ def test_non_map_input():
     with pytest.raises(ValueError, match='br must be a SunPy Map'):
         pfsspy.Input(np.random.rand(2, 2), 1, 1)
 
-def test_bvec_interpolator(dipole_result) :
+
+def test_bvec_interpolator(dipole_result):
     _, out = dipole_result
     test_coord = coord.SkyCoord(
         x = np.array([1/out.grid.rss,0.5,0.75,1]) * out.grid.rss*u.R_sun,
         y = np.zeros(4) * u.R_sun,
         z = np.zeros(4) * u.R_sun,
-        frame = out.coordinate_frame,  
-        representation_type="cartesian" 
+        frame = out.coordinate_frame,
+        representation_type="cartesian"
     )
     b_cart = out.get_Bvec(test_coord,out_type="cartesian")
     b_sph = out.get_Bvec(test_coord,out_type="spherical")
@@ -199,11 +208,11 @@ def test_bvec_interpolator(dipole_result) :
     # Test interpolation matches the analytic expectation
     # of the boundary condition at the solar surface.
     # The first test coordinate is located at [1,0,0] Rs
-    # i.e. on the solar surface at the equator of the dipole, 
-    # where we expect Br to vanish. 
+    # i.e. on the solar surface at the equator of the dipole,
+    # where we expect Br to vanish.
     assert np.isclose(b_cart[0,0],0.0)
 
-    # The test coordinates are all located at 
+    # The test coordinates are all located at
     # rhat = [1,0,0], thetahat = [0,0,1], phihat = [0,1,0]
     # Use this to sanity check the rotation to spherical coordinates
     assert np.all(b_sph[:,0] == b_cart[:,0])
@@ -222,14 +231,9 @@ def test_bvec_interpolator(dipole_result) :
         z = np.zeros(1) * u.R_sun,
         frame = frames.HeliographicCarrington,
         obstime = out.dtime.datetime + timedelta(days = 1),
-        observer='Earth', 
-        representation_type="cartesian" 
+        observer='Earth',
+        representation_type="cartesian"
     )
     with pytest.warns(UserWarning) as record :
         _=out.get_Bvec(wrong_datetime)
     assert record[0].message.args[0] == "The obstime of one of more input coordinates do not match the pfss model obstime."
-
-
-
-
-    

@@ -21,6 +21,8 @@ class GongSynopticMap(sunpy.map.GenericMap):
                 header['date-obs'] = (header['date-obs'] + ' ' +
                                       header.pop('time-obs'))
                 header['date-obs'] = Time(header['date-obs']).isot
+            if 'bunit' in header and header['bunit'] == 'Gauss':
+                header['bunit'] = 'G'
         super().__init__(data, header, **kwargs)
 
     @classmethod

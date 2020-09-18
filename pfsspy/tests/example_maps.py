@@ -37,6 +37,7 @@ def dipole_map():
 
     br = dipole_Br(1, theta)
     header = pfsspy.utils.carr_cea_wcs_header(Time('1992-12-21'), br.shape)
+    header['bunit'] = 'nT'
     return Map((br.T, header))
 
 
