@@ -49,9 +49,16 @@ def test_pfss(gong_map):
 def test_bunit(gong_map):
     # Regression test to check that the output of pfss doesn't change
     m = sunpy.map.Map(gong_map)
-    pfss_in = pfsspy.Input(m, 50, 2)
+    pfss_in = pfsspy.Input(m, 2, 2)
     pfss_out = pfsspy.pfss(pfss_in)
     assert pfss_out.bunit == u.G
+
+    pfss_out.input_map.meta['bunit'] = 'notaunit'
+    with pytest.warns(UserWarning, match='Could not parse unit string "notaunit"'):
+        assert pfss_out.bunit is None
+
+    pfss_out.input_map.meta.pop('bunit')
+    assert pfss_out.bunit is None
 
 
 def test_expansion_factor(dipole_result):
