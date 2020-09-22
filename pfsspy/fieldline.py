@@ -227,6 +227,14 @@ class FieldLine:
         return -1 - self._ss_coord_index
 
     @property
+    def b_along_fline(self):
+        """
+        The magnetic field vectors along the field line.
+        """
+        coords = self.coords
+        return self._output.get_bvec(coords)
+
+    @property
     @functools.lru_cache()
     def expansion_factor(self):
         r"""
