@@ -197,19 +197,19 @@ def test_non_map_input():
 def test_bvec_interpolator(dipole_result):
     _, out = dipole_result
     test_coord = coord.SkyCoord(
-        x = np.array([1/out.grid.rss,0.5,0.75,1]) * out.grid.rss*u.R_sun,
-        y = np.zeros(4) * u.R_sun,
-        z = np.zeros(4) * u.R_sun,
-        frame = out.coordinate_frame,
+        x=np.array([1 / out.grid.rss, 0.5, 0.75, 1]) * out.grid.rss * u.R_sun,
+        y=np.zeros(4) * u.R_sun,
+        z=np.zeros(4) * u.R_sun,
+        frame=out.coordinate_frame,
         representation_type="cartesian"
     )
-    b_cart = out.get_Bvec(test_coord,out_type="cartesian")
-    b_sph = out.get_Bvec(test_coord,out_type="spherical")
+    b_cart = out.get_bvec(test_coord, out_type="cartesian")
+    b_sph = out.get_bvec(test_coord, out_type="spherical")
 
     # Check the output shape matches is [N,3] whre
     # N is the length of test_coord, the unit is nT
-    assert b_cart.shape == (len(test_coord),3)
-    assert b_sph.shape == (len(test_coord),3)
+    assert b_cart.shape == (len(test_coord), 3)
+    assert b_sph.shape == (len(test_coord), 3)
     assert b_cart.unit == u.nT
 
     # Test interpolation matches the analytic expectation
@@ -217,30 +217,30 @@ def test_bvec_interpolator(dipole_result):
     # The first test coordinate is located at [1,0,0] Rs
     # i.e. on the solar surface at the equator of the dipole,
     # where we expect Br to vanish.
-    assert np.isclose(b_cart[0,0],0.0)
+    assert np.isclose(b_cart[0, 0], 0.0)
 
     # The test coordinates are all located at
     # rhat = [1,0,0], thetahat = [0,0,1], phihat = [0,1,0]
     # Use this to sanity check the rotation to spherical coordinates
-    assert np.all(b_sph[:,0] == b_cart[:,0])
-    assert np.all(b_sph[:,1] == -b_cart[:,2])
-    assert np.all(b_sph[:,2] == b_cart[:,1])
+    assert np.all(b_sph[:, 0] == b_cart[:, 0])
+    assert np.all(b_sph[:, 1] == -b_cart[:, 2])
+    assert np.all(b_sph[:, 2] == b_cart[:, 1])
 
     # Test warnings and errors are raised correctly
-    with pytest.raises(ValueError, match="parameter skycoord must be of type astropy.coordinates.SkyCoord"):
-        _ = out.get_Bvec([])
-    with pytest.raises(ValueError, match="keyword argument out_type must be 'cartesian' or 'spherical'"):
-        _ = out.get_Bvec(test_coord,out_type='')
-    #create test coord with different datetime
+    with pytest.raises(ValueError, match="coords must be of type astropy.coordinates.SkyCoord"):
+        out.get_bvec([])
+    with pytest.raises(ValueError, match="out_type must be 'cartesian' or 'spherical'"):
+        out.get_bvec(test_coord, out_type='')
+    # Create test coord with different datetime
     wrong_datetime = coord.SkyCoord(
-        x = np.array([1]) * out.grid.rss*u.R_sun,
-        y = np.zeros(1) * u.R_sun,
-        z = np.zeros(1) * u.R_sun,
-        frame = frames.HeliographicCarrington,
-        obstime = out.dtime.datetime + timedelta(days = 1),
+        x=np.array([1]) * out.grid.rss * u.R_sun,
+        y=np.zeros(1) * u.R_sun,
+        z=np.zeros(1) * u.R_sun,
+        frame=frames.HeliographicCarrington,
+        obstime=out.dtime.datetime + timedelta(days=1),
         observer='Earth',
         representation_type="cartesian"
     )
-    with pytest.warns(UserWarning) as record :
-        _=out.get_Bvec(wrong_datetime)
+    with pytest.warns(UserWarning) as record:
+        out.get_bvec(wrong_datetime)
     assert record[0].message.args[0] == "The obstime of one of more input coordinates do not match the pfss model obstime."
