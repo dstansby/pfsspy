@@ -4,6 +4,13 @@ Changelog
 0.6.0
 -----
 
+New features
+~~~~~~~~~~~~
+- The `pfsspy.utils` module has been added, and contains various tools for
+  loading and working with synoptic maps.
+- `pfsspy.Output` has a new `~pfsspy.Output.bunit` property, which returns the
+  `~astropy.units.Unit` of the input map.
+
 Breaking changes
 ~~~~~~~~~~~~~~~~
 - The ``.al`` property of `pfsspy.Output` is now private, as it is not intended
@@ -13,6 +20,22 @@ Breaking changes
 - A `ValueError` is now raised if any of the input data to `pfsspy.Input` is
   non-finite or NaN. Previously the pfss computation would run fine, but the
   output would consist entirely of NaNs.
+
+Behaviour changes
+~~~~~~~~~~~~~~~~~
+- The monopole term is now ignored in the PFSS calculation. Previously a
+  non-zero (but small) monopole term would cause floating point precision issues,
+  leading to a very noisy result. Now the monopole term is explicitly removed
+  from the calculation. If your input has a non-zero mean value, pfsspy will
+  issue a warning about this.
+- The data downloaded by the examples is now automatically downloaded and
+  cached with `sunpy.data.manager`. This means the files used for running the
+  examples will be downloaded and stored in your `sunpy` data directory if
+  they are required.
+
+Bug fixes
+~~~~~~~~~
+- The ``date-obs`` FITS keyword in GONG maps is now correctly populated.
 
 0.5.3
 -----
