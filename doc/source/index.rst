@@ -21,17 +21,6 @@ pfsspy can be installed from PyPi using
 
     pip install pfsspy
 
-Improving performance
----------------------
-
-numba
-~~~~~
-pfsspy automatically detects an installation of
-`numba <https://numba.pydata.org/>`_, which compiles
-some of the numerical code to speed up pfss calculations. To enable this
-simply `install numba <http://numba.pydata.org/numba-doc/latest/user/installing.html>`_
-and use pfsspy as normal.
-
 Citing
 ------
 
@@ -44,29 +33,15 @@ code at *both*
 Citation details can be found at the lower
 right hand of each web page.
 
-Code reference
---------------
-
-For the main user-facing code and a changelog see
+Contents
+--------
 
 .. toctree::
    :maxdepth: 1
-
-   pfsspy
-   changes
-
-for usage examples see
-
-.. toctree::
-   :maxdepth: 2
 
    auto_examples/index
-
-and for a quick reference guide to synoptic map FITS conventions see
-
-.. toctree::
-   :maxdepth: 1
-
+   pfsspy
+   changes
    synoptic_fits
 
 Indices and tables

@@ -8,3 +8,5 @@ API reference
 .. automodapi:: pfsspy.fieldline
 
 .. automodapi:: pfsspy.tracing
+
+.. automodapi:: pfsspy.utils
