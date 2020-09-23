@@ -515,7 +515,7 @@ class Output:
         br = np.zeros((nphi + 2, ns + 2, nr + 1))
         bs = np.zeros((nphi + 2, ns + 1, nr + 2))
         bp = np.zeros((nphi + 1, ns + 2, nr + 2))
-        br[1:-1, 1:-1, :] = als[1:, :, :] - als[:-1, :, :] + alp[:,:-1,:] - alp[:,1:,:]
+        br[1:-1, 1:-1, :] = als[1:, :, :] - als[:-1, :, :] + alp[:, :-1, :] - alp[:, 1:, :]
         bs[1:-1, :, 1:-1] = alp[:, :, 1:] - alp[:, :, :-1]
         bp[:, 1:-1, 1:-1] = als[:, :, :-1] - als[:, :, 1:]
 
@@ -524,17 +524,17 @@ class Output:
         bs[1:-1, :, -1] = 2 * bs[1:-1, :, -2] - bs[1:-1, :, -3]
         bp[:, 1:-1, -1] = 2 * bp[:, 1:-1, -2] - bp[:, 1:-1, -3]
         # - periodic in phi:
-        bs[0,:,:] = bs[-2,:,:]
-        bs[-1,:,:] = bs[1,:,:]
-        br[0,:,:] = br[-2,:,:]
-        br[-1,:,:] = br[1,:,:]
+        bs[0, :, :] = bs[-2, :, :]
+        bs[-1, :, :] = bs[1, :, :]
+        br[0, :, :] = br[-2, :, :]
+        br[-1, :, :] = br[1, :, :]
         # js = jp = 0 at photosphere:
-        for i in range(nphi+1):
+        for i in range(nphi + 1):
             bp[i,:,0] = Sbp[:,0]/dnp[:,0]*(bp[i,:,1]*dnp[:,1]/Sbp[:,1] + br[i,:,0]*dnr[:]/Sbr[:,0] - br[i+1,:,0]*dnr[:]/Sbr[:,0])
-        for i in range(nphi+2):
+        for i in range(nphi + 2):
             bs[i,:,0] = Sbs[:,0]/dns[:,0]*(bs[i,:,1]*dns[:,1]/Sbs[:,1] + br[i,:-1,0]*dnr[:-1]/Sbr[:-1,0] - br[i,1:,0]*dnr[1:]/Sbr[1:,0])
         # - polar boundaries as in dumfric:
-        for i in range(nphi+2):
+        for i in range(nphi + 2):
             i1 = (i + nphi//2) % nphi
             br[i,-1,:] = br[i1,-2,:]
             br[i,0,:] = br[i1,1,:]
@@ -548,8 +548,9 @@ class Output:
         self._common_b_cache = br, bs, bp, Sbr, Sbs, Sbp
         return self._common_b_cache
 
-    def get_Bvec(self,skycoord,out_type="spherical") :
-        """Evaluate magnetic vectors in pfss model
+    def get_bvec(self, coords, out_type="spherical"):
+        """
+        Evaluate magnetic vectors in pfss model.
 
         Method which takes an arbitrary astropy SkyCoord and
         returns a numpy array containing magnetic field vectors
@@ -558,7 +559,7 @@ class Output:
 
         Parameters
         ----------
-        skycoord : `astropy.SkyCoord`
+        coords : `astropy.SkyCoord`
             An arbitary point or set of points (length N >= 1)
             in the PFSS model domain (1Rs < r < Rss)
 
@@ -598,46 +599,47 @@ class Output:
         """
 
         # Assert skycoord is type astropy.coordinates.SkyCoord
-        if not isinstance(skycoord,coord.SkyCoord) :
-            raise ValueError("parameter skycoord must be of type astropy.coordinates.SkyCoord")
+        if not isinstance(coords, coord.SkyCoord):
+            raise ValueError("coords must be of type "
+                             "astropy.coordinates.SkyCoord")
 
         # Ensure representation type is spherical for input to interpolator
-        skycoord.representation_type="spherical"
+        coords.representation_type = "spherical"
 
         # Check coord_type is cartesian or spherical
-        if not out_type in ["cartesian","spherical"] :
-            raise ValueError("keyword argument out_type must be 'cartesian' or 'spherical'")
+        if out_type not in ["cartesian", "spherical"]:
+            raise ValueError("out_type must be 'cartesian' or 'spherical' "
+                             f"(got {out_type})")
 
         # Raise warning if input skycoord obstime does not match
         # self.coordinate_frame.obstime
-        if np.any(self.coordinate_frame.obstime.to_datetime()
-                  != skycoord.obstime.to_datetime()) :
-            warnings.warn("The obstime of one of more input coordinates do not match the pfss model obstime.")
+        if np.any(self.coordinate_frame.obstime.to_datetime() !=
+                  coords.obstime.to_datetime()):
+            warnings.warn("The obstime of one of more input coordinates "
+                          "do not match the pfss model obstime.")
 
         # Convert SkyCoord to pfsspy.Output coordinate frame
-        skycoord.transform_to(self.coordinate_frame)
+        coords.transform_to(self.coordinate_frame)
 
         # Do interpolation (returns cartesian vector)
-        bvecs = self._brgi(np.array(
-                            [skycoord.lon.to("rad").value,
-                             np.sin(skycoord.lat).value,
-                             np.log(skycoord.radius.to("R_sun").value)
-                            ]).T
-                            )
+        bvecs = self._brgi(np.array([coords.lon.to("rad").value,
+                                     np.sin(coords.lat).value,
+                                     np.log(coords.radius.to("R_sun").value)]).T
+                           )
 
         # Convert to spherical if requested
-        if out_type == "spherical" :
+        if out_type == "spherical":
             # Generate vector of 3x3 rotation matrices
             M = np.array([
-                [ np.cos(skycoord.lat).value*np.cos(skycoord.lon).value,
-                  np.cos(skycoord.lat).value*np.sin(skycoord.lon).value,
-                  np.sin(skycoord.lat).value],
-                [ np.sin(skycoord.lat).value*np.cos(skycoord.lon).value,
-                  np.sin(skycoord.lat).value*np.sin(skycoord.lon).value,
-                 -np.cos(skycoord.lat).value],
-                [-np.sin(skycoord.lon).value,
-                  np.cos(skycoord.lon).value,
-                  np.zeros(len(skycoord))],
+                [np.cos(coords.lat).value * np.cos(coords.lon).value,
+                 np.cos(coords.lat).value * np.sin(coords.lon).value,
+                 np.sin(coords.lat).value],
+                [np.sin(coords.lat).value * np.cos(coords.lon).value,
+                 np.sin(coords.lat).value * np.sin(coords.lon).value,
+                 -np.cos(coords.lat).value],
+                [-np.sin(coords.lon).value,
+                 np.cos(coords.lon).value,
+                 np.zeros(len(coords))],
             ])
             bvecs = np.array([np.dot(M_.T,v) for M_,v in zip(M.T,bvecs)])
         if self.bunit is not None:
