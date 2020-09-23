@@ -1,10 +1,12 @@
 import os
 
+import astropy.units as u
 import sunpy.map
-import pytest
 
 import pfsspy.map
 from .example_maps import gong_map, adapt_map
+
+import pytest
 
 
 def test_gong_source(gong_map):
@@ -15,6 +17,12 @@ def test_gong_source(gong_map):
     assert m.date.isot == '2020-09-01T13:04:00.000'
     # Construct a WCS to check no warnings are thrown
     m.wcs
+    # Check observer coordinate is populated
+    observer = m.coordinate_frame.observer
+    assert observer.obstime.isot == m.date.isot
+    assert observer.lon == 0 * u.deg
+    assert u.allclose(observer.lat, 7.20584924 * u.deg)
+    assert u.allclose(observer.radius, 1.50953137e+11 * u.m)
 
 
 def test_adapt_map(adapt_map):

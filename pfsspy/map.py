@@ -1,13 +1,15 @@
 """
 Custom `sunpy.map.GenericMap` sub-classes for different magnetogram sources.
 """
+from astropy.time import Time
+import astropy.units as u
 import numpy as np
 import sunpy.map
-from astropy.time import Time
 
 
 class GongSynopticMap(sunpy.map.GenericMap):
     def __init__(self, data, header, **kwargs):
+        # Fix coordinate system stuff
         if 'KEYCOMMENTS' in header:
             if 'deg' in header['KEYCOMMENTS']['CDELT1']:
                 header['CUNIT1'] = 'deg'
@@ -17,12 +19,17 @@ class GongSynopticMap(sunpy.map.GenericMap):
                 # that value (see Thompson 2005)
                 header['CDELT2'] = 180 / np.pi * header['CDELT2']
                 header['KEYCOMMENTS']['CDELT2'] = '180 / pi * sine-lat step'
-            if 'time-obs' in header:
-                header['date-obs'] = (header['date-obs'] + ' ' +
-                                      header.pop('time-obs'))
-                header['date-obs'] = Time(header['date-obs']).isot
-            if 'bunit' in header and header['bunit'] == 'Gauss':
-                header['bunit'] = 'G'
+        # Fix timestamp
+        if 'time-obs' in header:
+            header['date-obs'] = (header['date-obs'] + ' ' +
+                                  header.pop('time-obs'))
+            header['date-obs'] = Time(header['date-obs']).isot
+        # Fix unit
+        if 'bunit' in header and header['bunit'] == 'Gauss':
+            header['bunit'] = 'G'
+        # Fix observer coordinate
+        if 'hglt_obs' not in header:
+            header.update(_earth_obs_coord_meta(header['date-obs']))
         super().__init__(data, header, **kwargs)
 
     @classmethod
@@ -48,3 +55,25 @@ class ADAPTMap(sunpy.map.GenericMap):
     def is_datasource_for(cls, data, header, **kwargs):
         """Determines if header corresponds to an ADAPT map."""
         return header.get('model') == 'ADAPT'
+
+
+def _observer_coord_meta(observer_coord):
+    """
+    Convert an observer coordinate into FITS metadata.
+    """
+    new_obs_frame = sunpy.coordinates.HeliographicStonyhurst(
+        obstime=observer_coord.obstime)
+    observer_coord = observer_coord.transform_to(new_obs_frame)
+
+    new_meta = {}
+    new_meta['hglt_obs'] = observer_coord.lat.to_value(u.deg)
+    new_meta['hgln_obs'] = observer_coord.lon.to_value(u.deg)
+    new_meta['dsun_obs'] = observer_coord.radius.to_value(u.m)
+    return new_meta
+
+
+def _earth_obs_coord_meta(obstime):
+    """
+    Return metadata for an Earth obeserver coordinate.
+    """
+    return _observer_coord_meta(sunpy.coordinates.get_earth(obstime))
