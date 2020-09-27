@@ -28,8 +28,8 @@ bibliography: paper.bib
 
 # Summary
 Magnetic fields play a crucial role in the dynamics and evolution of our Sun
-and other stars. A common method used to model the magnetic field of the Sun
-and other stars is the potential field source surface (PFSS) model [@Altschuler1969; @Schatten1969].
+and other stars. A common method used to model the magnetic fields in solar and
+stellar atmospheres is the potential field source surface (PFSS) model [@Altschuler1969; @Schatten1969].
 The PFSS equations assume that there is zero electrical current in the domain
 of interest, leading to the equations
 \begin{equation}
@@ -42,10 +42,10 @@ conditions are given by the user specified radial component of $\mathbf{B}$ on
 inner boundary and the imposed condition of a purely radial field on the source
 surface.
 
-Historically, either custom implementations or `pfsspack`^[https://www.lmsal.com/~derosa/pfsspack/,
+Historically, either custom implementations or the `pfsspack`^[https://www.lmsal.com/~derosa/pfsspack/,
 which forms part of the larger `SolarSoft` library for solar physics [@Freeland1998],
 written in Interactive Data Language (IDL).]
-library have been used to perform PFSS extrapolations. As Python has become a
+IDL library have been used to perform PFSS extrapolations. As Python has become a
 major programming language within the solar physics and wider astronomy
 community [@Bobra2020], there is a need to provide well documented and tested
 functionality to perform PFSS extrapolations within the Python ecosystem,
@@ -88,7 +88,7 @@ it continues to provide a useful resource for the community in the future.
 
 # Acknowledgements
 
-David Stansby acknowledges STFC grants ST/N504336/1 and ST/S000240/1 for
-financial support.
+David Stansby acknowledges STFC grants ST/N504336/1 and ST/S000240/1.
+Anthony Yeates acknowledges STFC grant ST/S000321/1.
 
 # References
