@@ -42,7 +42,7 @@ gong_map = sunpy.map.Map(gong_map.data - np.mean(gong_map.data), gong_map.meta)
 
 ###############################################################################
 # Load the corresponding AIA 193 map
-if not os.path.exists('AIA20190310.fits'):
+if not os.path.exists('aia_map.fits'):
     import urllib.request
     urllib.request.urlretrieve(
         'http://jsoc2.stanford.edu/data/aia/synoptic/2020/09/01/H1300/AIA20200901_1300_0193.fits',
