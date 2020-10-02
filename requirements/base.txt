@@ -1,5 +1,0 @@
-matplotlib
-numpy
-scipy
-astropy>=3
-sunpy!=2.0.2
