@@ -10,6 +10,7 @@ New features
   loading and working with synoptic maps.
 - `pfsspy.Output` has a new `~pfsspy.Output.bunit` property, which returns the
   `~astropy.units.Unit` of the input map.
+- Added a guild to the numerical methods used by pfsspy.
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
