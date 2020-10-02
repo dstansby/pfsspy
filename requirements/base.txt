@@ -2,4 +2,4 @@ matplotlib
 numpy
 scipy
 astropy>=3
-sunpy
+sunpy!=2.0.2
