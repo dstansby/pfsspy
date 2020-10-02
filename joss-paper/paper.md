@@ -59,7 +59,7 @@ solution, importing various magnetic field data sources, and visualising all of
 this data.
 
 The PFSS code implements a finite difference solver, based on the method of
-[@Ballegooijen2000]. Given an 2D map of the radial magnetic field on the inner
+`@Ballegooijen2000`. Given an 2D map of the radial magnetic field on the inner
 boundary, the magnetic vector potential is calculated on a 3D grid equally
 spaced in $\sin($latitude$)$, longitude, and $\ln($radius$)$. This method is
 tailored in order to achieve $\nabla \times \mathbf{B} = 0$ to machine
@@ -71,14 +71,14 @@ documentation^[https://pfsspy.readthedocs.io].
 
 `pfsspy` is designed to closely integrate with other packages in the
 astronomical and solar physics Python ecosystems. Coordinate aware input and
-output maps are created with the SunPy package [@Mumford2020a; @TheSunPyCommunity2020],
+output maps are created with the sunpy package [@Mumford2020a; @TheSunPyCommunity2020],
 and `pfsspy` is fully integrated with the coordinate and unit framework
 present in astropy [@TheAstropyCollaboration2018]. This makes it easy to
 combine magnetic fields and field lines calculated in `pfsspy` with other data
 sources. As an example, \autoref{fig} shows magnetic field lines overplotted
 on an extreme-ultraviolet image of a large active region on the Sun.
 
-![An image of the Sun taken by SDO/AIA at 193 angstroms, with selected magnetic field lines traced through a PFSS solution overplotted in white. The PFSS solution and field line tracing were done with `pfsspy`, with a Global Oscillations Network Group (GONG) photospheric magnetogram as input and a source surface at 2.5 solar radii. Although only selected field lines are shown, the magnetic field is solved for over the whole Sun.\label{fig}](pfsspy.pdf)
+![An image of the Sun taken by SDO/AIA at 193 angstroms, with selected magnetic field lines traced through a PFSS solution overplotted in white. The PFSS solution and field line tracing were done with `pfsspy`, with a Global Oscillations Network Group (GONG) photospheric magnetogram as input and a source surface at 2.5 solar radii. Although only selected field lines are shown, the magnetic field is solved over the whole Sun.\label{fig}](pfsspy.pdf)
 
 The solar physics community has already made use of `pfsspy` in a number of
 works, from interpreting observations from Parker Solar Probe [@Bale2019; @Badman2020],
