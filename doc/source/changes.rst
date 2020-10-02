@@ -10,7 +10,11 @@ New features
   loading and working with synoptic maps.
 - `pfsspy.Output` has a new `~pfsspy.Output.bunit` property, which returns the
   `~astropy.units.Unit` of the input map.
-- Added a guild to the numerical methods used by pfsspy.
+- Added :meth:`pfsspy.Output.get_bvec`, to sample the magnetic field solution
+  at arbitrary coordinates.
+- Added the `pfsspy.fieldline.FieldLine.b_along_fline` property, to sample the
+  magnetic field along a traced field line.
+- Added a guide to the numerical methods used by pfsspy.
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
@@ -19,7 +23,7 @@ Breaking changes
   now private API and there is no guarantee it will stay or return the same thing
   in the future).
 - A `ValueError` is now raised if any of the input data to `pfsspy.Input` is
-  non-finite or NaN. Previously the pfss computation would run fine, but the
+  non-finite or NaN. Previously the PFSS computation would run fine, but the
   output would consist entirely of NaNs.
 
 Behaviour changes
@@ -33,6 +37,8 @@ Behaviour changes
   cached with `sunpy.data.manager`. This means the files used for running the
   examples will be downloaded and stored in your `sunpy` data directory if
   they are required.
+- The observer coordinate information in GONG maps is now automatically set
+  to the location of Earth at the time in the map header.
 
 Bug fixes
 ~~~~~~~~~
