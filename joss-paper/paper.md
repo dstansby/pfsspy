@@ -6,12 +6,13 @@ tags:
   - Solar physics
 authors:
   - name: David Stansby
-    orcid: 0000-0003-0872-7098
+    orcid: 0000-0002-1365-1908
     affiliation: 1
   - name: Anthony Yeates
     orcid: 0000-0002-2728-4053
     affiliation: 2
   - name: Samuel T. Badman
+    orcid: 0000-0002-6145-436X
     affiliation: "3, 4"
 affiliations:
  - name: Mullard Space Science Laboratory, University College London, Holmbury St. Mary, Surrey RH5 6NT, UK
