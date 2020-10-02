@@ -22,7 +22,7 @@ affiliations:
    index: 3
  - name: Space Sciences Laboratory, University of California, Berkeley, CA 94720-7450, USA
    index: 4
-date: 9 September 2020
+date: 2 October 2020
 bibliography: paper.bib
 ---
 
@@ -63,7 +63,8 @@ The PFSS code implements a finite difference solver, based on the method of
 boundary, the magnetic vector potential is calculated on a 3D grid equally
 spaced in $\sin($latitude$)$, longitude, and $\ln($radius$)$. This method is
 tailored in order to achieve $\nabla \times \mathbf{B} = 0$ to machine
-precision.
+precision. More details on the exact numerical scheme are given in the online
+documentation^[https://pfsspy.readthedocs.io].
 
 
 ## Integration
