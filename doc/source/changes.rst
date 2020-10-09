@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.6.1
+-----
+
+Bug fixes
+~~~~~~~~~
+
+- Fixed some messages in errors raised by functions in `pfsspy.utils`.
+
 0.6.0
 -----
 
