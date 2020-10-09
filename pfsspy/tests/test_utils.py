@@ -46,6 +46,13 @@ def test_validation(dipole_map, error):
     assert utils.is_full_sun_synoptic_map(dipole_map, error)
 
 
+def test_validation_not_full_map(dipole_map):
+    dipole_map.meta['cdelt1'] = 0.001
+    assert not utils.is_full_sun_synoptic_map(dipole_map)
+    with pytest.raises(ValueError):
+        utils.is_full_sun_synoptic_map(dipole_map, error=True)
+
+
 def test_car_reproject(adapt_map):
     adapt_map = utils.load_adapt(adapt_map)[0]
     adapt_reproj = utils.car_to_cea(adapt_map)
