@@ -11,7 +11,7 @@ and :math:`\log r`.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from pfsspy import Grid
+from pfsspy.grid import Grid
 
 ###############################################################################
 # Define the grid spacings
