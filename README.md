@@ -10,4 +10,4 @@ Potential Field Source Surface model package for Python. This package is based o
 
 Code of conduct
 ---------------
-This is a community package; please follow the [SunPy code of conduct](https://docs.sunpy.org/en/latest/code_of_conduct.html) when interacting with others within the pfsspy community.
+This is a community package, which has adopted the SunPy code of conduct. Please follow the [code of conduct](CODE_OF_CONDUCT.md) when interacting with others within the pfsspy community.
