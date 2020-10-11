@@ -41,6 +41,7 @@ Contents
    pfsspy
    performance
    changes
+   contributing
    numerical_method
    synoptic_fits
 
