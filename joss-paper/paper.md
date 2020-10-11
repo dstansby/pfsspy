@@ -60,7 +60,7 @@ solution, importing various magnetic field data sources, and visualising all of
 this data.
 
 The PFSS code implements a finite difference solver, based on the method of
-`@Ballegooijen2000`. Given an 2D map of the radial magnetic field on the inner
+`@Ballegooijen2000`. Given a 2D map of the radial magnetic field on the inner
 boundary, the magnetic vector potential is calculated on a 3D grid equally
 spaced in $\sin($latitude$)$, longitude, and $\ln($radius$)$. This method is
 tailored in order to achieve $\nabla \times \mathbf{B} = 0$ to machine
