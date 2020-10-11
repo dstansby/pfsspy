@@ -1,6 +1,10 @@
 Contributing to pfsspy
 ======================
 
+pfsspy is a community package, and contributions are welcome from anyone. This
+includes reporting bugs, requesting new features, along with writing code and
+improving documentation.
+
 Reporting Issues
 ^^^^^^^^^^^^^^^^
 
@@ -17,8 +21,16 @@ Requesting new features
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 If there is functionality that is not currently available in pfsspy you can
-make a feature request. Please add as much information as possible regarding
-the new feature you would like to see.
+make a feature request on the `issue`_ page. Please add as much information as
+possible regarding the new feature you would like to see.
+
+
+
+Improving documentaion
+^^^^^^^^^^^^^^^^^^^^^^
+If something doesn't make sense in the online documentation, please open an
+`issue`_. If you're comfortable fixing it, please open a pull request to the
+pfsspy repository.
 
 .. _issue: https://github.com/dstansby/pfsspy/issues
 
