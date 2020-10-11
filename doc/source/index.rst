@@ -5,8 +5,11 @@ modelling, a commonly used magnetic field model of the Sun and other stars.
 
 .. note::
 
-  pfsspy is a very new package, so elements of the API are liable to change with
-  the first few releases.
+  Until pfsspy 1.0 is released, elements of the API are liable to change between
+  versions. A full changelog that lists breaking changes, and how to adapt
+  your code for them can be found at :ref:`changelog`.
+
+.. note::
   If you find any bugs or have any suggestions for improvement, please raise
   an issue here: https://github.com/dstansby/pfsspy/issues
 
