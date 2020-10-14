@@ -180,7 +180,7 @@ def _is_full_sun_cea(m, error=False):
         if error:
             raise ValueError('Number of points in phi direction times '
                              'CDELT1 must be close to 360 degrees. '
-                             f'Instead got {dphi} x {shape[0]} = {phi}')
+                             f'Instead got {dphi} x {shape[1]} = {phi}')
         return False
 
     dtheta = m.meta['cdelt2']

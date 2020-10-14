@@ -30,8 +30,8 @@ def dipole_Br(r, theta):
     return 2 * np.sin(theta) / r**3
 
 
-br = dipole_Br(1, theta).T
-br = sunpy.map.Map(br, pfsspy.carr_cea_wcs_header('2010-01-01', br.shape))
+br = dipole_Br(1, theta)
+br = sunpy.map.Map(br.T, pfsspy.utils.carr_cea_wcs_header('2010-01-01', br.shape))
 pfss_input = pfsspy.Input(br, nr, rss)
 pfss_output = pfsspy.pfss(pfss_input)
 print('Computed PFSS solution')
