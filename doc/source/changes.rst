@@ -3,9 +3,12 @@
 Changelog
 =========
 
+0.6.3
+-----
+This release contains the source for the accepted JOSS paper describing pfsspy.
+
 0.6.2
 -----
-
 This release includes several small fixes in response to a review of pfsspy
 for the Journal of Open Source Software. Thanks to Matthieu Ancellin and
 Simon Birrer for their helpful feedback!
