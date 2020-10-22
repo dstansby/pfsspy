@@ -9,8 +9,8 @@ from sunpy.data import manager
 @manager.require('gong_map',
                  'https://gong2.nso.edu/oQR/zqs/202009/mrzqs200901/'
                  'mrzqs200901t1304c2234_022.fits.gz',
-                 '9272fcb09131a7b0b51c088f61c75a8923b76f32309dd1c'
-                 '5596b484469dfbb79')
+                 'aad927d8f617f32b72255b862c4910f13640fc7ca13edf982'
+                 '88cd0735a2db6a0')
 def get_gong_map():
     """
     Automatically download and unzip a sample GONG synoptic map.
