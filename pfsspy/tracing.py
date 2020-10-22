@@ -96,8 +96,7 @@ class FortranTracer(Tracer):
         except ModuleNotFoundError as e:
             raise RuntimeError(
                 'Using FortranTracer requires the streamtracer module, '
-                'but streamtracer could not be loaded '
-                f'with the following error:\n{e}')
+                'but streamtracer could not be loaded') from e
         self.max_steps = max_steps
         self.step_size = step_size
         self.tracer = StreamTracer(max_steps, step_size)
