@@ -3,6 +3,22 @@
 Changelog
 =========
 
+0.6.2
+-----
+
+This release includes several small fixes in response to a review of pfsspy
+for the Journal of Open Source Software. Thanks to Matthieu Ancellin and
+Simon Birrer for their helpful feedback!
+
+- A permanent code of conduct file has been added to the repository.
+- Information on how to contribute to pfsspy has been added to the docs.
+- The example showing the performance of different magnetic field tracers has
+  been fixed.
+- The docs are now clearer about optional dependencies that can increase
+  performance.
+- The GONG example data has been updated due to updated data on the remote
+  GONG server.
+
 0.6.1
 -----
 
