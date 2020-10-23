@@ -30,17 +30,7 @@ improve code performance. These can be installed with
 
     pip install pfsspy[performance]
 
-Citing
-------
-
-If you use pfsspy in work that results in publication, please cite the archived
-code at *both*
-
-  - https://zenodo.org/record/2566462
-  - https://zenodo.org/record/1472183
-
-Citation details can be found at the lower
-right hand of each web page.
+.. include:: ../../CITING.rst
 
 Contents
 --------
