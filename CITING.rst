@@ -2,7 +2,7 @@ Citing
 ------
 
 If you use pfsspy in work that results in publication, please cite the
-Journal of Open Source Science paper at https://doi.org/10.21105/joss.02732.
+Journal of Open Source Software paper at https://doi.org/10.21105/joss.02732.
 A ready made bibtex entry is
 
 .. code:: bibtex

@@ -3,6 +3,10 @@
 Changelog
 =========
 
+0.6.4
+-----
+This release adds citation information to the documentation.
+
 0.6.3
 -----
 This release contains the source for the accepted JOSS paper describing pfsspy.
