@@ -251,3 +251,22 @@ def car_to_cea(m, method='interp'):
         meta_out[key] = header_out[key]
     m_out = sunpy.map.Map(data_out, header_out)
     return m_out
+
+def get_units(mapobj):
+    return mapobj.meta['cunit1'],mapobj.meta['cunit1']
+def Mm_to_unit(unit):
+    """Convert Megameters to degree or arcsec.
+        1arcsec = 725 km on the Sun. 1 degree= 3600 arcsec
+
+    Args:
+        unit (string): "degree" or "arcsec"
+
+    Returns:
+        (float): Conversion factor FROM Mm TO unit
+    """
+    if unit=='deg':
+        return 1000.0/(725*3600)
+    elif unit=='arcsec':
+        return 1000.0/(725)
+    else:
+        raise ValueError("Units should be degree or arcsec.")
