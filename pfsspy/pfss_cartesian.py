@@ -27,8 +27,9 @@ def fft_pot_open(input):
         dz: Grid spacing in Z, in Mm.
     """
     Bz = input.map
+    latitude = np.cos(np.linspace(Bz.bottom_left_coord.data.lat,Bz.top_right_coord.data.lat,Bz.data.shape[0]))
     print("Removing monopole term...")
-    coeff = fft_pot_decompose_open(Bz.data-np.mean(Bz.data))
+    coeff = fft_pot_decompose_open((Bz.data-np.mean(Bz.data))/latitude.reshape([-1,1]))
     fits_keys = Bz.fits_header
     Z_range = input.gridz
     
