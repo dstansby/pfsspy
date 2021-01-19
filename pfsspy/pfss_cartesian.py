@@ -1,4 +1,5 @@
 import pfss_cartesian_obj as pieck
+from utils import calc_cosine_heliocentric_angle
 """
     Attack on Titan trivia: Pieck-san is the "Cart" titan.
     Get it? Cartesian --> Cart?
@@ -26,11 +27,12 @@ def fft_pot_open(input):
         Z_max: max Z value in Mm. 1arcsec = 725 km on the Sun. 1 degree= 3600 arcsec
         dz: Grid spacing in Z, in Mm.
     """
-    Bz = input.map
-    latitude = np.cos(np.linspace(Bz.bottom_left_coord.data.lat,Bz.top_right_coord.data.lat,Bz.data.shape[0]))
+    Blos = input.map
+    mu = calc_cosine_heliocentric_angle(Blos)
+    #latitude = np.cos(np.linspace(Bz.bottom_left_coord.data.lat,Bz.top_right_coord.data.lat,Bz.data.shape[0]))
     print("Removing monopole term...")
-    coeff = fft_pot_decompose_open((Bz.data-np.mean(Bz.data))/latitude.reshape([-1,1]))
-    fits_keys = Bz.fits_header
+    coeff = fft_pot_decompose_open((Blos.data-np.mean(Blos.data))/mu)
+    fits_keys = Blos.fits_header
     Z_range = input.gridz
     
     kx=2*np.pi*np.fft.fftfreq(coeff.shape[0],d=fits_keys['CDELT2']).reshape([-1,1])
