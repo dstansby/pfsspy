@@ -7,6 +7,9 @@ import numpy as np
 import sunpy.map
 
 
+__all__ = ['GongSynopticMap', 'ADAPTMap']
+
+
 class GongSynopticMap(sunpy.map.GenericMap):
     def __init__(self, data, header, **kwargs):
         # Fix coordinate system stuff
