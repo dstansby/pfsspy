@@ -242,7 +242,9 @@ def car_to_cea(m, method='interp'):
     header_out['CTYPE2'] = header_out['CTYPE2'][:5] + 'CEA'
     header_out['CDELT2'] = 180 / np.pi * 2 / m.data.shape[0]
     wcs_out = WCS(header_out, fix=False)
-    wcs_out.heliographic_observer = m.observer_coordinate
+    # Check if we need to add the heliographic observer (in sunpy <2.1)
+    if hasattr(m.wcs, 'heliographic_observer'):
+        wcs_out.heliographic_observer = m.observer_coordinate
     data_out = reproject(m, wcs_out, shape_out=m.data.shape,
                          return_footprint=False)
 
