@@ -8,6 +8,9 @@ from astropy import units as u
 
 import sunpy.io
 import sunpy.map
+import sunpy.time
+
+import pfsspy.map
 
 
 def fix_hmi_meta(hmi_map):
@@ -15,9 +18,10 @@ def fix_hmi_meta(hmi_map):
     Fix non-compliant FITS metadata in HMI maps.
 
     This function:
-    - Corrects CUNIT2 from 'Sine Latitude' to 'deg'
-    - Corrects CDELT1 and CDELT2 for a CEA projection
-    - Populates the DATE-OBS keyword from the T_OBS keyword
+        - Corrects CUNIT2 from 'Sine Latitude' to 'deg'
+        - Corrects CDELT1 and CDELT2 for a CEA projection
+        - Populates the DATE-OBS keyword from the T_OBS keyword
+        - Sets the observer coordinate to the Earth
 
     Notes
     -----
@@ -43,7 +47,11 @@ def fix_hmi_meta(hmi_map):
         hmi_map.meta['cdelt1'] = np.abs(hmi_map.meta['cdelt1'])
 
     if 'date-obs' not in hmi_map.meta and 't_obs' in hmi_map.meta:
-        hmi_map.meta['date-obs'] = hmi_map.meta['t_obs']
+        hmi_map.meta['date-obs'] = sunpy.time.parse_time(hmi_map.meta['t_obs']).isot
+
+    # Fix observer coordinate
+    if 'hglt_obs' not in hmi_map.meta:
+        hmi_map.meta.update(pfsspy.map._earth_obs_coord_meta(hmi_map.meta['date-obs']))
 
 
 def load_adapt(adapt_path):
