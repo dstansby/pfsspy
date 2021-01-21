@@ -65,10 +65,8 @@ ax.set_title('Input field')
 set_axes_lims(ax)
 
 ###############################################################################
-# Now calculate the PFSS solution, and plot the polarity inversion line.
+# Now calculate the PFSS solution
 output = pfsspy.pfss(input)
-# output.plot_pil(ax)
-
 
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the

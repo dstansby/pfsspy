@@ -23,6 +23,7 @@ site.
 # First import the required modules
 from sunpy.net import Fido, attrs as a
 import sunpy.map
+import pfsspy.utils
 
 ###############################################################################
 # Set up the search.
@@ -57,6 +58,8 @@ print(files)
 
 ###############################################################################
 # Read in a file. This will read in the first file downloaded to a sunpy Map
-# object.
+# object. Note that HMI maps have several bits of metadata that do not comply
+# to the FITS standard, so we need to fix them first.
 hmi_map = sunpy.map.Map(files[0])
+pfsspy.utils.fix_hmi_meta(hmi_map)
 hmi_map.peek()
