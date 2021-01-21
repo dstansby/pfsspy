@@ -3,6 +3,16 @@
 Changelog
 =========
 
+0.6.5
+-----
+This release improves documentation and handling of HMI maps. In particular:
+
+  - The HMI map downloading example has been updated to use the polar filled
+    data product, which does not have any data missing at the poles.
+  - :func:`pfsspy.utils.fix_hmi_meta` has been added to fix metadata issues in
+    HMI maps. This modifies the metadata of a HMI map to make it FITS compliant,
+    allowing it to be used with pfsspy.
+
 0.6.4
 -----
 This release adds citation information to the documentation.
