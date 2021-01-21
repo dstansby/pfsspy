@@ -41,7 +41,8 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y gfortran
-        python -m pip install --upgrade pip ${{ matrix.pip-extras }}
+        python -m pip install --upgrade pip
+        python -m pip install numpy ${{ matrix.pip-extras }}
         python -m pip install .[test]
     - name: Run tests
       run: |
