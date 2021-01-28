@@ -26,8 +26,6 @@ def test_header_generation():
     assert header['LONPOLE'] == 0
     assert header['CTYPE1'] == 'CRLN-CEA'
     assert header['CTYPE2'] == 'CRLT-CEA'
-    assert header['PV1_1'] == 1
-    assert header['PV2_1'] == 1
     assert header['CDELT1'] == 360 / nphi
     np.testing.assert_almost_equal(
         header['CDELT2'], (180 / np.pi) * (2 / ntheta))
@@ -47,9 +45,12 @@ def test_header_generation():
     # Bottom left corner
     corner_coord = m.pixel_to_world(-0.5 * u.pix, -0.5 * u.pix)
     assert u.allclose(corner_coord.lat, -90 * u.deg, **tols)
-    # Top left corner
-    top_coord = m.pixel_to_world(-0.5 * u.pix, 179.5 * u.pix)
+    assert u.allclose(corner_coord.lon, 180 * u.deg, **tols)
+
+    # Top right corner
+    top_coord = m.pixel_to_world(359.5 * u.pix, 179.5 * u.pix)
     assert u.allclose(top_coord.lat, 90 * u.deg, **tols)
+    assert u.allclose(corner_coord.lon, 180 * u.deg, **tols)
 
 
 @pytest.mark.parametrize('error', [True, False])
