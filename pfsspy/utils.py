@@ -116,7 +116,8 @@ def carr_cea_wcs_header(dtime, shape):
         shape, frame_out,
         scale=[360 / shape[0],
                180 / shape[1]] * u.deg / u.pix,
-        reference_pixel=[(shape[0] / 2) - 0.5, (shape[1] / 2) - 0.5] * u.pix,
+        reference_pixel=[(shape[0] / 2) - 0.5,
+                         (shape[1] / 2) - 0.5] * u.pix,
         projection_code="CEA")
 
     # Fill in these missing values
