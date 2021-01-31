@@ -3,6 +3,15 @@
 Changelog
 =========
 
+0.6.6
+-----
+Two bugs have been fixed in `pfsspy.utils.carr_cea_wcs_header`:
+
+  - The reference pixel was previously one pixel too large in both longitude and latitude.
+  - The longitude coordinate was previously erroneously translated by one degree.
+
+Both of these are now fixed.
+
 0.6.5
 -----
 This release improves documentation and handling of HMI maps. In particular:
