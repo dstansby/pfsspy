@@ -108,7 +108,7 @@ class Output:
     @property
     def coordinate_frame(self):
         """
-        The coordinate frame that the PFSS solution is in.
+        Coordinate frame of the input map.
 
         Notes
         -----
@@ -144,7 +144,7 @@ class Output:
     @property
     def source_surface_br(self):
         """
-        Br on the source surface.
+        Radial magnetic field component on the source surface.
 
         Returns
         -------
@@ -167,8 +167,8 @@ class Output:
 
         Notes
         -----
-        This is always returned as a list of coordinates, as in general there
-        may be more than one polarity inversion line.
+        This is always returned as a list of `~astropy.coordinates.SkyCoord`,
+        as in general there may be more than one polarity inversion line.
         """
         from skimage import measure
         m = self.source_surface_br
@@ -238,6 +238,8 @@ class Output:
 
     def trace(self, tracer, seeds):
         """
+        Trace magnetic field lines.
+
         Parameters
         ----------
         tracer : tracing.Tracer
@@ -289,9 +291,9 @@ class Output:
 
         Returns
         -------
-        br
-        btheta
-        bphi
+        br : numpy.ndarray
+        btheta : numpy.ndarray
+        bphi : numpy.ndarray
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Remove area factors:
@@ -450,30 +452,23 @@ class Output:
 
     def get_bvec(self, coords, out_type="spherical"):
         """
-        Evaluate magnetic vectors in pfss model.
-
-        Method which takes an arbitrary astropy SkyCoord and
-        returns a numpy array containing magnetic field vectors
-        evaluated from the parent pfsspy.Output pfss model at
-        the locations specified by the SkyCoords
+        Interpolate magnetic vectors at arbitrary coordinates.
 
         Parameters
         ----------
         coords : `astropy.SkyCoord`
-            An arbitary point or set of points (length N >= 1)
-            in the PFSS model domain (1Rs < r < Rss)
+            An arbitary point or set of points (length N >= 1) in the PFSS
+            model domain (1Rs < r < Rss).
 
         out_type : str, optional
-            Takes values 'spherical' (default) or 'cartesian'
-            and specifies whether the output vector is in
-            spherical coordinates (B_r,B_theta,B_phi) or
-            cartesian (B_x,B_y,B_z)
+            Takes values 'spherical' (default) or 'cartesian' and specifies
+            whether the output vector is in spherical coordinates
+            (B_r, B_theta, B_phi) or cartesian (B_x, B_y, B_z).
 
         Returns
         -------
         bvec : ndarray
-            Magnetic field vectors at the requested locations
-            ndarray.shape = (N,3), units nT)
+            (N, 3) shaped array of magnetic field vectors.
 
         Notes
         -----
