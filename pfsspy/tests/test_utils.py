@@ -1,6 +1,7 @@
 import os
 import numpy as np
 
+import astropy.units as u
 import sunpy.map
 import pytest
 
@@ -17,27 +18,39 @@ def test_load_adapt(adapt_map):
 
 
 def test_header_generation():
-    dtime = None
     ntheta = 180
     nphi = 360
+    dtime = '2001-01-01 00:00:00'
     shape = [nphi, ntheta]
     header = pfsspy.utils.carr_cea_wcs_header(dtime, shape)
     assert header['LONPOLE'] == 0
     assert header['CTYPE1'] == 'CRLN-CEA'
     assert header['CTYPE2'] == 'CRLT-CEA'
-    assert header['PV1_1'] == 1
-    assert header['PV2_1'] == 1
     assert header['CDELT1'] == 360 / nphi
     np.testing.assert_almost_equal(
         header['CDELT2'], (180 / np.pi) * (2 / ntheta))
 
-    # Extra + 1s are for FITS counting from 1 indexing
-    assert header['CRPIX1'] == (nphi / 2) + 0.5 + 1
-    assert header['CRPIX2'] == (ntheta / 2) + 0.5 + 1
+    assert header['CRPIX1'] == (nphi / 2) + 0.5
+    assert header['CRPIX2'] == (ntheta / 2) + 0.5
     assert header['CRVAL1'] == 0
     assert header['CRVAL2'] == 0
     assert header['CUNIT1'] == 'deg'
     assert header['CUNIT2'] == 'deg'
+
+    # Check corner coordinates are as expected
+    data = np.random.rand(*shape)
+    m = sunpy.map.Map(data.T, header)
+
+    tols = {'rtol': 0, 'atol': 0.01*u.deg}
+    # Bottom left corner
+    corner_coord = m.pixel_to_world(-0.5 * u.pix, -0.5 * u.pix)
+    assert u.allclose(corner_coord.lat, -90 * u.deg, **tols)
+    assert u.allclose(corner_coord.lon, 180 * u.deg, **tols)
+
+    # Top right corner
+    top_coord = m.pixel_to_world(359.5 * u.pix, 179.5 * u.pix)
+    assert u.allclose(top_coord.lat, 90 * u.deg, **tols)
+    assert u.allclose(corner_coord.lon, 180 * u.deg, **tols)
 
 
 @pytest.mark.parametrize('error', [True, False])

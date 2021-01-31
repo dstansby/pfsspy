@@ -116,12 +116,10 @@ def carr_cea_wcs_header(dtime, shape):
         shape, frame_out,
         scale=[360 / shape[0],
                180 / shape[1]] * u.deg / u.pix,
-        reference_pixel=[(shape[0] / 2) + 0.5, (shape[1] / 2) + 0.5] * u.pix,
+        reference_pixel=[(shape[0] / 2) - 0.5,
+                         (shape[1] / 2) - 0.5] * u.pix,
         projection_code="CEA")
 
-    # Fill in these missing values
-    header['PV1_1'] = 1
-    header['PV2_1'] = 1
     # Fix CELT for lat axis
     header['CDELT2'] = (180 / np.pi) * (2 / shape[1])
     # pop out the time if it isn't supplied
