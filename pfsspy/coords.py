@@ -11,7 +11,9 @@ __all__ = ['strum2cart', 'cart2strum']
 
 
 @u.quantity_input
-def strum2cart(rho, s, phi: u.rad):
+def strum2cart(rho: u.dimensionless_unscaled,
+               s: u.dimensionless_unscaled,
+               phi: u.rad):
     """
     Convert strumfric coordinates to cartesian coordinates.
     """

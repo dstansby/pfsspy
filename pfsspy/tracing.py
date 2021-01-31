@@ -156,7 +156,10 @@ class FortranTracer(Tracer):
                 'You should probably increase max_steps '
                 f'(currently set to {self.max_steps}) and try again.')
 
-        xs = [np.stack(pfsspy.coords.strum2cart(x[:, 2], x[:, 1], x[:, 0]), axis=-1) for x in xs]
+        xs = [np.stack(pfsspy.coords.strum2cart(
+            x[:, 2] << u.dimensionless_unscaled,
+            x[:, 1] << u.dimensionless_unscaled,
+            x[:, 0] << u.rad), axis=-1) for x in xs]
         flines = [fieldline.FieldLine(x[:, 0], x[:, 1], x[:, 2], output) for x in xs]
         return fieldline.FieldLines(flines)
 
