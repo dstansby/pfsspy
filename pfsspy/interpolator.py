@@ -93,7 +93,7 @@ def _find_indices(xi, grid):
     # compute distance to lower edge in unity units
     norm_distances = []
     # check for out of bounds xi
-    out_of_bounds = np.zeros((xi.shape[1]), dtype=np.bool)
+    out_of_bounds = np.zeros((xi.shape[1]), dtype=bool)
     # iterate through dimensions
     for x, grid in zip(xi, grid):
         i = np.searchsorted(grid, x) - 1
