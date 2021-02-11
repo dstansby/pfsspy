@@ -19,14 +19,19 @@ def test_field_lines(dipole_result, tracer):
 
     seed = coord.SkyCoord(0*u.deg, -45*u.deg, 1.01*const.R_sun, frame=out_frame)
     field_lines = tracer.trace(seed, out)
+
+    solar_feet = field_lines.open_field_lines.solar_feet
+    ss_feet = field_lines.open_field_lines.source_surface_feet
+
     assert isinstance(field_lines[0],
                       pfsspy.fieldline.FieldLine)
-    assert isinstance(field_lines.open_field_lines.solar_feet,
-                      coord.SkyCoord)
-    assert isinstance(field_lines.open_field_lines.source_surface_feet,
-                      coord.SkyCoord)
+    assert isinstance(solar_feet, coord.SkyCoord)
+    assert isinstance(ss_feet, coord.SkyCoord)
     assert isinstance(field_lines.polarities,
                       np.ndarray)
+
+    assert solar_feet.radius == const.R_sun.to(u.m)
+    assert ss_feet.radius == 2.5 * const.R_sun.to(u.m)
 
 
 def test_rot_warning(dipole_result):
