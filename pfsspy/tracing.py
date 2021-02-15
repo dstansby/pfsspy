@@ -156,9 +156,30 @@ class FortranTracer(Tracer):
                 'You should probably increase max_steps '
                 f'(currently set to {self.max_steps}) and try again.')
 
+        rss = output.grid.rss
+        xs = [_clip_fline(x, rss) for x in xs]
         xs = [np.stack(pfsspy.coords.strum2cart(x[:, 2], x[:, 1], x[:, 0]), axis=-1) for x in xs]
         flines = [fieldline.FieldLine(x[:, 0], x[:, 1], x[:, 2], output) for x in xs]
         return fieldline.FieldLines(flines)
+
+
+def _clip_fline(xs, rss):
+    """
+    Clip a field line at the inner and outer boundary.
+    """
+    r0 = np.exp(xs[0, 2])
+    print(r0)
+    if r0 < 1:
+        dr = (0. - r0) / (np.exp(xs[1, 2]) - r0)
+        xs[0, 2] = 0
+        xs[0, 1] += dr * (xs[1, 1] - xs[0, 1])
+        xs[0, 0] += dr * (xs[1, 0] - xs[0, 0])
+    elif r0 > rss:
+        dr = (rss - r0) / (np.exp(xs[1, 2]) - r0)
+        xs[0, 2] = rss
+        xs[0, 1] += dr * (xs[1, 1] - xs[0, 1])
+        xs[0, 0] += dr * (xs[1, 0] - xs[0, 0])
+    return xs
 
 
 class PythonTracer(Tracer):
