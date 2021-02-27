@@ -36,7 +36,8 @@ crot = a.jsoc.PrimeKey('CAR_ROT', 2210)
 # If you use this code, please replace this email address
 # with your own one, registered here:
 # http://jsoc.stanford.edu/ajax/register_email.html
-result = Fido.search(time, series, crot, a.jsoc.Notify("jsoc@cadair.com"))
+result = Fido.search(time, series, crot,
+                     a.jsoc.Notify(os.environ["JSOC_EMAIL"]))
 files = Fido.fetch(result)
 
 ###############################################################################

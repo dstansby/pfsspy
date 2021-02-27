@@ -38,7 +38,7 @@ adapt_fits = sunpy.io.fits.read(adapt_fname)
 # the `~sunpy.map.MapSequence`. We unpack this ``HDPair`` into a list of
 # ``(data,header)`` tuples where ``data`` are the different adapt realizations.
 data_header_pairs = [(map_slice, adapt_fits[0].header)
-				     for map_slice in adapt_fits[0].data]
+					 for map_slice in adapt_fits[0].data]
 
 
 ###############################################################################
@@ -57,6 +57,7 @@ fig = plt.figure(figsize=(7, 8))
 gs = gridspec.GridSpec(4, 3, figure=fig)
 for ii, aMap in enumerate(adaptMapSequence):
 	ax = fig.add_subplot(gs[ii], projection=aMap)
-	aMap.plot(axes=ax, cmap='bwr', vmin=-2, vmax=2, title=f"Realization {1+ii:02d}")
+    aMap.plot(axes=ax, cmap='bwr', vmin=-2, vmax=2, title=f"Realization {1+ii:02d}")
+
 plt.tight_layout(pad=5, h_pad=2)
 plt.show()

@@ -47,7 +47,8 @@ print(result)
 # with your own one, registered here:
 # http://jsoc.stanford.edu/ajax/register_email.html
 crot = a.jsoc.PrimeKey('CAR_ROT', 2210)
-result = Fido.search(time, series, crot, a.jsoc.Notify("jsoc@cadair.com"))
+result = Fido.search(time, series, crot,
+                     a.jsoc.Notify(os.environ['JSOC_EMAIL']))
 print(result)
 
 ###############################################################################
