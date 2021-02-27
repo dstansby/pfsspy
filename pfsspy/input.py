@@ -21,11 +21,9 @@ class Input:
     br : sunpy.map.GenericMap
         Boundary condition of radial magnetic field at the inner surface.
         Note that the data *must* have a cylindrical equal area projection.
-
     nr : int
         Number of cells in the radial direction to calculate the PFSS solution
         on.
-
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
     """
@@ -56,7 +54,7 @@ class Input:
 
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
-        self.grid = Grid(ns, nphi, nr, rss)
+        self._grid = Grid(ns, nphi, nr, rss)
 
     @property
     def map(self):
@@ -64,3 +62,11 @@ class Input:
         :class:`sunpy.map.GenericMap` representation of the input.
         """
         return self._map_in
+
+    @property
+    def grid(self):
+        """
+        `~pfsspy.grid.Grid` that the PFSS solution for this input is
+        calculated on.
+        """
+        return self._grid
