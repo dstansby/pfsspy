@@ -22,8 +22,9 @@ from sphinx_gallery.sorting import ExplicitOrder
 # -- Project information -----------------------------------------------------
 
 project = 'pfsspy'
-copyright = '2018-2020 pfsspy contributors'
+copyright = '2018-2021 pfsspy contributors'
 author = 'pfsspy contributors'
+
 
 # The short X.Y version
 version = ''
@@ -207,3 +208,5 @@ intersphinx_mapping = {'https://docs.python.org/3/': None,
                        'https://streamtracer.readthedocs.io/en/stable': None,
                        'https://docs.scipy.org/doc/scipy/reference': None,
                        'https://reproject.readthedocs.io/en/stable/': None}
+
+nitpicky = True
