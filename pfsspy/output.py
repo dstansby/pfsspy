@@ -292,8 +292,18 @@ class Output:
         Returns
         -------
         br : numpy.ndarray
+            A ``nphi, ns, nrho + 1`` shaped array.
         btheta : numpy.ndarray
+            A ``nphi, ns + 1, nrho`` shaped array.
         bphi : numpy.ndarray
+            A ``nphi + 1, ns, nrho`` shaped array.
+
+        Notes
+        -----
+        The three components are not co-located at the same locations.
+        Component ``n`` is located on cell faces of constant ``n``, e.g.
+        the ``r`` component is located on the cell faces at constant ``r``
+        values.
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Remove area factors:
@@ -320,7 +330,8 @@ class Output:
         numpy.ndarray
             A ``(nphi + 1, ns + 1, nrho + 1, 3)`` shaped array.
             The last index gives the corodinate axis, 0 for Bphi, 1 for Bs, 2
-            for Brho.
+            for Brho. Because the phi dimension is periodic,
+            ``bg[0, :, :] == bg[-1, :, :]``.
         """
         br, bs, bp, Sbr, Sbs, Sbp = self._common_b()
         # Weighted average to grid points:
