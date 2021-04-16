@@ -41,6 +41,7 @@ def test_pfss(gong_map):
     pfss_out = pfsspy.pfss(pfss_in)
 
     br = pfss_out.source_surface_br.data
+    assert br.shape == m.data.shape
     expected = np.loadtxt(test_data / 'br_out.txt')
     # atol is emperically set for tests to pass on CI
     np.testing.assert_allclose(br, expected, atol=1e-13, rtol=0)
@@ -160,6 +161,7 @@ def test_shape(zero_map):
     bg = out.bg
     assert np.all(bg == 0)
     assert bg.shape == (nphi + 1, ns + 1, nr + 1, 3)
+    assert (bg[0, ...] == bg[-1, ...]).all()
 
 
 def test_monopole_warning(dipole_map):
