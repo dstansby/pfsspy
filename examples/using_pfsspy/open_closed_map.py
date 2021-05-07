@@ -7,19 +7,17 @@ Creating an open/closed field map on the solar surface.
 
 ###############################################################################
 # First, import required modules
-import astropy.units as u
 import astropy.constants as const
-from astropy.coordinates import SkyCoord
-import matplotlib.pyplot as plt
+import astropy.units as u
 import matplotlib.colors as mcolor
-
+import matplotlib.pyplot as plt
 import numpy as np
 import sunpy.map
+from astropy.coordinates import SkyCoord
 
 import pfsspy
 from pfsspy import tracing
 from pfsspy.sample_data import get_gong_map
-
 
 ###############################################################################
 # Load a GONG magnetic field map. If 'gong.fits' is present in the current

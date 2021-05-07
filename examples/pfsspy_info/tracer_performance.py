@@ -5,14 +5,13 @@ A quick script to compare the performance of the python and fortran tracers.
 """
 import timeit
 
-import astropy.units as u
 import astropy.coordinates
-import numpy as np
+import astropy.units as u
 import matplotlib.pyplot as plt
+import numpy as np
 import sunpy.map
 
 import pfsspy
-
 
 ###############################################################################
 # Create a dipole map

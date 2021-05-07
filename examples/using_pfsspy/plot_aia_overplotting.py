@@ -8,21 +8,19 @@ overplot the traced field lines on an AIA 193 map.
 
 ###############################################################################
 # First, we import the required modules
-from datetime import datetime
 import os
 
 import astropy.constants as const
 import astropy.units as u
-from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 import numpy as np
-import sunpy.map
 import sunpy.io.fits
+import sunpy.map
+from astropy.coordinates import SkyCoord
 
 import pfsspy
 import pfsspy.tracing as tracing
 from pfsspy.sample_data import get_gong_map
-
 
 ###############################################################################
 # Load a GONG magnetic field map. If 'gong.fits' is present in the current

@@ -10,9 +10,9 @@ projection.
 This example shows how to use the `pfsspy.utils.car_to_cea` function to
 reproject a CAR projection to a CEA projection that pfsspy can take as input.
 """
-from pfsspy import sample_data
-from pfsspy import utils
 import matplotlib.pyplot as plt
+
+from pfsspy import sample_data, utils
 
 ###############################################################################
 # Load a sample ADAPT map, which has a CAR projection

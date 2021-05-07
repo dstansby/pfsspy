@@ -21,8 +21,10 @@ site.
 
 ###############################################################################
 # First import the required modules
-from sunpy.net import Fido, attrs as a
 import sunpy.map
+from sunpy.net import Fido
+from sunpy.net import attrs as a
+
 import pfsspy.utils
 
 ###############################################################################

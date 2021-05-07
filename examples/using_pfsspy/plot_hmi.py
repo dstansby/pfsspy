@@ -15,8 +15,10 @@ There are a couple of important things that this example shows:
 # First import the required modules
 import astropy.units as u
 import matplotlib.pyplot as plt
-from sunpy.net import Fido, attrs as a
 import sunpy.map
+from sunpy.net import Fido
+from sunpy.net import attrs as a
+
 import pfsspy
 import pfsspy.utils
 
