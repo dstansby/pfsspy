@@ -38,13 +38,13 @@ adapt_fits = sunpy.io.fits.read(adapt_fname)
 # the `~sunpy.map.MapSequence`. We unpack this ``HDPair`` into a list of
 # ``(data,header)`` tuples where ``data`` are the different adapt realizations.
 data_header_pairs = [(map_slice, adapt_fits[0].header)
-				     for map_slice in adapt_fits[0].data]
+					 for map_slice in adapt_fits[0].data]
 
 
 ###############################################################################
 # Next, pass this list of tuples as the argument to `sunpy.map.Map` to create
 # the map sequence :
-adaptMapSequence = sunpy.map.Map(data_header_pairs, sequence=True)
+adapt_maps = sunpy.map.Map(data_header_pairs, sequence=True)
 
 ###############################################################################
 # ``adapt_map_sequence`` is now a list of our individual adapt realizations.
@@ -55,8 +55,9 @@ adaptMapSequence = sunpy.map.Map(data_header_pairs, sequence=True)
 # plot accessing the individual maps in turn :
 fig = plt.figure(figsize=(7, 8))
 gs = gridspec.GridSpec(4, 3, figure=fig)
-for ii, aMap in enumerate(adaptMapSequence):
-	ax = fig.add_subplot(gs[ii], projection=aMap)
-	aMap.plot(axes=ax, cmap='bwr', vmin=-2, vmax=2, title=f"Realization {1+ii:02d}")
+for i, a_map in enumerate(adapt_maps):
+	ax = fig.add_subplot(gs[i], projection=a_map)
+    a_map.plot(axes=ax, cmap='bwr', vmin=-2, vmax=2, title=f"Realization {1+i:02d}")
+
 plt.tight_layout(pad=5, h_pad=2)
 plt.show()
