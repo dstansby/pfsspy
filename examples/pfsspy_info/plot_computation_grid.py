@@ -9,8 +9,9 @@ Notice how the spacing becomes larger at the poles, and closer to the source
 surface. This is because the grid is equally spaced in :math:`\cos \theta`
 and :math:`\log r`.
 """
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from pfsspy.grid import Grid
 
 ###############################################################################

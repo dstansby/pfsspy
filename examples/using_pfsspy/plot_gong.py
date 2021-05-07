@@ -9,15 +9,13 @@ Calculating PFSS solution for a GONG synoptic magnetic field map.
 # First, import required modules
 import astropy.constants as const
 import astropy.units as u
-from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import sunpy.map
+from astropy.coordinates import SkyCoord
 
 import pfsspy
-from pfsspy import coords
-from pfsspy import tracing
+from pfsspy import coords, tracing
 from pfsspy.sample_data import get_gong_map
 
 ###############################################################################

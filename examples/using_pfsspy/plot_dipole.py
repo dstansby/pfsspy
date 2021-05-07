@@ -10,15 +10,15 @@ source field.
 # First, import required modules
 import astropy.constants as const
 import astropy.units as u
-from astropy.coordinates import SkyCoord
-from astropy.time import Time
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatch
+import matplotlib.pyplot as plt
 import numpy as np
 import sunpy.map
+from astropy.coordinates import SkyCoord
+from astropy.time import Time
+
 import pfsspy
 import pfsspy.coords as coords
-
 
 ###############################################################################
 # To start with we need to construct an input for the PFSS model. To do this,
