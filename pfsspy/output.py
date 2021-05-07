@@ -443,14 +443,14 @@ class Output:
         br[-1, :, :] = br[1, :, :]
         # js = jp = 0 at photosphere:
         for i in range(nphi + 1):
-            bp[i,:,0] = Sbp[:,0]/dnp[:,0]*(bp[i,:,1]*dnp[:,1]/Sbp[:,1] + br[i,:,0]*dnr[:]/Sbr[:,0] - br[i+1,:,0]*dnr[:]/Sbr[:,0])
+            bp[i, :, 0] = Sbp[:, 0] / dnp[:, 0] * (bp[i, :, 1] * dnp[:, 1] / Sbp[:, 1] + br[i, :, 0] * dnr[:] / Sbr[:, 0] - br[i + 1, :, 0] * dnr[:] / Sbr[:, 0])
         for i in range(nphi + 2):
-            bs[i,:,0] = Sbs[:,0]/dns[:,0]*(bs[i,:,1]*dns[:,1]/Sbs[:,1] + br[i,:-1,0]*dnr[:-1]/Sbr[:-1,0] - br[i,1:,0]*dnr[1:]/Sbr[1:,0])
+            bs[i, :, 0] = Sbs[:, 0] / dns[:, 0] * (bs[i, :, 1] * dns[:, 1] / Sbs[:, 1] + br[i, :-1, 0] * dnr[:-1] / Sbr[:-1, 0] - br[i, 1:, 0] * dnr[1:] / Sbr[1:, 0])
         # - polar boundaries as in dumfric:
         for i in range(nphi + 2):
-            i1 = (i + nphi//2) % nphi
-            br[i,-1,:] = br[i1,-2,:]
-            br[i,0,:] = br[i1,1,:]
+            i1 = (i + nphi // 2) % nphi
+            br[i, -1, :] = br[i1, -2, :]
+            br[i, 0, :] = br[i1, 1, :]
             bs[i, -1, :] = 0.5 * (bs[i, -2, :] - bs[i1, -2, :])
             bs[i, 0, :] = 0.5 * (bs[i, 1, :] - bs[i1, 1, :])
         for i in range(nphi + 1):
@@ -547,7 +547,7 @@ class Output:
                  np.cos(coords.lon).value,
                  np.zeros(len(coords))],
             ])
-            bvecs = np.array([np.dot(M_.T,v) for M_,v in zip(M.T,bvecs)])
+            bvecs = np.array([np.dot(M_.T, v) for M_, v in zip(M.T, bvecs)])
         if self.bunit is not None:
             bvecs *= self.bunit
         return bvecs
