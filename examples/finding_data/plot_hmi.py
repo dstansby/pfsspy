@@ -21,6 +21,7 @@ site.
 
 ###############################################################################
 # First import the required modules
+import os
 import sunpy.map
 from sunpy.net import Fido
 from sunpy.net import attrs as a
@@ -49,7 +50,8 @@ print(result)
 # with your own one, registered here:
 # http://jsoc.stanford.edu/ajax/register_email.html
 crot = a.jsoc.PrimeKey('CAR_ROT', 2210)
-result = Fido.search(time, series, crot, a.jsoc.Notify("jsoc@cadair.com"))
+result = Fido.search(time, series, crot,
+                     a.jsoc.Notify(os.environ['JSOC_EMAIL']))
 print(result)
 
 ###############################################################################

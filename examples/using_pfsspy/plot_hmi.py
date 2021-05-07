@@ -13,6 +13,7 @@ There are a couple of important things that this example shows:
 
 ###############################################################################
 # First import the required modules
+import os
 import astropy.units as u
 import matplotlib.pyplot as plt
 import sunpy.map
@@ -38,7 +39,8 @@ crot = a.jsoc.PrimeKey('CAR_ROT', 2210)
 # If you use this code, please replace this email address
 # with your own one, registered here:
 # http://jsoc.stanford.edu/ajax/register_email.html
-result = Fido.search(time, series, crot, a.jsoc.Notify("jsoc@cadair.com"))
+result = Fido.search(time, series, crot,
+                     a.jsoc.Notify(os.environ["JSOC_EMAIL"]))
 files = Fido.fetch(result)
 
 ###############################################################################
