@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import pathlib
 
 import astropy.constants as const
@@ -24,8 +25,6 @@ matplotlib.use('Agg')
 
 R_sun = const.R_sun
 test_data = pathlib.Path(__file__).parent / 'data'
-
-from datetime import datetime, timedelta
 
 
 def test_pfss(gong_map):
