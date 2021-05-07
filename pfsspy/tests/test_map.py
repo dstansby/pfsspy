@@ -1,4 +1,3 @@
-import os
 
 import astropy.units as u
 import sunpy.map
@@ -6,7 +5,6 @@ import sunpy.map
 import pfsspy.map
 from .example_maps import gong_map, adapt_map
 
-import pytest
 
 
 def test_gong_source(gong_map):

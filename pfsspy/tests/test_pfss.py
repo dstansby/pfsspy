@@ -4,7 +4,6 @@ import astropy.constants as const
 import astropy.coordinates as coord
 import astropy.units as u
 from astropy.tests.helper import quantity_allclose
-from astropy.wcs.wcs import FITSFixedWarning
 
 import pytest
 

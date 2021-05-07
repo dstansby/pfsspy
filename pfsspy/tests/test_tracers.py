@@ -37,4 +37,4 @@ def test_rot_warning(dipole_result):
                           frame=out_frame)
 
     with pytest.warns(UserWarning, match='ran out of steps'):
-        field_lines = tracer.trace(seed, out)
+        tracer.trace(seed, out)
