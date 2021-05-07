@@ -1,8 +1,5 @@
 from pfsspy.fieldline import FieldLine, FieldLines, OpenFieldLines, ClosedFieldLines
 
-import astropy.units as u
-from astropy.time import Time
-from sunpy.coordinates import frames as sunframes
 
 import pytest
 

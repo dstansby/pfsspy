@@ -16,7 +16,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-import sys
 from sphinx_gallery.sorting import ExplicitOrder
 
 # -- Project information -----------------------------------------------------

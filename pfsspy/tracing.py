@@ -29,7 +29,6 @@ class Tracer(abc.ABC):
         streamlines : FieldLines
             Traced field lines.
         """
-        pass
 
     @staticmethod
     def validate_seeds(seeds):
