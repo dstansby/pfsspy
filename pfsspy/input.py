@@ -1,5 +1,3 @@
-import warnings
-
 import numpy as np
 import sunpy.map
 
@@ -11,10 +9,6 @@ class Input:
     r"""
     Input to PFSS modelling.
 
-    .. warning::
-        The input must be on a regularly spaced grid in :math:`\phi` and
-        :math:`s = \cos (\theta)`. See `pfsspy.grid` for more
-        information on the coordinate system.
 
     Parameters
     ----------
@@ -26,6 +20,12 @@ class Input:
         on.
     rss : float
         Radius of the source surface, as a fraction of the solar radius.
+
+    Notes
+    -----
+    The input must be on a regularly spaced grid in :math:`\phi` and
+    :math:`s = \cos (\theta)`. See `pfsspy.grid` for more
+    information on the coordinate system.
     """
     def __init__(self, br, nr, rss):
         if not isinstance(br, sunpy.map.GenericMap):
@@ -34,10 +34,6 @@ class Input:
             raise ValueError('At least one value in the input is NaN or '
                              'non-finite. The input must consist solely of '
                              'finite values.')
-        if np.mean(br.data) > 1e-10:
-            warnings.warn('Input data has a non-zero mean. '
-                          'pfsspy will ignore this non-zero monopole term '
-                          'when calculating the PFSS solution.')
 
         pfsspy.utils.is_cea_map(br, error=True)
         pfsspy.utils.is_full_sun_synoptic_map(br, error=True)
