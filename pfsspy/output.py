@@ -1,8 +1,13 @@
 import functools
 import warnings
 
+import astropy.constants as const
 from astropy.coordinates import SkyCoord
+import astropy.modeling
 import astropy.units as u
+import astropy.wcs
+from gwcs.coordinate_frames import CoordinateFrame
+import gwcs.wcs
 import numpy as np
 import sunpy.map
 
@@ -93,9 +98,54 @@ class Output:
             file, alr=self._alr, als=self._als, alp=self._alp,
             rss=np.array([self.grid.rss]))
 
-    def _wcs_header(self):
+    @property
+    def _wcs(self):
         """
-        Construct a world coordinate system describing the pfsspy solution.
+        Full 3D WCS for the output magnetic field solution.
+        """
+        def pixel_to_world(lon_pix, lat_pix, r_pix):
+            wcs_2d = self._lon_lat_wcs_header()
+            lon, lat = wcs_2d.pixel_to_world_values(lon_pix, lat_pix)
+            rho = r_pix * np.log(self.grid.rss) / self.grid.nr
+            r = np.exp(rho)
+            return lon, lat, r
+
+        pix2world_model = astropy.modeling.custom_model(pixel_to_world)
+        pix2world_model.n_outputs = 3
+        pix2world_model.separable = True
+        pix2world_model.uses_quantity = False
+
+        grid_frame = CoordinateFrame(naxes=3,
+                                     axes_type=['SPATIAL'] * 3,
+                                     axes_order=[0, 1, 2],
+                                     name='grid')
+        sky_frame = CoordinateFrame(naxes=3,
+                                    axes_type=['SPATIAL'] * 3,
+                                    axes_order=[0, 1, 2],
+                                    reference_frame=self.coordinate_frame,
+                                    name=self.coordinate_frame.name,
+                                    unit=[u.deg, u.deg, const.R_sun]
+                                    )
+
+        pipeline = [(grid_frame, pix2world_model()),
+                    (sky_frame, None)]
+
+        wcs = gwcs.wcs.WCS(pipeline)
+        return wcs
+
+    @property
+    def _ndcube(self):
+        from ndcube import NDCube
+        # Just get the radial component for now
+        data = self.bg[..., 2]
+        # Scale to r**2
+        data = data * (10**self.grid.rg)**2
+        return NDCube(data.T, self._wcs)
+
+    def _lon_lat_wcs_header(self):
+        """
+        Construct a world coordinate system describing the longitude/latitude
+        component of the pfsspy solution.
         """
         return self.input_map.wcs
 
@@ -153,7 +203,7 @@ class Output:
         # Get radial component at the top
         br = self.bc[0][:, :, -1]
         # Remove extra ghost cells off the edge of the grid
-        m = sunpy.map.Map((br.T, self._wcs_header()))
+        m = sunpy.map.Map((br.T, self._lon_lat_wcs_header()))
         vlim = np.max(np.abs(br))
         m.plot_settings['cmap'] = _MAG_CMAP
         m.plot_settings['vmin'] = -vlim

@@ -9,6 +9,7 @@ Calculating PFSS solution for a GONG synoptic magnetic field map.
 # First, import required modules
 import astropy.constants as const
 import astropy.units as u
+import matplotlib.colors as mcolor
 import matplotlib.pyplot as plt
 import numpy as np
 import sunpy.map
@@ -65,6 +66,15 @@ set_axes_lims(ax)
 ###############################################################################
 # Now calculate the PFSS solution
 output = pfsspy.pfss(input)
+# output.plot_pil(ax)
+
+cube = output._ndcube
+print(cube.array_axis_physical_types)
+ax = cube.plot(cmap='RdBu', plot_axes=[None, 'y', 'x'], norm=mcolor.SymLogNorm(vmin=-100, vmax=100, linthresh=1, base=10), colorbar=True)
+plt.show()
+
+exit()
+
 
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the
