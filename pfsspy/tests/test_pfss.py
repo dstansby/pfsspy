@@ -8,7 +8,6 @@ from astropy.tests.helper import quantity_allclose
 
 import pytest
 
-import matplotlib
 import numpy as np
 
 import sunpy.map
@@ -20,7 +19,6 @@ import pfsspy.coords
 from pfsspy import tracing
 
 from .example_maps import dipole_map, zero_map, dipole_result, gong_map
-matplotlib.use('Agg')
 
 R_sun = const.R_sun
 test_data = pathlib.Path(__file__).parent / 'data'
