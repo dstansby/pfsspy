@@ -11,10 +11,10 @@ import pfsspy.utils
 import pfsspy.sample_data
 
 from .pfss import pfss
-from .output import Output, load_output
+from .output import Output
 from .input import Input
 
-__all__ = ['Input', 'Output', 'load_output', 'pfss']
+__all__ = ['Input', 'Output', 'pfss']
 
 
 from ._version import get_versions

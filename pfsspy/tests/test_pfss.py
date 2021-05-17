@@ -160,14 +160,6 @@ def test_shape(zero_map):
     assert (bg[0, ...] == bg[-1, ...]).all()
 
 
-def test_input_output(dipole_result):
-    # Smoke test of saving/loading files
-    _, out = dipole_result
-    out.save('test.npz')
-    new_out = pfsspy.load_output('test.npz')
-    assert (new_out._al[0] == out._al[0]).all()
-
-
 def test_wrong_projection_error(dipole_map):
     dipole_map.meta['ctype1'] = 'HGLN-CAR'
     with pytest.raises(ValueError, match='must be CEA'):
