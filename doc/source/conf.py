@@ -16,6 +16,9 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import os
+import sys
+
 from sphinx_gallery.sorting import ExplicitOrder
 
 # -- Project information -----------------------------------------------------
@@ -193,6 +196,8 @@ epub_title = project
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
+
+os.environ["JSOC_EMAIL"] = 'jsoc@cadair.com'
 
 
 # -- Extension configuration -------------------------------------------------
