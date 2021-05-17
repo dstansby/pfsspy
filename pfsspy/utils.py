@@ -6,6 +6,7 @@ import astropy.constants as const
 import astropy.coordinates as coord
 import astropy.time
 from astropy import units as u
+from astropy.wcs import WCS
 
 import sunpy.io
 import sunpy.map
@@ -267,7 +268,7 @@ def car_to_cea(m, method='interp'):
     --------
     :mod:`reproject` for the methods that perform the reprojection.
     """
-    from astropy.wcs import WCS
+    # Add reproject import here to avoid import dependency
     from reproject import reproject_interp, reproject_exact, reproject_adaptive
     methods = {'adaptive': reproject_adaptive,
                'interp': reproject_interp,
@@ -280,19 +281,15 @@ def car_to_cea(m, method='interp'):
     is_full_sun_synoptic_map(m, error=True)
     is_car_map(m, error=True)
 
+    # Create output FITS header
     header_out = m.wcs.to_header()
     header_out['CTYPE1'] = header_out['CTYPE1'][:5] + 'CEA'
     header_out['CTYPE2'] = header_out['CTYPE2'][:5] + 'CEA'
     header_out['CDELT2'] = 180 / np.pi * 2 / m.data.shape[0]
     wcs_out = WCS(header_out, fix=False)
-    # Check if we need to add the heliographic observer (in sunpy <2.1)
-    if hasattr(m.wcs, 'heliographic_observer'):
-        wcs_out.heliographic_observer = m.observer_coordinate
+
+    # Reproject data
     data_out = reproject(m, wcs_out, shape_out=m.data.shape,
                          return_footprint=False)
 
-    meta_out = m.meta.copy()
-    for key in ['CTYPE1', 'CTYPE2', 'CDELT2']:
-        meta_out[key] = header_out[key]
-    m_out = sunpy.map.Map(data_out, header_out)
-    return m_out
+    return sunpy.map.Map(data_out, header_out)
