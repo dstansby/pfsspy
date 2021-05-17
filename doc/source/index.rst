@@ -16,7 +16,7 @@ modelling, a commonly used magnetic field model of the Sun and other stars.
 Installing
 ----------
 
-pfsspy can be installed from PyPi using
+pfsspy requires python >= 3.7, and can be installed from PyPi using
 
 .. code::
 
