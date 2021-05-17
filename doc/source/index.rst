@@ -13,23 +13,6 @@ modelling, a commonly used magnetic field model of the Sun and other stars.
   If you find any bugs or have any suggestions for improvement, please raise
   an issue here: https://github.com/dstansby/pfsspy/issues
 
-Installing
-----------
-
-pfsspy requires python >= 3.7, and can be installed from PyPi using
-
-.. code::
-
-    pip install pfsspy
-
-This will install pfsspy and all of its dependencies. In addition to the core
-dependencies, there are two optional dependencies (numba, streamtracer) that
-improve code performance. These can be installed with
-
-.. code::
-
-    pip install pfsspy[performance]
-
 .. include:: ../../CITING.rst
 
 Contents
@@ -38,6 +21,7 @@ Contents
 .. toctree::
    :maxdepth: 1
 
+   installing
    auto_examples/index
    pfsspy
    performance
