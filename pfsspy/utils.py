@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 
+import astropy.constants as const
 import astropy.coordinates as coord
 import astropy.time
 from astropy import units as u
@@ -109,8 +110,8 @@ def carr_cea_wcs_header(dtime, shape):
     obstime = dtime or astropy.time.Time('2000-1-1')
 
     frame_out = coord.SkyCoord(
-        0 * u.deg, 0 * u.deg, obstime=obstime,
-        frame="heliographic_carrington", observer='sun')
+        0 * u.deg, 0 * u.deg, const.R_sun, obstime=obstime,
+        frame="heliographic_carrington", observer='self')
     # Construct header
     header = sunpy.map.make_fitswcs_header(
         shape, frame_out,
@@ -120,7 +121,7 @@ def carr_cea_wcs_header(dtime, shape):
                          (shape[1] / 2) - 0.5] * u.pix,
         projection_code="CEA")
 
-    # Fix CELT for lat axis
+    # Fix CDELT for lat axis
     header['CDELT2'] = (180 / np.pi) * (2 / shape[1])
     # pop out the time if it isn't supplied
     if dtime is None:

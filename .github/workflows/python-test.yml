@@ -16,20 +16,20 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: linux py36
-            os: ubuntu-20.04
-            python-version: '3.6'
           - name: linux py37
             os: ubuntu-20.04
             python-version: '3.7'
           - name: linux py38
             os: ubuntu-20.04
             python-version: '3.8'
+          - name: linux py39
+            os: ubuntu-20.04
+            python-version: '3.9'
             pip-extras: numba
 
           - name: devdeps
             os: ubuntu-20.04
-            python-version: '3.8'
+            python-version: '3.9'
             pip-extras: git+https://github.com/astropy/astropy git+https://github.com/sunpy/sunpy
 
     steps:
