@@ -293,3 +293,68 @@ def car_to_cea(m, method='interp'):
                          return_footprint=False)
 
     return sunpy.map.Map(data_out, header_out)
+
+def roll_map(m, lh_edge_lon = 0.0, method='interp'):
+    """
+    Roll an input synoptic map so that it's left edge corresponds to a specific
+    Carrington longitude.
+
+    Roll is performed by changing the FITS header parameter "CRVAL1" 
+    to the new value of the reference pixel (FITS header parameter CRPIX1) 
+    corresponding to aligning the left hand edge of the map with 
+    lh_edge_lon. The altered header is provided to reproject to produce 
+    the new map.
+
+    Parameters
+    ----------
+    m : sunpy.map.GenericMap
+        Input map
+    lh_edge_lon : float
+        Desired Carrington longitude (degrees) for left hand edge of map. 
+        Default is 0.0 which results in a map with the edges at 0/360 degrees 
+        Carrington  longitude. Input value must be in the range [0,360]
+    method : str
+        Reprojection method to use. Can be ``'interp'`` (default),
+        ``'exact'``, or ``'adaptive'``. See :mod:`reproject` for a
+        description of the different methods. Note that different methods will
+        give different results, and not all will conserve flux.
+
+    Returns
+    -------
+    output_map : sunpy.map.GenericMap
+        Re-projected map. All metadata is preserved, apart from CRVAL1  which 
+        encodes the longitude of the reference pixel in the image, and which
+        is updated to produce the correct roll.
+
+    See also
+    --------
+    :mod:`reproject` for the methods that perform the reprojection.
+    """
+    # Add reproject import here to avoid import dependency
+    from reproject import reproject_interp, reproject_exact, reproject_adaptive
+    methods = {'adaptive': reproject_adaptive,
+               'interp': reproject_interp,
+               'exact': reproject_exact}
+    if method not in methods:
+        raise ValueError(f'method must be one of {methods.keys()} '
+                         f'(got {method})')
+    if type(lh_edge_lon) not in [float, int] :
+        raise ValueError(f"lh_edge_lon must be type float` or `int`"
+                         f"(got {type(lh_edge_lon)})")
+    if lh_edge_lon > 360.0 or lh_edge_lon < 0.0 :
+        raise ValueError(f"lh_edge_lon must be in the range [0,360])")        
+
+    reproject = methods[method]
+    # Check input map is valid
+    is_full_sun_synoptic_map(m, error=True)
+
+    # Create output FITS header
+    header_out = m.wcs.to_header()
+    header_out['CRVAL1'] = (lh_edge_lon + header_out['CRPIX1']*header_out['CDELT1']) % 360
+    wcs_out = WCS(header_out, fix=False)
+
+    # Reproject data
+    data_out = reproject(m, wcs_out, shape_out=m.data.shape,
+                         return_footprint=False)
+
+    return sunpy.map.Map(data_out, header_out)
