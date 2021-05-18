@@ -6,7 +6,7 @@ import pytest
 
 import pfsspy
 from pfsspy import utils
-from .example_maps import adapt_map, dipole_map
+from .example_maps import adapt_map, dipole_map, gong_map
 
 
 def test_load_adapt(adapt_map):
@@ -78,3 +78,32 @@ def test_car_reproject(adapt_map):
 
     with pytest.raises(ValueError, match='method must be one of'):
         utils.car_to_cea(adapt_map, method='gibberish')
+
+def test_roll_map(gong_map) :
+    gong_map = sunpy.map.Map(gong_map)
+    rolled_map = utils.roll_map(gong_map,lh_edge_lon=0.0)
+
+    # Test ref pixel rolled correctly
+    head_in = gong_map.meta
+    crval_new = (head_in['CRPIX1']*head_in['CDELT1']) % 360
+    assert rolled_map.meta["CRVAL1"] == crval_new
+
+    # Test output map is all finite
+    assert np.all(np.isfinite(rolled_map.data))
+
+    # Test output map is full sun synoptic
+    assert utils.is_full_sun_synoptic_map(rolled_map,error=True)
+
+    # Test reproject method error handling
+    with pytest.raises(ValueError, match='method must be one of'):
+        utils.roll_map(gong_map, method='gibberish')
+
+    # Test left_hand_edge input type validation
+    with pytest.raises(ValueError, 
+                       match='lh_edge_lon must be type'):
+        utils.roll_map(adapt_map, lh_edge_lon='a string')
+
+    # Test left_hand_edge input range validation
+    with pytest.raises(ValueError, 
+                       match='lh_edge_lon must be in'):
+        utils.roll_map(adapt_map, lh_edge_lon=361)
