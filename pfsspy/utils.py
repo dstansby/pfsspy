@@ -352,7 +352,7 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
     # correctly aligned with map LH edge
     header_out['CRVAL1'] = (lh_edge_lon - 0.5*header_out['CDELT1']*u.deg +
                             header_out['CRPIX1']*header_out['CDELT1'] *
-                            u.deg).value % 360
+                            u.deg).to_value(u.deg) % 360
     wcs_out = WCS(header_out, fix=False)
 
     # Reproject data
