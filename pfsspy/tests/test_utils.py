@@ -80,13 +80,15 @@ def test_car_reproject(adapt_map):
         utils.car_to_cea(adapt_map, method='gibberish')
 
 def test_roll_map(gong_map) :
+    lh_edge_test = 0.0*u.deg
     gong_map = sunpy.map.Map(gong_map)
-    rolled_map = utils.roll_map(gong_map,lh_edge_lon=0.0)
+    rolled_map = utils.roll_map(gong_map,
+                                lh_edge_lon=lh_edge_test)
 
     # Test ref pixel rolled correctly
-    head_in = gong_map.meta
-    crval_new = (head_in['CRPIX1']*head_in['CDELT1']) % 360
-    assert rolled_map.meta["CRVAL1"] == crval_new
+    # (-0.5, -0.5) is the bottom-left corner of the bottom-left pixel
+    assert rolled_map.pixel_to_world(-0.5*u.pixel, 
+                                     -0.5*u.pixel).lon == lh_edge_test
 
     # Test output map is all finite
     assert np.all(np.isfinite(rolled_map.data))
@@ -98,12 +100,17 @@ def test_roll_map(gong_map) :
     with pytest.raises(ValueError, match='method must be one of'):
         utils.roll_map(gong_map, method='gibberish')
 
-    # Test left_hand_edge input type validation
-    with pytest.raises(ValueError, 
-                       match='lh_edge_lon must be type'):
-        utils.roll_map(adapt_map, lh_edge_lon='a string')
+    # Test left hand edge input type validation
+    ## 1. No Units
+    with pytest.raises(TypeError, 
+                       match="has no 'unit' attribute"):
+        utils.roll_map(adapt_map, lh_edge_lon=0)
+    ## 2. Incompatible units 
+    with pytest.raises(u.UnitsError, 
+                       match="must be in units convertible to 'deg'"):
+        utils.roll_map(adapt_map, lh_edge_lon=0*u.m)
 
-    # Test left_hand_edge input range validation
+    # Test left hand edge input range validation
     with pytest.raises(ValueError, 
                        match='lh_edge_lon must be in'):
-        utils.roll_map(adapt_map, lh_edge_lon=361)
+        utils.roll_map(adapt_map, lh_edge_lon=361*u.deg)

@@ -294,7 +294,8 @@ def car_to_cea(m, method='interp'):
 
     return sunpy.map.Map(data_out, header_out)
 
-def roll_map(m, lh_edge_lon = 0.0, method='interp'):
+@u.quantity_input
+def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
     """
     Roll an input synoptic map so that it's left edge corresponds to a specific
     Carrington longitude.
@@ -338,10 +339,7 @@ def roll_map(m, lh_edge_lon = 0.0, method='interp'):
     if method not in methods:
         raise ValueError(f'method must be one of {methods.keys()} '
                          f'(got {method})')
-    if type(lh_edge_lon) not in [float, int] :
-        raise ValueError(f"lh_edge_lon must be type float` or `int`"
-                         f"(got {type(lh_edge_lon)})")
-    if lh_edge_lon > 360.0 or lh_edge_lon < 0.0 :
+    if lh_edge_lon > 360.0*u.deg or lh_edge_lon < 0.0*u.deg :
         raise ValueError(f"lh_edge_lon must be in the range [0,360])")        
 
     reproject = methods[method]
@@ -350,7 +348,11 @@ def roll_map(m, lh_edge_lon = 0.0, method='interp'):
 
     # Create output FITS header
     header_out = m.wcs.to_header()
-    header_out['CRVAL1'] = (lh_edge_lon + header_out['CRPIX1']*header_out['CDELT1']) % 360
+    # Note half pixel shift to ensure LH edge leftmost pixel is 
+    # correctly aligned with map LH edge
+    header_out['CRVAL1'] = (lh_edge_lon - 0.5*header_out['CDELT1']*u.deg +
+                            header_out['CRPIX1']*header_out['CDELT1'] *
+                            u.deg).value % 360
     wcs_out = WCS(header_out, fix=False)
 
     # Reproject data
