@@ -1,5 +1,4 @@
-import numpy as np
-from numpy.lib import isin 
+import numpy as np 
 import sunpy 
 
 class CoordObj:
