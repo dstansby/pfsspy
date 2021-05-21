@@ -148,6 +148,11 @@ class FortranTracer(Tracer):
         # Do the tracing
         self.tracer.trace(seeds, vector_grid)
         xs = self.tracer.xs
+
+        # Filter out of bounds points out
+        rho_ss = np.log(output.grid.rss)
+        xs = [x[(x[:, 2] <= rho_ss) & (x[:, 2] > 0), :] for x in xs]
+
         rots = self.tracer.ROT
         if np.any(rots == 1):
             warnings.warn(
