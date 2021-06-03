@@ -78,10 +78,18 @@ class FortranTracer(Tracer):
 
     Parameters
     ----------
-    max_steps: int
+    max_steps: str, int
         Maximum number of steps each streamline can take before stopping.
+        This controls the total amount of memory allocated for all the
+        streamlines.
+
+        If ``'auto'`` (the default) this is set to :math:`2n_{r} / ds`, where
+        :math:`n_{r}` is the number of radial grid points and :math:`ds` is
+        the specified ``step_size``.
+
     step_size : float
-        Step size as a fraction of cell size at the equator.
+        Step size as a fraction of numerical grid cell size at the equator.
+        Must be less than the number of radial coordinate cells.
 
     Notes
     -----
@@ -89,7 +97,7 @@ class FortranTracer(Tracer):
     singularity at the poles (ie. :math:`s = \pm 1`), which means seeds placed
     directly on the poles will not go anywhere.
     """
-    def __init__(self, max_steps=1000, step_size=0.01):
+    def __init__(self, max_steps='auto', step_size=0.5):
         try:
             from streamtracer import StreamTracer
         except ModuleNotFoundError as e:
@@ -98,6 +106,7 @@ class FortranTracer(Tracer):
                 'but streamtracer could not be loaded') from e
         self.max_steps = max_steps
         self.step_size = step_size
+        max_steps = 100 if max_steps == 'auto' else max_steps
         self.tracer = StreamTracer(max_steps, step_size)
 
     @staticmethod
@@ -115,9 +124,12 @@ class FortranTracer(Tracer):
         # phi correction
         with np.errstate(divide='ignore', invalid='ignore'):
             vectors[..., 0] /= sqrtsg
-        # Technically where s=0 Bphi is now infinite, but because this is
-        # singular and Bphi doesn't matter, just set it to a large number
-        vectors[~np.isfinite(vectors[..., 0]), 0] = 0.8e+308
+        # At the poles B_phi is now infinite. Since changes to B_phi at the
+        # poles have little effect on the field line, set to zero to allow for
+        # easy handline in the streamline integrator
+        vectors[:, 0, :, 0] = 0
+        vectors[:, -1, :, 0] = 0
+
         # s correction
         vectors[..., 1] *= -sqrtsg
 
@@ -131,6 +143,9 @@ class FortranTracer(Tracer):
         return vector_grid
 
     def trace(self, seeds, output):
+        if self.max_steps == 'auto':
+            self.tracer.max_steps = int(2 * output.grid.nr / self.step_size)
+
         self.validate_seeds(seeds)
         x, y, z = self.coords_to_xyz(seeds, output)
         r, lat, phi = astrocoords.cartesian_to_spherical(x, y, z)
@@ -146,12 +161,16 @@ class FortranTracer(Tracer):
         vector_grid = self.vector_grid(output)
 
         # Do the tracing
+        #
+        # Normalise step size to the radial cell size, so step size is a
+        # fraction of the radial cell size.
+        self.tracer.ds = self.step_size * output.grid._grid_spacing[2]
         self.tracer.trace(seeds, vector_grid)
         xs = self.tracer.xs
 
         # Filter out of bounds points out
         rho_ss = np.log(output.grid.rss)
-        xs = [x[(x[:, 2] <= rho_ss) & (x[:, 2] > 0), :] for x in xs]
+        xs = [x[(x[:, 2] <= rho_ss) & (x[:, 2] >= 0), :] for x in xs]
 
         rots = self.tracer.ROT
         if np.any(rots == 1):

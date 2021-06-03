@@ -3,6 +3,27 @@
 Changelog
 =========
 
+1.0.0
+-----
+
+New features
+~~~~~~~~~~~~
+
+- The ``max_steps`` argument to `pfsspy.tracers.FortranTracer` now defaults to
+  ``'auto'`` and automatically sets the maximum number of steps to twice the
+  number of steps that are needed to span radially from the solar to source
+  surface. ``max_steps`` can still be manually specified as a number if more
+  or less steps are desired.
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- The interpretation of the ``step_size`` to `pfsspy.tracers.FortranTracer` has been
+  corrected so that it is the step size relative to the radial cell size. A step
+  size of 0.01 specified in pfsspy<1.0 is approximately equivalent to a step size of
+  1 in pfsspy 1.0, so you will need to adjust any custom step sizes accordingly.
+
+
 0.6.6
 -----
 Two bugs have been fixed in `pfsspy.utils.carr_cea_wcs_header`:
