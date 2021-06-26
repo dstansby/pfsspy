@@ -1,11 +1,5 @@
-import pfss_cartesian_obj as pieck
 from utils import ExtentObj,calc_cosine_heliocentric_angle
 import warnings
-"""
-    Attack on Titan trivia: Pieck-san is the "Cart" titan.
-    Get it? Cartesian --> Cart?
-
-"""
 import numpy as np 
 
 def fft_pot_decompose_open(Bz):
@@ -54,24 +48,3 @@ def solve_cartesian(Blos,Zmax,dx,dy,dz,coordinates = None):
     # TODO: Possibly parallelize this loop. 
     B_field=np.asarray([fft_pot_field_plane_open(coeff,kx,ky,k,z_i) for z_i in Z_range]).transpose([1,0,3,2])
     return B_field
-
-def fft_pot_open(input):
-    """
-        Bz: sunpy.map object of Bz at z=0.
-        Z_max: max Z value in Mm. 1arcsec = 725 km on the Sun. 1 degree= 3600 arcsec
-        dz: Grid spacing in Z, in Mm.
-    """
-    Blos = input.map
-    mu = calc_cosine_heliocentric_angle(Blos)
-    #latitude = np.cos(np.linspace(Bz.bottom_left_coord.data.lat,Bz.top_right_coord.data.lat,Bz.data.shape[0]))
-    print("Removing monopole term...")
-    coeff = fft_pot_decompose_open((Blos.data-np.mean(Blos.data))/mu)
-    fits_keys = Blos.fits_header
-    Z_range = input.gridz
-    
-    kx=2*np.pi*np.fft.fftfreq(coeff.shape[0],d=fits_keys['CDELT2']).reshape([-1,1])
-    ky=2*np.pi*np.fft.fftfreq(coeff.shape[1],d=fits_keys['CDELT1']).reshape([1,-1])
-    k=np.sqrt(kx**2+ky**2)
-    k[0,0]=1.0
-    B_field=np.asarray([fft_pot_field_plane_open(coeff,kx,ky,k,z_i) for z_i in Z_range]).transpose([1,0,3,2])
-    return pieck.Output(B_field,input)
