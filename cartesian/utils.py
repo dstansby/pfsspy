@@ -30,7 +30,8 @@ def Mm_to_unit(unit):
         return 1000.0/(725)
     else:
         raise ValueError("Units should be degree or arcsec.")
-def calc_cosine_heliocentric_angle(map_ob):
+
+def calc_mu(x,y):
     """Calculates the heliocentric cosine angle given a map object.
       The cosine value, called "mu" is defined as :
         mu = cos(theta), where
@@ -43,18 +44,37 @@ def calc_cosine_heliocentric_angle(map_ob):
         cos(theta) = sqrt(R**2-x**2-y**2)/R
         
         Reference: arXiv:1307.2410v1 
-
     Args:
-        map_ob (sunpy.map.GenericMap): a sunpy map object
+        x (float): latitude value in arcsec
+        y (float): longitude value in arcsec
+    Returns:
+        mu = sqrt(R**2-x**2-y**2)/R
     """
-    R=1919.0/2
-    if isinstance(map_ob,sunpy.map):
-        latitude = np.linspace(map_ob.bottom_left_coord.data.lat,map_ob.top_right_coord.data.lat,map_ob.data.shape[0]).reshape([-1,1]).value
-        longitude = np.linspace(map_ob.bottom_left_coord.data.lon,map_ob.top_right_coord.data.lon,map_ob.data.shape[1]).reshape([1,-1]).value
+    R=1919.0/2 #In arcsec.
+    mu = np.sqrt(R**2-np.square(x)-np.square(y))/R
+    return mu 
+
+def calc_cosine_heliocentric_angle(map_ob):
+    """Calculates the heliocentric cosine angle given a map object or an ExtentObj.
+
+        Only use this function if the map object is known. If you have an array of 
+        latitudes or longitudes, use the function calc_mu.
+    Args:
+        map_ob (sunpy.map.GenericMap,ExtentObj ): a sunpy map object or ExtentObj
+    """
+    if isinstance(map_ob,sunpy.map.GenericMap):
+        lat_r = map_ob.fits_header['CRVAL1']+map_ob.fits_header['CDELT1']*map_ob.fits_header['NAXIS2']/2
+        lat_l = map_ob.fits_header['CRVAL1']-map_ob.fits_header['CDELT1']*map_ob.fits_header['NAXIS2']/2
+        lon_r = map_ob.fits_header['CRVAL2']+map_ob.fits_header['CDELT2']*map_ob.fits_header['NAXIS1']/2
+        lon_l = map_ob.fits_header['CRVAL2']-map_ob.fits_header['CDELT2']*map_ob.fits_header['NAXIS1']/2
+        latitude = np.linspace(lat_l,lat_r,map_ob.fits_header['NAXIS2']).reshape([-1,1])/0.000277778
+        longitude = np.linspace(lon_l,lon_r,map_ob.fits_header['NAXIS1']).reshape([1,-1])/0.000277778
+        mu = calc_mu(latitude,longitude)
     elif isinstance(map_ob,ExtentObj):
         latitude = np.linspace(map_ob.bottom_left_coord.lat,map_ob.top_right_coord.lat,map_ob.size_lat).reshape([-1,1])
         longitude = np.linspace(map_ob.bottom_left_coord.lon,map_ob.top_right_coord.lon,map_ob.size_lon).reshape([1,-1])
+        mu = calc_mu(latitude,longitude)
     else:
         raise TypeError("Please use either a sunpy map or an ExtenObj instance.")
-    mu = np.sqrt(R**2-np.square(latitude)-np.square(longitude))/R
     return mu 
+
