@@ -50,13 +50,13 @@ def test_fline_step_size(dipole_result):
     flines = tracer.trace(seed, out)
     assert out.grid.nr == 10
     # With a step size of 0.5, this should be ~20
-    assert flines[0].coords.shape[0] == 21
+    assert len(flines[0]) == 21
 
     tracer = tracing.FortranTracer(step_size=0.2)
     flines = tracer.trace(seed, out)
     assert out.grid.nr == 10
     # With a step size of 0.2, this should be ~50
-    assert flines[0].coords.shape[0] == 52
+    assert len(flines[0]) == 52
 
 
 def test_rot_warning(dipole_result):

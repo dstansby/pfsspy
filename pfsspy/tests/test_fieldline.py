@@ -14,6 +14,7 @@ def test_open(x, open, pol):
 
     assert (fline.is_open == open)
     assert (fline.polarity == pol)
+    assert len(fline) == 2
 
     flines = FieldLines([fline])
 

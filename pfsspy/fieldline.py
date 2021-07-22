@@ -134,6 +134,9 @@ class FieldLine:
         # Set _polarity
         self._polarity = -np.sign(self._r[0] - self._r[-1]) * self._is_open
 
+    def __len__(self):
+        return len(self._x)
+
     @property
     def coords(self):
         """
