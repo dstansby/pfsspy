@@ -18,7 +18,7 @@ def test_load_adapt(adapt_map):
 
 def test_header_generation():
     ntheta = 180
-    nphi = 360
+    nphi = 90
     dtime = '2001-01-01 00:00:00'
     shape = [nphi, ntheta]
     header = pfsspy.utils.carr_cea_wcs_header(dtime, shape)
@@ -47,7 +47,7 @@ def test_header_generation():
     assert u.allclose(corner_coord.lon, 180 * u.deg, **tols)
 
     # Top right corner
-    top_coord = m.pixel_to_world(359.5 * u.pix, 179.5 * u.pix)
+    top_coord = m.pixel_to_world(89.5 * u.pix, 179.5 * u.pix)
     assert u.allclose(top_coord.lat, 90 * u.deg, **tols)
     assert u.allclose(corner_coord.lon, 180 * u.deg, **tols)
 
@@ -87,7 +87,7 @@ def test_roll_map(gong_map) :
 
     # Test ref pixel rolled correctly
     # (-0.5, -0.5) is the bottom-left corner of the bottom-left pixel
-    assert rolled_map.pixel_to_world(-0.5*u.pixel, 
+    assert rolled_map.pixel_to_world(-0.5*u.pixel,
                                      -0.5*u.pixel).lon == lh_edge_test
 
     # Test output map is all finite
@@ -102,15 +102,15 @@ def test_roll_map(gong_map) :
 
     # Test left hand edge input type validation
     ## 1. No Units
-    with pytest.raises(TypeError, 
+    with pytest.raises(TypeError,
                        match="has no 'unit' attribute"):
         utils.roll_map(adapt_map, lh_edge_lon=0)
-    ## 2. Incompatible units 
-    with pytest.raises(u.UnitsError, 
+    ## 2. Incompatible units
+    with pytest.raises(u.UnitsError,
                        match="must be in units convertible to 'deg'"):
         utils.roll_map(adapt_map, lh_edge_lon=0*u.m)
 
     # Test left hand edge input range validation
-    with pytest.raises(ValueError, 
+    with pytest.raises(ValueError,
                        match='lh_edge_lon must be in'):
         utils.roll_map(adapt_map, lh_edge_lon=361*u.deg)

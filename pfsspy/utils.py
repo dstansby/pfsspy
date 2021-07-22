@@ -115,7 +115,7 @@ def carr_cea_wcs_header(dtime, shape):
         frame="heliographic_carrington", observer='self')
     # Construct header
     header = sunpy.map.make_fitswcs_header(
-        shape, frame_out,
+        [shape[1], shape[0]], frame_out,
         scale=[360 / shape[0],
                180 / shape[1]] * u.deg / u.pix,
         reference_pixel=[(shape[0] / 2) - 0.5,
@@ -300,10 +300,10 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
     Roll an input synoptic map so that it's left edge corresponds to a specific
     Carrington longitude.
 
-    Roll is performed by changing the FITS header parameter "CRVAL1" 
-    to the new value of the reference pixel (FITS header parameter CRPIX1) 
-    corresponding to aligning the left hand edge of the map with 
-    lh_edge_lon. The altered header is provided to reproject to produce 
+    Roll is performed by changing the FITS header parameter "CRVAL1"
+    to the new value of the reference pixel (FITS header parameter CRPIX1)
+    corresponding to aligning the left hand edge of the map with
+    lh_edge_lon. The altered header is provided to reproject to produce
     the new map.
 
     Parameters
@@ -311,8 +311,8 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
     m : sunpy.map.GenericMap
         Input map
     lh_edge_lon : float
-        Desired Carrington longitude (degrees) for left hand edge of map. 
-        Default is 0.0 which results in a map with the edges at 0/360 degrees 
+        Desired Carrington longitude (degrees) for left hand edge of map.
+        Default is 0.0 which results in a map with the edges at 0/360 degrees
         Carrington  longitude. Input value must be in the range [0,360]
     method : str
         Reprojection method to use. Can be ``'interp'`` (default),
@@ -323,7 +323,7 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
     Returns
     -------
     output_map : sunpy.map.GenericMap
-        Re-projected map. All metadata is preserved, apart from CRVAL1  which 
+        Re-projected map. All metadata is preserved, apart from CRVAL1  which
         encodes the longitude of the reference pixel in the image, and which
         is updated to produce the correct roll.
 
@@ -340,7 +340,7 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
         raise ValueError(f'method must be one of {methods.keys()} '
                          f'(got {method})')
     if lh_edge_lon > 360.0*u.deg or lh_edge_lon < 0.0*u.deg :
-        raise ValueError(f"lh_edge_lon must be in the range [0,360])")        
+        raise ValueError(f"lh_edge_lon must be in the range [0,360])")
 
     reproject = methods[method]
     # Check input map is valid
@@ -348,7 +348,7 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
 
     # Create output FITS header
     header_out = m.wcs.to_header()
-    # Note half pixel shift to ensure LH edge leftmost pixel is 
+    # Note half pixel shift to ensure LH edge leftmost pixel is
     # correctly aligned with map LH edge
     header_out['CRVAL1'] = (lh_edge_lon - 0.5*header_out['CDELT1']*u.deg +
                             header_out['CRPIX1']*header_out['CDELT1'] *
