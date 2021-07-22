@@ -62,8 +62,11 @@ gs = GridSpec(len(ls), len(ls) + 1)
 
 
 for i, l in enumerate(ls):
+    ax0 = fig.add_subplot(gs[i, 0])
+    axs = [fig.add_subplot(gs[i, j], sharey=ax0) for j in range(1, l + 1)]
+    axs = [ax0] + axs
     for j, m in enumerate(list(range(l + 1))):
-        ax = fig.add_subplot(gs[i, j])
+        ax = axs[j]
         nphi = 359
         ns = 179
         rss = 2.5
@@ -75,6 +78,7 @@ for i, l in enumerate(ls):
         ax.plot(br_pfsspy[:, 180], label='pfsspy')
         ax.plot(br_actual[:, 180], label='analytic')
         ax.set_title(f'l={l}, m={m}')
-        ax.legend()
+        if i == 0 and j == 0:
+            ax.legend()
 
 plt.show()
