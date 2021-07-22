@@ -61,13 +61,13 @@ print('New shape: ', hmi_map.data.shape)
 # Now calculate the PFSS solution
 nrho = 35
 rss = 2.5
-input = pfsspy.Input(hmi_map, nrho, rss)
-output = pfsspy.pfss(input)
+pfss_in = pfsspy.Input(hmi_map, nrho, rss)
+pfss_out = pfsspy.pfss(pfss_in)
 
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the
 # polarity inversion line.
-ss_br = output.source_surface_br
+ss_br = pfss_out.source_surface_br
 # Create the figure and axes
 fig = plt.figure()
 ax = plt.subplot(projection=ss_br)
@@ -75,7 +75,7 @@ ax = plt.subplot(projection=ss_br)
 # Plot the source surface map
 ss_br.plot()
 # Plot the polarity inversion line
-ax.plot_coord(output.source_surface_pils[0])
+ax.plot_coord(pfss_out.source_surface_pils[0])
 # Plot formatting
 plt.colorbar()
 ax.set_title('Source surface magnetic field')

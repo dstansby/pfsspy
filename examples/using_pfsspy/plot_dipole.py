@@ -54,11 +54,11 @@ rss = 2.5
 # surface, we now construct an Input object that stores this information
 header = pfsspy.utils.carr_cea_wcs_header(Time('2020-1-1'), br.shape)
 input_map = sunpy.map.Map((br.T, header))
-input = pfsspy.Input(input_map, nrho, rss)
+pfss_in = pfsspy.Input(input_map, nrho, rss)
 
 ###############################################################################
 # Using the Input object, plot the input field
-m = input.map
+m = pfss_in.map
 fig = plt.figure()
 ax = plt.subplot(projection=m)
 m.plot()
@@ -67,12 +67,12 @@ ax.set_title('Input dipole field')
 
 ###############################################################################
 # Now calculate the PFSS solution.
-output = pfsspy.pfss(input)
+pfss_out = pfsspy.pfss(pfss_in)
 
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the
 # polarity inversion line.
-ss_br = output.source_surface_br
+ss_br = pfss_out.source_surface_br
 
 # Create the figure and axes
 fig = plt.figure()
@@ -81,7 +81,7 @@ ax = plt.subplot(projection=ss_br)
 # Plot the source surface map
 ss_br.plot()
 # Plot the polarity inversion line
-ax.plot_coord(output.source_surface_pils[0])
+ax.plot_coord(pfss_out.source_surface_pils[0])
 # Plot formatting
 plt.colorbar()
 ax.set_title('Source surface magnetic field')
@@ -97,10 +97,10 @@ ax.set_aspect('equal')
 r = 1.01 * const.R_sun
 lon = np.pi / 2 * u.rad
 lat = np.linspace(-np.pi / 2, np.pi / 2, 33) * u.rad
-seeds = SkyCoord(lon, lat, r, frame=output.coordinate_frame)
+seeds = SkyCoord(lon, lat, r, frame=pfss_out.coordinate_frame)
 
 tracer = pfsspy.tracing.PythonTracer()
-field_lines = tracer.trace(seeds, output)
+field_lines = tracer.trace(seeds, pfss_out)
 
 for field_line in field_lines:
     coords = field_line.coords
@@ -111,7 +111,7 @@ for field_line in field_lines:
 
 # Add inner and outer boundary circles
 ax.add_patch(mpatch.Circle((0, 0), 1, color='k', fill=False))
-ax.add_patch(mpatch.Circle((0, 0), input.grid.rss, color='k', linestyle='--',
+ax.add_patch(mpatch.Circle((0, 0), pfss_in.grid.rss, color='k', linestyle='--',
                            fill=False))
 ax.set_title('PFSS solution for a dipole source field')
 plt.show()

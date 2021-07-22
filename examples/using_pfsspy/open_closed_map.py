@@ -43,8 +43,8 @@ rss = 2.5
 
 ###############################################################################
 # Construct the input, and calculate the output solution
-input = pfsspy.Input(gong_map, nrho, rss)
-output = pfsspy.pfss(input)
+pfss_in = pfsspy.Input(gong_map, nrho, rss)
+pfss_out = pfsspy.pfss(pfss_in)
 
 
 ###############################################################################
@@ -61,13 +61,13 @@ lon_1d = np.linspace(0, 2 * np.pi, nsteps * 2 + 1)
 lat_1d = np.arcsin(np.linspace(-1, 1, nsteps + 1))
 lon, lat = np.meshgrid(lon_1d, lat_1d, indexing='ij')
 lon, lat = lon*u.rad, lat*u.rad
-seeds = SkyCoord(lon.ravel(), lat.ravel(), r, frame=output.coordinate_frame)
+seeds = SkyCoord(lon.ravel(), lat.ravel(), r, frame=pfss_out.coordinate_frame)
 
 ###############################################################################
 # Trace the field lines
 print('Tracing field lines...')
 tracer = tracing.FortranTracer(max_steps=2000)
-field_lines = tracer.trace(seeds, output)
+field_lines = tracer.trace(seeds, pfss_out)
 print('Finished tracing field lines')
 
 ###############################################################################
@@ -75,7 +75,7 @@ print('Finished tracing field lines')
 # shows a contour map of the the footpoint polarities, which are +/- 1 for open
 # field regions and 0 for closed field regions.
 fig = plt.figure()
-m = input.map
+m = pfss_in.map
 ax = fig.add_subplot(2, 1, 1, projection=m)
 m.plot()
 ax.set_title('Input GONG magnetogram')

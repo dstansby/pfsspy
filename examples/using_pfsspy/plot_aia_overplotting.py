@@ -59,11 +59,11 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an `Input` object that stores this information
-input = pfsspy.Input(gong_map, nrho, rss)
+pfss_in = pfsspy.Input(gong_map, nrho, rss)
 
 ###############################################################################
 # Using the `Input` object, plot the input photospheric magnetic field
-m = input.map
+m = pfss_in.map
 fig = plt.figure()
 ax = plt.subplot(projection=m)
 m.plot()
@@ -101,7 +101,7 @@ seeds = SkyCoord(lon.ravel(), lat.ravel(), 1.01 * const.R_sun,
 ###############################################################################
 # Plot the magnetogram and the seed footpoints The footpoints are centered
 # around the active region metnioned above.
-m = input.map
+m = pfss_in.map
 fig = plt.figure()
 ax = plt.subplot(projection=m)
 m.plot()
@@ -117,17 +117,17 @@ ax.set_ylim(bottom=0)
 
 #######################################################################
 # Compute the PFSS solution from the GONG magnetic field input
-output = pfsspy.pfss(input)
+pfss_out = pfsspy.pfss(pfss_in)
 
 ###############################################################################
 # Trace field lines from the footpoints defined above.
 tracer = tracing.PythonTracer()
-flines = tracer.trace(seeds, output)
+flines = tracer.trace(seeds, pfss_out)
 
 ###############################################################################
 # Plot the input GONG magnetic field map, along with the traced mangetic field
 # lines.
-m = input.map
+m = pfss_in.map
 fig = plt.figure()
 ax = plt.subplot(projection=m)
 m.plot()
