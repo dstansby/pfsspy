@@ -10,3 +10,5 @@ API reference
 .. automodapi:: pfsspy.tracing
 
 .. automodapi:: pfsspy.utils
+
+.. automodapi:: pfsspy.analytic
