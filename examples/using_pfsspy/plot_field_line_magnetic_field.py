@@ -43,8 +43,8 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-input = pfsspy.Input(gong_map, nrho, rss)
-output = pfsspy.pfss(input)
+pfss_in = pfsspy.Input(gong_map, nrho, rss)
+pfss_out = pfsspy.pfss(pfss_in)
 
 ###############################################################################
 # Now take a seed point, and trace a magnetic field line through the PFSS
@@ -55,8 +55,8 @@ r = 1.2 * const.R_sun
 lat = 70 * u.deg
 lon = 0 * u.deg
 
-seeds = SkyCoord(lon, lat, r, frame=output.coordinate_frame)
-field_lines = tracer.trace(seeds, output)
+seeds = SkyCoord(lon, lat, r, frame=pfss_out.coordinate_frame)
+field_lines = tracer.trace(seeds, pfss_out)
 
 ###############################################################################
 # From this field line we can extract the coordinates, and then use

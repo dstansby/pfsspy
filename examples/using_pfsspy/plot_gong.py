@@ -44,7 +44,7 @@ rss = 2.5
 ###############################################################################
 # From the boundary condition, number of radial grid points, and source
 # surface, we now construct an Input object that stores this information
-input = pfsspy.Input(gong_map, nrho, rss)
+pfss_in = pfsspy.Input(gong_map, nrho, rss)
 
 
 def set_axes_lims(ax):
@@ -54,7 +54,7 @@ def set_axes_lims(ax):
 
 ###############################################################################
 # Using the Input object, plot the input field
-m = input.map
+m = pfss_in.map
 fig = plt.figure()
 ax = plt.subplot(projection=m)
 m.plot()
@@ -64,12 +64,12 @@ set_axes_lims(ax)
 
 ###############################################################################
 # Now calculate the PFSS solution
-output = pfsspy.pfss(input)
+pfss_out = pfsspy.pfss(pfss_in)
 
 ###############################################################################
 # Using the Output object we can plot the source surface field, and the
 # polarity inversion line.
-ss_br = output.source_surface_br
+ss_br = pfss_out.source_surface_br
 # Create the figure and axes
 fig = plt.figure()
 ax = plt.subplot(projection=ss_br)
@@ -77,7 +77,7 @@ ax = plt.subplot(projection=ss_br)
 # Plot the source surface map
 ss_br.plot()
 # Plot the polarity inversion line
-ax.plot_coord(output.source_surface_pils[0])
+ax.plot_coord(pfss_out.source_surface_pils[0])
 # Plot formatting
 plt.colorbar()
 ax.set_title('Source surface magnetic field')
@@ -89,11 +89,11 @@ set_axes_lims(ax)
 
 # Get the radial magnetic field at a given height
 ridx = 15
-br = output.bc[0][:, :, ridx]
+br = pfss_out.bc[0][:, :, ridx]
 # Create a sunpy Map object using output WCS
-br = sunpy.map.Map(br.T, output.source_surface_br.wcs)
+br = sunpy.map.Map(br.T, pfss_out.source_surface_br.wcs)
 # Get the radial coordinate
-r = np.exp(output.grid.rc[ridx])
+r = np.exp(pfss_out.grid.rc[ridx])
 
 # Create the figure and axes
 fig = plt.figure()
@@ -121,9 +121,9 @@ lon = np.linspace(0, 2 * np.pi, 8, endpoint=False)
 lat, lon = np.meshgrid(lat, lon, indexing='ij')
 lat, lon = lat.ravel() * u.rad, lon.ravel() * u.rad
 
-seeds = SkyCoord(lon, lat, r, frame=output.coordinate_frame)
+seeds = SkyCoord(lon, lat, r, frame=pfss_out.coordinate_frame)
 
-field_lines = tracer.trace(seeds, output)
+field_lines = tracer.trace(seeds, pfss_out)
 
 for field_line in field_lines:
     color = {0: 'black', -1: 'tab:blue', 1: 'tab:red'}.get(field_line.polarity)
