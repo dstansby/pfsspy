@@ -51,6 +51,20 @@ _extras = {'Ynm': _Ynm, 'cot': _cot}
 def _spherical_harmonic_sympy(l, m):
     """
     Return a complex spherical harmonic with numbers ``l, m``.
+
+    Parameters
+    ----------
+    l, m: int
+        Spherical harmonic numbers.
+
+    Returns
+    -------
+    harm :
+    theta, phi : sympy.core.symbol.Symbol
+
+    See also
+    --------
+    sympy.functions.special.spherical_harmonics.Ynm
     """
     L, M = sympy.symbols('l, m')
     theta, phi = sympy.symbols('theta, phi')
@@ -62,6 +76,20 @@ def _spherical_harmonic_sympy(l, m):
 def _real_spherical_harmonic_sympy(l, m):
     """
     Return a real spherical harmonic.
+
+    Parameters
+    ----------
+    l, m: int
+        Spherical harmonic numbers.
+
+    Returns
+    -------
+    harm :
+    theta, phi : sympy.core.symbol.Symbol
+
+    See also
+    --------
+    sympy.functions.special.spherical_harmonics.Ynm
     """
     sph, theta, phi = _spherical_harmonic_sympy(l, m)
     if m == 0:
@@ -97,11 +125,19 @@ def _d(l, zss):
 
 def Br(l, m, zss):
     """
+    Analytic radial component of magnetic field on the source surface.
+
+    Parameters
+    ----------
+    l, m: int
+        Spherical harmonic numbers.
+    zss: float
+        Source surface radius (as a fraction of the solar radius).
+
     Returns
     -------
     function :
-        ``Br(r, theta, phi)``, which takes coordiantes and returns the radial
-        magnetic field component.
+        Has the signature ``Br(z, theta, phi)``.
     """
     sph, t, p = _real_spherical_harmonic_sympy(l, m)
     sph = sympy.lambdify((t, p), sph, _extras)
@@ -115,11 +151,19 @@ def Br(l, m, zss):
 
 def Btheta(l, m, zss):
     """
+    Analytic theta component of magnetic field on the source surface.
+
+    Parameters
+    ----------
+    l, m: int
+        Spherical harmonic numbers.
+    zss: float
+        Source surface radius (as a fraction of the solar radius).
+
     Returns
     -------
     function :
-        ``Btheta(z, theta, phi)``, which takes coordiantes and returns the
-        radial magnetic field component.
+        Has the signature ``Btheta(z, theta, phi)``.
     """
     sph, t, p = _real_spherical_harmonic_sympy(l, m)
     sph = sympy.diff(sph, t)
@@ -135,11 +179,19 @@ def Btheta(l, m, zss):
 
 def Bphi(l, m, zss):
     """
+    Analytic phi component of magnetic field on the source surface.
+
+    Parameters
+    ----------
+    l, m: int
+        Spherical harmonic numbers.
+    zss: float
+        Source surface radius (as a fraction of the solar radius).
+
     Returns
     -------
     function :
-        ``Btheta(z, theta, phi)``, which takes coordiantes and returns the
-        radial magnetic field component.
+        Has the signature ``Bphi(z, theta, phi)``.
     """
     sph, t, p = _real_spherical_harmonic_sympy(l, m)
     sphi = sympy.diff(sph, p)
