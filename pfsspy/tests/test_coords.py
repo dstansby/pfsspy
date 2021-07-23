@@ -1,5 +1,6 @@
-import pfsspy.coords
 import numpy as np
+
+import pfsspy.coords
 
 
 def test_forward_backwards():

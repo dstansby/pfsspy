@@ -13,7 +13,6 @@ Angular definitions
 
 Using this module requires `sympy` to be installed.
 """
-from functools import partial
 
 import astropy.units as u
 import numpy as np
@@ -194,7 +193,7 @@ def Bphi(l, m, zss):
         Has the signature ``Bphi(z, theta, phi)``.
     """
     sph, t, p = _real_spherical_harmonic_sympy(l, m)
-    sphi = sympy.diff(sph, p)
+    sph = sympy.diff(sph, p)
     sph = sympy.lambdify((t, p), sph, [_extras, 'numpy'])
 
     @u.quantity_input

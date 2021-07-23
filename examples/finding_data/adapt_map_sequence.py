@@ -7,9 +7,9 @@ Parse an ADAPT FITS file into a `sunpy.map.MapSequence`.
 
 ###############################################################################
 # Necessary imports
-import sunpy.map
-import sunpy.io
 import matplotlib.pyplot as plt
+import sunpy.io
+import sunpy.map
 from matplotlib import gridspec
 
 from pfsspy.sample_data import get_adapt_map
@@ -38,7 +38,7 @@ adapt_fits = sunpy.io.fits.read(adapt_fname)
 # the `~sunpy.map.MapSequence`. We unpack this ``HDPair`` into a list of
 # ``(data,header)`` tuples where ``data`` are the different adapt realizations.
 data_header_pairs = [(map_slice, adapt_fits[0].header)
-					 for map_slice in adapt_fits[0].data]
+                     for map_slice in adapt_fits[0].data]
 
 
 ###############################################################################
@@ -56,8 +56,9 @@ adapt_maps = sunpy.map.Map(data_header_pairs, sequence=True)
 fig = plt.figure(figsize=(7, 8))
 gs = gridspec.GridSpec(4, 3, figure=fig)
 for i, a_map in enumerate(adapt_maps):
-	ax = fig.add_subplot(gs[i], projection=a_map)
-    a_map.plot(axes=ax, cmap='bwr', vmin=-2, vmax=2, title=f"Realization {1+i:02d}")
+    ax = fig.add_subplot(gs[i], projection=a_map)
+    a_map.plot(axes=ax, cmap='bwr', vmin=-2, vmax=2,
+               title=f"Realization {1+i:02d}")
 
 plt.tight_layout(pad=5, h_pad=2)
 plt.show()

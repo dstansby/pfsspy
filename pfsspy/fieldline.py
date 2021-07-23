@@ -1,12 +1,11 @@
-import astropy.coordinates as coord
-import astropy.constants as const
-import astropy.units as u
+import functools
 
+import astropy.constants as const
+import astropy.coordinates as coord
+import astropy.units as u
 import numpy as np
 
 from pfsspy import coords
-
-import functools
 
 
 class FieldLines:

@@ -8,6 +8,7 @@ THE CODE HERE IS LIABLE TO CHANGE/BREAK AT ANY TIME. Do not use this code
 outside of pfsspy.
 """
 import itertools
+
 import numpy as np
 
 

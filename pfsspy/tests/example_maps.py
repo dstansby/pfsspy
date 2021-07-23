@@ -1,7 +1,7 @@
-from astropy.time import Time
 import numpy as np
-from sunpy.map import Map
 import pytest
+from astropy.time import Time
+from sunpy.map import Map
 
 import pfsspy
 

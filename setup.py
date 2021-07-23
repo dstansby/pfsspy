@@ -1,5 +1,7 @@
-from setuptools import setup
 import sys
+
+from setuptools import setup
+
 import versioneer
 
 if sys.version_info < (3, 5):

@@ -1,11 +1,10 @@
 """
 Custom `sunpy.map.GenericMap` sub-classes for different magnetogram sources.
 """
-from astropy.time import Time
 import astropy.units as u
 import numpy as np
 import sunpy.map
-
+from astropy.time import Time
 
 __all__ = ['GongSynopticMap', 'ADAPTMap']
 
