@@ -50,7 +50,7 @@ pfss_out = pfsspy.pfss(pfss_in)
 # Now take a seed point, and trace a magnetic field line through the PFSS
 # solution from this point
 
-tracer = tracing.PythonTracer()
+tracer = tracing.FortranTracer()
 r = 1.2 * const.R_sun
 lat = 70 * u.deg
 lon = 0 * u.deg
