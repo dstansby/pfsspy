@@ -1,13 +1,12 @@
 import functools
 import warnings
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
 import numpy as np
 import sunpy.map
+from astropy.coordinates import SkyCoord
 
 import pfsspy.coords
-from pfsspy.grid import Grid
 
 # Default colourmap for magnetic field maps
 _MAG_CMAP = 'RdBu'
@@ -338,7 +337,7 @@ class Output:
         thc = np.zeros(ns + 2) - 1
         thc[1:-1] = np.arccos(sc)
         # Centre of cells in phi (including ghost cells)
-        pc = np.linspace(-0.5 * dp, 2 * np.pi + 0.5 * dp, nphi + 2)
+        np.linspace(-0.5 * dp, 2 * np.pi + 0.5 * dp, nphi + 2)
 
         # Required face normals:
         dnp = np.zeros((ns + 2, 2))

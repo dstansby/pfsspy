@@ -22,6 +22,7 @@ site.
 ###############################################################################
 # First import the required modules
 import os
+
 import sunpy.map
 from sunpy.net import Fido
 from sunpy.net import attrs as a

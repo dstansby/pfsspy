@@ -1,17 +1,14 @@
-from datetime import datetime, timedelta
 import pathlib
+from datetime import timedelta
 
 import astropy.constants as const
 import astropy.coordinates as coord
 import astropy.units as u
-from astropy.tests.helper import quantity_allclose
-
-import pytest
-
 import numpy as np
-
+import pytest
 import sunpy.map
 import sunpy.util.exceptions
+from astropy.tests.helper import quantity_allclose
 from sunpy.coordinates import frames
 
 import pfsspy

@@ -5,7 +5,6 @@ import numpy as np
 
 import pfsspy
 
-
 HAS_NUMBA = False
 try:
     import numba
@@ -99,7 +98,7 @@ def pfss(input):
     dr = input.grid.dr
 
     rg = input.grid.rg
-    rc = input.grid.rc
+    input.grid.rc
 
     sg = input.grid.sg
     sc = input.grid.sc
@@ -162,9 +161,5 @@ def pfss(input):
     alp = np.zeros((nphi, ns + 1, nr + 1))
 
     als, alp = _als_alp(nr, nphi, Fs, psi, Fp, als, alp)
-
-    r = np.exp(rg)
-    th = np.arccos(sg)
-    ph = np.linspace(0, 2 * np.pi, nphi + 1)
 
     return pfsspy.Output(alr, als, alp, input.grid, input.map)

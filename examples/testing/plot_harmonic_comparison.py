@@ -7,18 +7,13 @@ Comparing analytical spherical harmonic solutions to PFSS output.
 
 ###############################################################################
 # First, import required modules
-import astropy.constants as const
 import astropy.units as u
-from astropy.coordinates import SkyCoord
-from astropy.time import Time
-
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
-
 import numpy as np
 import sunpy.map
+from matplotlib.gridspec import GridSpec
+
 import pfsspy
-import pfsspy.coords as coords
 from pfsspy import analytic
 
 

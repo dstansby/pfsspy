@@ -1,8 +1,7 @@
-import numpy as np
-
 import astropy.units as u
-import sunpy.map
+import numpy as np
 import pytest
+import sunpy.map
 
 import pfsspy
 from pfsspy import utils
@@ -79,7 +78,8 @@ def test_car_reproject(adapt_map):
     with pytest.raises(ValueError, match='method must be one of'):
         utils.car_to_cea(adapt_map, method='gibberish')
 
-def test_roll_map(gong_map) :
+
+def test_roll_map(gong_map):
     lh_edge_test = 0.0*u.deg
     gong_map = sunpy.map.Map(gong_map)
     rolled_map = utils.roll_map(gong_map,

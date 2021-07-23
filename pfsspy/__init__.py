@@ -1,23 +1,25 @@
-import astropy
 import distutils.version
+
+import astropy
 
 # Import pfsspy sub-modules to have them available through pfsspy.{name}
 import pfsspy.coords
-import pfsspy.tracing
 import pfsspy.fieldline
 # Import this to register map sources
 import pfsspy.map
-import pfsspy.utils
 import pfsspy.sample_data
+import pfsspy.tracing
+import pfsspy.utils
 
-from .pfss import pfss
-from .output import Output
 from .input import Input
+from .output import Output
+from .pfss import pfss
 
 __all__ = ['Input', 'Output', 'pfss']
 
 
 from ._version import get_versions
+
 __version__ = get_versions()['version']
 del get_versions
 

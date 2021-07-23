@@ -1,16 +1,14 @@
 import os
 
-import numpy as np
-
 import astropy.constants as const
 import astropy.coordinates as coord
 import astropy.time
-from astropy import units as u
-from astropy.wcs import WCS
-
+import numpy as np
 import sunpy.io
 import sunpy.map
 import sunpy.time
+from astropy import units as u
+from astropy.wcs import WCS
 
 import pfsspy.map
 
@@ -269,7 +267,7 @@ def car_to_cea(m, method='interp'):
     :mod:`reproject` for the methods that perform the reprojection.
     """
     # Add reproject import here to avoid import dependency
-    from reproject import reproject_interp, reproject_exact, reproject_adaptive
+    from reproject import reproject_adaptive, reproject_exact, reproject_interp
     methods = {'adaptive': reproject_adaptive,
                'interp': reproject_interp,
                'exact': reproject_exact}
@@ -332,7 +330,7 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
     :mod:`reproject` for the methods that perform the reprojection.
     """
     # Add reproject import here to avoid import dependency
-    from reproject import reproject_interp, reproject_exact, reproject_adaptive
+    from reproject import reproject_adaptive, reproject_exact, reproject_interp
     methods = {'adaptive': reproject_adaptive,
                'interp': reproject_interp,
                'exact': reproject_exact}

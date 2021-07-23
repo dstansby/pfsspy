@@ -1,7 +1,6 @@
 import astropy.units as u
 import numpy as np
 import pytest
-from scipy.special import sph_harm
 
 from pfsspy import analytic
 

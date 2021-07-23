@@ -14,6 +14,7 @@ There are a couple of important things that this example shows:
 ###############################################################################
 # First import the required modules
 import os
+
 import astropy.units as u
 import matplotlib.pyplot as plt
 import sunpy.map

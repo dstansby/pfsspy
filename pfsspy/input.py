@@ -1,8 +1,8 @@
 import numpy as np
 import sunpy.map
 
-from pfsspy.grid import Grid
 import pfsspy.utils
+from pfsspy.grid import Grid
 
 
 class Input:
