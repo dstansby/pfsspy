@@ -97,7 +97,7 @@ def pfss(input):
     dp = input.grid.dp
     dr = input.grid.dr
 
-    rg = input.grid.rg
+    input.grid.rg
     input.grid.rc
 
     sg = input.grid.sg

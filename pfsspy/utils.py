@@ -47,11 +47,13 @@ def fix_hmi_meta(hmi_map):
         hmi_map.meta['cdelt1'] = np.abs(hmi_map.meta['cdelt1'])
 
     if 'date-obs' not in hmi_map.meta and 't_obs' in hmi_map.meta:
-        hmi_map.meta['date-obs'] = sunpy.time.parse_time(hmi_map.meta['t_obs']).isot
+        hmi_map.meta['date-obs'] = sunpy.time.parse_time(
+            hmi_map.meta['t_obs']).isot
 
     # Fix observer coordinate
     if 'hglt_obs' not in hmi_map.meta:
-        hmi_map.meta.update(pfsspy.map._earth_obs_coord_meta(hmi_map.meta['date-obs']))
+        hmi_map.meta.update(pfsspy.map._earth_obs_coord_meta(
+            hmi_map.meta['date-obs']))
 
 
 def load_adapt(adapt_path):
@@ -232,7 +234,8 @@ def _is_full_sun_cea(m, error=False):
             raise ValueError('Number of points in theta direction times '
                              'CDELT2 times pi/2 must be close to '
                              '180 degrees. '
-                             f'Instead got {dtheta} x {shape[0]} * pi/2 = {theta}')
+                             f'Instead got {dtheta} x {shape[0]} * pi/2 '
+                             f'= {theta}')
         return False
     return True
 
@@ -292,8 +295,9 @@ def car_to_cea(m, method='interp'):
 
     return sunpy.map.Map(data_out, header_out)
 
+
 @u.quantity_input
-def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
+def roll_map(m, lh_edge_lon: u.deg = 0.0 * u.deg, method='interp'):
     """
     Roll an input synoptic map so that it's left edge corresponds to a specific
     Carrington longitude.
@@ -337,7 +341,7 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
     if method not in methods:
         raise ValueError(f'method must be one of {methods.keys()} '
                          f'(got {method})')
-    if lh_edge_lon > 360.0*u.deg or lh_edge_lon < 0.0*u.deg :
+    if lh_edge_lon > 360.0 * u.deg or lh_edge_lon < 0.0 * u.deg:
         raise ValueError(f"lh_edge_lon must be in the range [0,360])")
 
     reproject = methods[method]
@@ -348,8 +352,8 @@ def roll_map(m, lh_edge_lon: u.deg = 0.0*u.deg, method='interp'):
     header_out = m.wcs.to_header()
     # Note half pixel shift to ensure LH edge leftmost pixel is
     # correctly aligned with map LH edge
-    header_out['CRVAL1'] = (lh_edge_lon - 0.5*header_out['CDELT1']*u.deg +
-                            header_out['CRPIX1']*header_out['CDELT1'] *
+    header_out['CRVAL1'] = (lh_edge_lon - 0.5 * header_out['CDELT1'] * u.deg +
+                            header_out['CRPIX1'] * header_out['CDELT1'] *
                             u.deg).to_value(u.deg) % 360
     wcs_out = WCS(header_out, fix=False)
 
