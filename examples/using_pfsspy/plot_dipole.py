@@ -99,7 +99,7 @@ lon = np.pi / 2 * u.rad
 lat = np.linspace(-np.pi / 2, np.pi / 2, 33) * u.rad
 seeds = SkyCoord(lon, lat, r, frame=pfss_out.coordinate_frame)
 
-tracer = pfsspy.tracing.PythonTracer()
+tracer = pfsspy.tracing.FortranTracer()
 field_lines = tracer.trace(seeds, pfss_out)
 
 for field_line in field_lines:

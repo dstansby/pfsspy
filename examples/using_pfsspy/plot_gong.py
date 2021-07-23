@@ -114,7 +114,7 @@ set_axes_lims(ax)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-tracer = tracing.PythonTracer()
+tracer = tracing.FortranTracer()
 r = 1.2 * const.R_sun
 lat = np.linspace(-np.pi / 2, np.pi / 2, 8, endpoint=False)
 lon = np.linspace(0, 2 * np.pi, 8, endpoint=False)

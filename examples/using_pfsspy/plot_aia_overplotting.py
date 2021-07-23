@@ -121,7 +121,7 @@ pfss_out = pfsspy.pfss(pfss_in)
 
 ###############################################################################
 # Trace field lines from the footpoints defined above.
-tracer = tracing.PythonTracer()
+tracer = tracing.FortranTracer()
 flines = tracer.trace(seeds, pfss_out)
 
 ###############################################################################
