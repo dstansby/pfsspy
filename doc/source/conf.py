@@ -53,7 +53,7 @@ extensions = [
 napoleon_google_docstring = False
 
 sphinx_gallery_conf = {
-    'ignore_pattern': '*helpers.py',
+    'ignore_pattern': '.*helpers.py',
     'examples_dirs': '../../examples',
     'gallery_dirs': 'auto_examples',
     'subsection_order': ExplicitOrder(['../../examples/using_pfsspy',
