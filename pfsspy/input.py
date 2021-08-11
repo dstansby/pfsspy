@@ -29,7 +29,7 @@ class Input:
     """
     def __init__(self, br, nr, rss):
         if not isinstance(br, sunpy.map.GenericMap):
-            raise ValueError('br must be a SunPy Map')
+            raise ValueError('br must be a sunpy Map')
         if np.any(~np.isfinite(br.data)):
             raise ValueError('At least one value in the input is NaN or '
                              'non-finite. The input must consist solely of '

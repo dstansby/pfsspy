@@ -171,7 +171,7 @@ def test_nan_value(dipole_map):
 
 
 def test_non_map_input():
-    with pytest.raises(ValueError, match='br must be a SunPy Map'):
+    with pytest.raises(ValueError, match='br must be a sunpy Map'):
         pfsspy.Input(np.random.rand(2, 2), 1, 1)
 
 

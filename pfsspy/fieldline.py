@@ -127,10 +127,10 @@ class FieldLine:
         self._z = np.array(z)
         self._r = np.sqrt(self._x**2 + self._y**2 + self._z**2)
         self._output = output
-        # Set _is_open
+        # Field line is open if one end is on the solar surface and one on
+        # the source surface
         atol = 0.1
         self._is_open = np.abs(self._r[0] - self._r[-1]) > atol
-        # Set _polarity
         self._polarity = -np.sign(self._r[0] - self._r[-1]) * self._is_open
 
     def __len__(self):

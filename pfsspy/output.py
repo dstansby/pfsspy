@@ -72,6 +72,9 @@ class Output:
 
     @property
     def dtime(self):
+        """
+        Date and time of the input map.
+        """
         return self.input_map.date
 
     @property
