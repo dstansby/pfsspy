@@ -81,19 +81,21 @@ class Output:
     def bunit(self):
         """
         `~astropy.units.Unit` of the input map data.
+
+        If no metadata is available, returns dimensionless units.
         """
         # Note that this can be removed once pfsspy depends on sunpy>=2.1, see
         # https://github.com/sunpy/sunpy/pull/4451
         unit_str = self.input_map.meta.get('bunit', None)
         if unit_str is None:
-            return
+            return u.dimensionless_unscaled
 
         unit = u.Unit(unit_str, format='fits', parse_strict='silent')
         if isinstance(unit, u.UnrecognizedUnit):
             warnings.warn(f'Could not parse unit string "{unit_str}" as a valid FITS unit.\n'
                           'See https://fits.gsfc.nasa.gov/fits_standard.html '
                           'for the FITS unit standards.')
-            unit = None
+            unit = u.dimensionless_unscaled
         return unit
 
     @property
@@ -106,9 +108,11 @@ class Output:
         :class:`sunpy.map.GenericMap`
         """
         # Get radial component at the top
-        br = self.bc[0][:, :, -1]
+        br = self.bc[0][:, :, -1].to_value(self.bunit)
         # Remove extra ghost cells off the edge of the grid
         m = sunpy.map.Map((br.T, self._wcs_header()))
+        if 'bunit' in self.input_map.meta:
+            m.meta['bunit'] = self.input_map.meta['bunit']
         vlim = np.max(np.abs(br))
         m.plot_settings['cmap'] = _MAG_CMAP
         m.plot_settings['vmin'] = -vlim
@@ -150,7 +154,7 @@ class Output:
         # Because we need the cartesian grid to stretch just beyond r=rss,
         # add an extra dummy layer of magnetic field pointing radially outwards
         rho = np.append(rho, rho[-1] + 0.01)
-        extras = np.ones(br.shape[0:2] + (1, ))
+        extras = np.ones(br.shape[0:2] + (1, )) * self.bunit
         br = np.concatenate((br, extras), axis=2).astype(f32)
         bth = np.concatenate((bth, 0 * extras), axis=2).astype(f32)
         bph = np.concatenate((bph, 0 * extras), axis=2).astype(f32)
@@ -246,12 +250,12 @@ class Output:
 
         Returns
         -------
-        br : numpy.ndarray
-            A ``nphi, ns, nrho + 1`` shaped array.
-        btheta : numpy.ndarray
-            A ``nphi, ns + 1, nrho`` shaped array.
-        bphi : numpy.ndarray
-            A ``nphi + 1, ns, nrho`` shaped array.
+        br : astropy.units.Quantity
+            A ``nphi, ns, nrho + 1`` shaped Quantity.
+        btheta : astropy.units.Quantity
+            A ``nphi, ns + 1, nrho`` shaped Quantity.
+        bphi : astropy.units.Quantity
+            A ``nphi + 1, ns, nrho`` shaped Quantity.
 
         Notes
         -----
@@ -272,7 +276,9 @@ class Output:
             bp[i, :, :] = bp[i, :, :] / Sbp
 
         # Slice to remove ghost cells
-        return br[1:-1, 1:-1, :], -bs[1:-1, :, 1:-1], bp[:, 1:-1, 1:-1]
+        return (br[1:-1, 1:-1, :] * self.bunit,
+                -bs[1:-1, :, 1:-1] * self.bunit,
+                bp[:, 1:-1, 1:-1] * self.bunit)
 
     @property
     @functools.lru_cache(maxsize=1)
@@ -282,8 +288,8 @@ class Output:
 
         Returns
         -------
-        numpy.ndarray
-            A ``(nphi + 1, ns + 1, nrho + 1, 3)`` shaped array.
+        astropy.units.Quantity
+            A ``(nphi + 1, ns + 1, nrho + 1, 3)`` shaped Quantity.
             The last index gives the corodinate axis, 0 for Bphi, 1 for Bs, 2
             for Brho. Because the phi dimension is periodic,
             ``bg[0, :, :] == bg[-1, :, :]``.
@@ -302,7 +308,7 @@ class Output:
         bsg *= -1
         out = np.stack((bpg, bsg, brg), axis=-1)
         out.flags.writeable = False
-        return out
+        return out * self.bunit
 
     @property
     @functools.lru_cache(maxsize=1)
@@ -433,8 +439,8 @@ class Output:
 
         Returns
         -------
-        bvec : ndarray
-            (N, 3) shaped array of magnetic field vectors.
+        bvec : astropy.units.Quantity
+            (N, 3) shaped Quantity of magnetic field vectors.
 
         Notes
         -----
@@ -503,6 +509,4 @@ class Output:
                  np.zeros(len(coords))],
             ])
             bvecs = np.array([np.dot(M_.T, v) for M_, v in zip(M.T, bvecs)])
-        if self.bunit is not None:
-            bvecs *= self.bunit
-        return bvecs
+        return bvecs * self.bunit

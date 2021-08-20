@@ -49,10 +49,10 @@ def test_bunit(gong_map):
 
     pfss_out.input_map.meta['bunit'] = 'notaunit'
     with pytest.warns(UserWarning, match='Could not parse unit string "notaunit"'):
-        assert pfss_out.bunit is None
+        assert pfss_out.bunit == u.dimensionless_unscaled
 
     pfss_out.input_map.meta.pop('bunit')
-    assert pfss_out.bunit is None
+    assert pfss_out.bunit == u.dimensionless_unscaled
 
 
 def test_expansion_factor(dipole_result):
