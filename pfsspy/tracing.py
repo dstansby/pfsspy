@@ -83,7 +83,7 @@ class FortranTracer(Tracer):
         This controls the total amount of memory allocated for all the
         streamlines.
 
-        If ``'auto'`` (the default) this is set to :math:`2n_{r} / ds`, where
+        If ``'auto'`` (the default) this is set to :math:`4n_{r} / ds`, where
         :math:`n_{r}` is the number of radial grid points and :math:`ds` is
         the specified ``step_size``.
 
@@ -97,7 +97,7 @@ class FortranTracer(Tracer):
     singularity at the poles (ie. :math:`s = \pm 1`), which means seeds placed
     directly on the poles will not go anywhere.
     """
-    def __init__(self, max_steps='auto', step_size=0.5):
+    def __init__(self, max_steps='auto', step_size=1):
         try:
             from streamtracer import StreamTracer
         except ModuleNotFoundError as e:
@@ -106,7 +106,8 @@ class FortranTracer(Tracer):
                 'but streamtracer could not be loaded') from e
         self.max_steps = max_steps
         self.step_size = step_size
-        max_steps = 100 if max_steps == 'auto' else max_steps
+        self.max_steps = max_steps
+        max_steps = 1 if max_steps == 'auto' else max_steps
         self.tracer = StreamTracer(max_steps, step_size)
 
     @staticmethod
@@ -144,7 +145,7 @@ class FortranTracer(Tracer):
 
     def trace(self, seeds, output):
         if self.max_steps == 'auto':
-            self.tracer.max_steps = int(2 * output.grid.nr / self.step_size)
+            self.tracer.max_steps = int(4 * output.grid.nr / self.step_size)
 
         self.validate_seeds(seeds)
         x, y, z = self.coords_to_xyz(seeds, output)
