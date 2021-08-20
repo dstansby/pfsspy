@@ -19,7 +19,7 @@ jobs:
           - name: linux py37-mindeps
             os: ubuntu-20.04
             python-version: '3.7'
-            pip-extras: '"sunpy<3.1" "astropy<4.1"'
+            pip-extras: '"sunpy<3.1" "astropy<4.2"'
           - name: linux py38
             os: ubuntu-20.04
             python-version: '3.8'
