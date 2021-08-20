@@ -1,6 +1,10 @@
 r"""
 Analytic inputs and solutions to the PFSS equations.
 
+This sub-module contains functions to generate solutions to the PFSS equations
+in the case where the input field is a single spherical harmonic, specified
+with the spherical harmonic numbers ``l, m``.
+
 All angular quantities must be passed as astropy quantities. All radial
 quantities are passed normalised to the source surface radius, and therefore
 can be passed as normal scalar values.
