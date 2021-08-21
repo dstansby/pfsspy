@@ -46,10 +46,8 @@ files = Fido.fetch(result)
 
 ###############################################################################
 # Read in a file. This will read in the first file downloaded to a sunpy Map
-# object. Note that HMI maps have several bits of metadata that do not comply
-# to the FITS standard, so we need to fix them first.
+# object
 hmi_map = sunpy.map.Map(files[0])
-pfsspy.utils.fix_hmi_meta(hmi_map)
 print('Data shape: ', hmi_map.data.shape)
 
 ###############################################################################

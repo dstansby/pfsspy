@@ -20,21 +20,9 @@ from pfsspy import tracing
 from pfsspy.sample_data import get_gong_map
 
 ###############################################################################
-# Load a GONG magnetic field map. If 'gong.fits' is present in the current
-# directory, just use that, otherwise download a sample GONG map.
+# Load a GONG magnetic field map
 gong_fname = get_gong_map()
-
-###############################################################################
-# We can now use SunPy to load the GONG fits file, and extract the magnetic
-# field data.
-#
-# The mean is subtracted to enforce div(B) = 0 on the solar surface: n.b. it is
-# not obvious this is the correct way to do this, so use the following lines
-# at your own risk!
 gong_map = sunpy.map.Map(gong_fname)
-# Remove the mean
-gong_map = sunpy.map.Map(gong_map.data - np.mean(gong_map.data), gong_map.meta)
-
 
 ###############################################################################
 # Set the model parameters
