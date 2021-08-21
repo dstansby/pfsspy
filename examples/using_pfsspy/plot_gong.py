@@ -19,12 +19,8 @@ from pfsspy import coords, tracing
 from pfsspy.sample_data import get_gong_map
 
 ###############################################################################
-# Load a GONG magnetic field map. If 'gong.fits' is present in the current
-# directory, just use that, otherwise download a sample GONG map.
+# Load a GONG magnetic field map
 gong_fname = get_gong_map()
-
-###############################################################################
-# We can now use SunPy to load the GONG fits file
 gong_map = sunpy.map.Map(gong_fname)
 
 ###############################################################################

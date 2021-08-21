@@ -20,18 +20,9 @@ from pfsspy import tracing
 from pfsspy.sample_data import get_gong_map
 
 ###############################################################################
-# Load a GONG magnetic field map. If 'gong.fits' is present in the current
-# directory, just use that, otherwise download a sample GONG map.
+# Load a GONG magnetic field map
 gong_fname = get_gong_map()
-
-###############################################################################
-# We can now use SunPy to load the GONG fits file, and extract the magnetic
-# field data.
-#
-# The mean is subtracted to remove the monopole component
 gong_map = sunpy.map.Map(gong_fname)
-# Remove the mean
-gong_map = sunpy.map.Map(gong_map.data - np.mean(gong_map.data), gong_map.meta)
 
 ###############################################################################
 # The PFSS solution is calculated on a regular 3D grid in (phi, s, rho), where
