@@ -121,3 +121,7 @@ doc/source/auto_examples/*
 *.fts
 *.fts.gz
 *.pdf
+
+
+#Cartesian
+cartesian/__pycache__/
