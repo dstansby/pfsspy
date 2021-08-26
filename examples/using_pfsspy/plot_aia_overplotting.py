@@ -69,23 +69,19 @@ aia.plot(ax)
 
 ###############################################################################
 # Now we construct a 5 x 5 grid of footpoitns to trace some magnetic field
-# lines from. These coordinates are defined in the native Carrington
-# coordinates of the input magnetogram.
+# lines from. These coordinates are defined in the helioprojective frame of the
+# AIA image
 
-# Create 5 points spaced between sin(lat)={0.35, 0.55}
-s = np.linspace(0.35, 0.55, 5)
-# Create 5 points spaced between long={60, 100} degrees
-phi = np.linspace(60, 100, 5)
-print(f's = {s}')
-print(f'phi = {phi}')
+hp_lon = np.linspace(-250, 250, 5) * u.arcsec
+hp_lat = np.linspace(250, 500, 5) * u.arcsec
 # Make a 2D grid from these 1D points
-s, phi = np.meshgrid(s, phi)
-
-# Now convert the points to a coordinate object
-lat = np.arcsin(s) * u.rad
-lon = phi * u.deg
-seeds = SkyCoord(lon.ravel(), lat.ravel(), 1.01 * const.R_sun,
-                 frame=gong_map.coordinate_frame)
+lon, lat = np.meshgrid(hp_lon, hp_lat)
+seeds = SkyCoord(lon.ravel(), lat.ravel(),
+                 frame=aia.coordinate_frame)
+fig = plt.figure()
+ax = plt.subplot(projection=aia)
+aia.plot(axes=ax)
+ax.plot_coord(seeds, color='white', marker='o', linewidth=0)
 
 ###############################################################################
 # Plot the magnetogram and the seed footpoints The footpoints are centered
