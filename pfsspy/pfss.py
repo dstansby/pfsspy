@@ -26,7 +26,7 @@ def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir):
             continue
         # - sum (c_{lm} + d_{lm}) * lam_{l}
         # lam[l] is small so this blows up
-        cdlm = np.dot(Q[:, l], brt[:, m]) / lam[l]
+        cdlm = np.dot(Q[:, l], np.asfortranarray(brt[:, m])) / lam[l]
         # - ratio c_{lm}/d_{lm} [numerically safer this way up]
         ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
         dlm = cdlm / (1.0 + ratio)
