@@ -41,8 +41,8 @@ class Input:
         pfsspy.utils.is_full_sun_synoptic_map(br, error=True)
 
         self.map = br
-        self.dtime = br.date
-        self.br = br.data
+        self.dtime = self.map.date
+        self.br = self.map.data
 
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
