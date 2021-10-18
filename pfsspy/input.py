@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import sunpy.map
 
@@ -38,9 +40,9 @@ class Input:
         pfsspy.utils.is_cea_map(br, error=True)
         pfsspy.utils.is_full_sun_synoptic_map(br, error=True)
 
-        self._map_in = br
-        self.dtime = br.date
-        self.br = br.data
+        self._map_in = copy.deepcopy(br)
+        self.dtime = self.map.date
+        self.br = self.map.data
 
         # Force some nice defaults
         self._map_in.plot_settings['cmap'] = 'RdBu'

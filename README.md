@@ -1,4 +1,4 @@
-![pfsspy](https://github.com/dstansby/pfsspy/raw/master/logo/logo_rectangle.png "pfsspy")
+![pfsspy](logo/logo_rectangle.png "pfsspy")
 
 [![DOI](https://zenodo.org/badge/163663713.svg)](https://zenodo.org/badge/latestdoi/163663713)
 [![Documentation Status](https://readthedocs.org/projects/pfsspy/badge/?version=stable)](https://pfsspy.readthedocs.io/en/stable/?badge=stable)
