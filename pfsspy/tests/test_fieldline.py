@@ -1,7 +1,11 @@
 import pytest
 
-from pfsspy.fieldline import (ClosedFieldLines, FieldLine, FieldLines,
-                              OpenFieldLines)
+from pfsspy.fieldline import (
+    ClosedFieldLines,
+    FieldLine,
+    FieldLines,
+    OpenFieldLines,
+)
 
 
 @pytest.mark.parametrize('x, open, pol',

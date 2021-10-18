@@ -3,8 +3,7 @@ import astropy.units as u
 import sunpy.map
 
 import pfsspy.map
-from .example_maps import gong_map, adapt_map
-
+from .example_maps import adapt_map, gong_map  # NoQA
 
 
 def test_gong_source(gong_map):

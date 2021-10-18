@@ -121,3 +121,4 @@ doc/source/auto_examples/*
 *.fts
 *.fts.gz
 *.pdf
+*.hdf

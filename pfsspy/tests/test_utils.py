@@ -5,7 +5,7 @@ import sunpy.map
 
 import pfsspy
 from pfsspy import utils
-from .example_maps import adapt_map, dipole_map, gong_map
+from .example_maps import adapt_map, dipole_map, gong_map  # NoQA
 
 
 def test_load_adapt(adapt_map):
