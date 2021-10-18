@@ -40,9 +40,15 @@ class Input:
         pfsspy.utils.is_cea_map(br, error=True)
         pfsspy.utils.is_full_sun_synoptic_map(br, error=True)
 
-        self.map = br
+        self._map_in = copy.deepcopy(br)
         self.dtime = self.map.date
         self.br = self.map.data
+
+        # Force some nice defaults
+        self._map_in.plot_settings['cmap'] = 'RdBu'
+        lim = np.nanmax(np.abs(self._map_in.data))
+        self._map_in.plot_settings['vmin'] = -lim
+        self._map_in.plot_settings['vmax'] = lim
 
         ns = self.br.shape[0]
         nphi = self.br.shape[1]
@@ -54,15 +60,6 @@ class Input:
         :class:`sunpy.map.GenericMap` representation of the input.
         """
         return self._map_in
-
-    @map.setter
-    def map(self, value):
-        self._map_in = copy.deepcopy(value)
-        # Force some nice defaults
-        self._map_in.plot_settings['cmap'] = 'RdBu'
-        lim = np.nanmax(np.abs(self._map_in.data))
-        self._map_in.plot_settings['vmin'] = -lim
-        self._map_in.plot_settings['vmax'] = lim
 
     @property
     def grid(self):

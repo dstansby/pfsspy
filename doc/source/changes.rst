@@ -31,6 +31,7 @@ Bug fixes
   >= 2.0.
 - GONG synoptic maps now automatically have their observer information corrected
   (by assuming an Earth observer) when loaded by `sunpy.map.Map`.
+- The plot settings of input maps are no longer modified in place.
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
