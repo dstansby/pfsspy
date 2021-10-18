@@ -5,7 +5,8 @@ How to search for HMI data.
 
 This example shows how to search for, download, and load HMI data, using the
 `sunpy.net.Fido` interface. HMI data is available via. the Joint Stanford
-Operations Center (`JSOC`_).
+Operations Center (`JSOC`_). Similar code can be used to download MDI data
+by changing the JSOC series below.
 
 The polar filled radial magnetic field synoptic maps
 are obtained using the 'hmi.synoptic_mr_polfil_720s' series keyword. Note that
@@ -31,17 +32,12 @@ import pfsspy.utils
 
 ###############################################################################
 # Set up the search.
-#
-# Note that for SunPy versions earlier than 2.0, a time attribute is needed to
-# do the search, even if (in this case) it isn't used, as the synoptic maps are
-# labelled by Carrington rotation number instead of time
-time = a.Time('2010/01/01', '2010/01/01')
 series = a.jsoc.Series('hmi.synoptic_mr_polfil_720s')
 
 ###############################################################################
 # Do the search. This will return all the maps in the 'hmi_mrsynop_small_720s
 # series.'
-result = Fido.search(time, series)
+result = Fido.search(series)
 print(result)
 
 ###############################################################################
@@ -51,7 +47,7 @@ print(result)
 # with your own one, registered here:
 # http://jsoc.stanford.edu/ajax/register_email.html
 crot = a.jsoc.PrimeKey('CAR_ROT', 2210)
-result = Fido.search(time, series, crot,
+result = Fido.search(series, crot,
                      a.jsoc.Notify(os.environ['JSOC_EMAIL']))
 print(result)
 
