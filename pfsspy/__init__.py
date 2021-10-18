@@ -10,7 +10,6 @@ import pfsspy.map
 import pfsspy.sample_data
 import pfsspy.tracing
 import pfsspy.utils
-
 from .input import Input
 from .output import Output
 from .pfss import pfss

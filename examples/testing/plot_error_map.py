@@ -7,16 +7,16 @@ Analytic dipole field lines
 # First, import required modules
 import astropy.constants as const
 import astropy.units as u
-from astropy.coordinates import SkyCoord
-from astropy.visualization import quantity_support
-
-quantity_support()
-
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.coordinates import SkyCoord
+from astropy.visualization import quantity_support
 from helpers import pffspy_output, phi_fline_coords, theta_fline_coords
 
 from pfsspy import tracing
+
+quantity_support()
+
 
 ###############################################################################
 # Compare the the pfsspy solution to the analytic solutions. Cuts are taken

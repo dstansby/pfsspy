@@ -20,10 +20,13 @@ from helpers import brss_pfsspy
 
 from pfsspy import analytic
 
+
 def open_flux_analytic(l, m, zss):
     Br = analytic.Br(l, m, zss)
     Br = functools.partial(Br, zss)
-    absBr = lambda theta, phi: np.abs(Br(theta * u.rad, phi *u.rad)) * np.sin(theta)
+
+    def absBr(theta, phi):
+        return np.abs(Br(theta * u.rad, phi * u.rad)) * np.sin(theta)
     res = scipy.integrate.nquad(absBr, ranges=[[0, np.pi], [0, 2 * np.pi]])
     return res[0]
 

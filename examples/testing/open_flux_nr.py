@@ -23,7 +23,10 @@ from pfsspy import analytic
 def open_flux_analytic(l, m, zss):
     Br = analytic.Br(l, m, zss)
     Br = functools.partial(Br, zss)
-    absBr = lambda theta, phi: np.abs(Br(theta * u.rad, phi *u.rad)) * np.sin(theta)
+
+    def absBr(theta, phi):
+        return np.abs(Br(theta * u.rad, phi * u.rad)) * np.sin(theta)
+
     res = scipy.integrate.nquad(absBr, ranges=[[0, np.pi], [0, 2 * np.pi]])
     return res[0]
 
@@ -33,6 +36,7 @@ def open_flux_numeric(l, m, zss, nrho):
     ns = 180
     br = brss_pfsspy(nphi, ns, nrho, zss, l, m)
     return np.sum(np.abs(br)) * (4 * np.pi) / nphi / ns
+
 
 ###############################################################################
 # Set the source surface height, and the (l, m) values to investigate
@@ -77,5 +81,5 @@ ax.set_ylim(1)
 ax.set_xlim(8)
 ax.yaxis.grid(linestyle='--')
 ax.set_xlabel('$n_{r}$')
-ax.set_ylabel('$\Phi_{pfsspy} / \Phi_{analytic}$')
+ax.set_ylabel(r'$\Phi_{pfsspy} / \Phi_{analytic}$')
 plt.show()
