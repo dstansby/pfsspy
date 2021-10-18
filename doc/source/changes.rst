@@ -6,23 +6,51 @@ Changelog
 1.0.0
 -----
 
+New requirements
+~~~~~~~~~~~~~~~~
+pfsspy now depends on python >= 3.7, and now does *not* depend on Matplotlib.
+
 New features
 ~~~~~~~~~~~~
-
 - The ``max_steps`` argument to `pfsspy.tracers.FortranTracer` now defaults to
-  ``'auto'`` and automatically sets the maximum number of steps to twice the
+  ``'auto'`` and automatically sets the maximum number of steps to four times the
   number of steps that are needed to span radially from the solar to source
   surface. ``max_steps`` can still be manually specified as a number if more
   or less steps are desired.
+- `~pfsspy.fieldline.FieldLines` now has a ``__len__`` method, meaning one
+  can now do ``n_field_lines = len(my_field_lines)``.
+- Added :func:`pfsspy.utils.roll_map` to roll a map in the longitude direction.
+  This is particularly helpful to modify GONG maps so they have a common
+  longitude axis.
+- Added the `pfsspy.analytic` sub-module that provides functions to sample
+  analytic solutions to the PFSS equations.
+
+Bug fixes
+~~~~~~~~~
+- :func:`pfsspy.utils.carr_cea_wcs_header` now works with versions of sunpy
+  >= 2.0.
+- GONG synoptic maps now automatically have their observer information corrected
+  (by assuming an Earth observer) when loaded by `sunpy.map.Map`.
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
+- The interpretation of the ``step_size`` to `pfsspy.tracers.FortranTracer` has
+  been corrected so that it is the step size relative to the radial cell size.
+  A step size of 0.01 specified in pfsspy<1.0 is approximately equivalent to a
+  step size of 1 in pfsspy 1.0, so you will need to adjust any custom step
+  sizes accordingly.
+- Any points on field lines that are out of bounds (ie. below the solar surface
+  or above the source surface) are now removed by the
+  `~pfsspy.tracing.FortranTracer`.
+- :func:`pfsspy.pfss` no longer warns if the mean of the input data is non-zero,
+  and silently ignores the monopole component.
 
-- The interpretation of the ``step_size`` to `pfsspy.tracers.FortranTracer` has been
-  corrected so that it is the step size relative to the radial cell size. A step
-  size of 0.01 specified in pfsspy<1.0 is approximately equivalent to a step size of
-  1 in pfsspy 1.0, so you will need to adjust any custom step sizes accordingly.
-
+Removals
+~~~~~~~~
+- Saving and load PFSS solutions is no longer possible. This was poorly tested,
+  and possibly broken. If you have interest in saving and loading being added
+  as a new feature to pfsspy, please open a new issue at
+  https://github.com/dstansby/pfsspy/issues.
 
 0.6.6
 -----
