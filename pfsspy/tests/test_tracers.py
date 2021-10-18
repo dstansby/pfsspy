@@ -6,8 +6,7 @@ import pytest
 
 import pfsspy
 from pfsspy import tracing
-
-from .example_maps import dipole_map, dipole_result
+from .example_maps import dipole_map, dipole_result  # NoQA
 
 
 @pytest.fixture(params=[tracing.PythonTracer(),

@@ -10,7 +10,6 @@ overplot the traced field lines on an AIA 193 map.
 # First, we import the required modules
 import os
 
-import astropy.constants as const
 import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
