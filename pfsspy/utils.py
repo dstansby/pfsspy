@@ -197,7 +197,7 @@ def _is_full_sun_car(m, error=False):
 
     dphi = m.meta['cdelt1']
     phi = shape[1] * dphi
-    if not np.allclose(phi, 360, atol=0.1):
+    if not np.allclose(np.abs(phi), 360, atol=0.1):
         if error:
             raise ValueError('Number of points in phi direction times '
                              'CDELT1 must be close to 360 degrees. '
@@ -220,7 +220,7 @@ def _is_full_sun_cea(m, error=False):
 
     dphi = m.meta['cdelt1']
     phi = shape[1] * dphi
-    if not np.allclose(phi, 360, atol=0.1):
+    if not np.allclose(np.abs(phi), 360, atol=0.1):
         if error:
             raise ValueError('Number of points in phi direction times '
                              'CDELT1 must be close to 360 degrees. '
