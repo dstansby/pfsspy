@@ -195,18 +195,18 @@ def is_full_sun_synoptic_map(m, error=False):
 def _is_full_sun_car(m, error=False):
     shape = m.data.shape
 
-    dphi = m.meta['cdelt1']
-    phi = shape[1] * dphi
-    if not np.allclose(np.abs(phi), 360, atol=0.1):
+    dphi = m.scale.axis1
+    phi = shape[1] * u.pix * dphi
+    if not np.allclose(np.abs(phi), 360 * u.deg, atol=0.1 * u.deg):
         if error:
             raise ValueError('Number of points in phi direction times '
                              'CDELT1 must be close to 360 degrees. '
                              f'Instead got {dphi} x {shape[0]} = {phi}')
         return False
 
-    dtheta = m.meta['cdelt2']
-    theta = shape[0] * dtheta
-    if not np.allclose(theta, 180, atol=0.1):
+    dtheta = m.scale.axis2
+    theta = shape[0] * u.pix * dtheta
+    if not np.allclose(theta, 180 * u.deg, atol=0.1 * u.deg):
         if error:
             raise ValueError('Number of points in theta direction times '
                              'CDELT2 must be close to 180 degrees. '
@@ -218,18 +218,18 @@ def _is_full_sun_car(m, error=False):
 def _is_full_sun_cea(m, error=False):
     shape = m.data.shape
 
-    dphi = m.meta['cdelt1']
-    phi = shape[1] * dphi
-    if not np.allclose(np.abs(phi), 360, atol=0.1):
+    dphi = m.scale.axis1
+    phi = shape[1] * u.pix * dphi
+    if not np.allclose(np.abs(phi), 360 * u.deg, atol=0.1 * u.deg):
         if error:
             raise ValueError('Number of points in phi direction times '
                              'CDELT1 must be close to 360 degrees. '
                              f'Instead got {dphi} x {shape[1]} = {phi}')
         return False
 
-    dtheta = m.meta['cdelt2']
-    theta = shape[0] * dtheta * np.pi / 2
-    if not np.allclose(theta, 180, atol=0.1):
+    dtheta = m.scale.axis2
+    theta = shape[0] * u.pix * dtheta * np.pi / 2
+    if not np.allclose(theta, 180 * u.deg, atol=0.1 * u.deg):
         if error:
             raise ValueError('Number of points in theta direction times '
                              'CDELT2 times pi/2 must be close to '
