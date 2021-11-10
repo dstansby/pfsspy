@@ -3,12 +3,21 @@
 Changelog
 =========
 
+1.0.1
+-----
+Bug fixes
+~~~~~~~~~
+- Fixed compatibility of map validity checks with sunpy 3.1.
+- Updated this changelog to make it clear that pfsspy 1.0.0 depends on
+  sunpy >= 3.0.
+
 1.0.0
 -----
 
 New requirements
 ~~~~~~~~~~~~~~~~
-pfsspy now depends on python >= 3.7, and now does *not* depend on Matplotlib.
+pfsspy now depends on python >= 3.7, sunpy >=3,
+and now does *not* depend on Matplotlib.
 
 New features
 ~~~~~~~~~~~~
