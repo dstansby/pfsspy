@@ -171,7 +171,9 @@ class FortranTracer(Tracer):
 
         # Filter out of bounds points out
         rho_ss = np.log(output.grid.rss)
-        xs = [x[(x[:, 2] <= rho_ss) & (x[:, 2] >= 0), :] for x in xs]
+        xs = [x[(x[:, 2] <= rho_ss) & (x[:, 2] >= 0) &
+                (np.abs(x[:, 1]) < 1), :]
+              for x in xs]
 
         rots = self.tracer.ROT
         if np.any(rots == 1):
