@@ -41,14 +41,14 @@ def _Ynm(l, m, theta, phi):
     """
     # Note swapped arguments phi, theta, as scipy has a different
     # definition of these
-    return scipy.special.sph_harm(m, l, phi, theta)
+    return -scipy.special.sph_harm(m, l, phi, theta)
 
 
 def _cot(theta):
     return 1 / np.tan(theta)
 
 
-_extras = {'Ynm': _Ynm, 'cot': _cot}
+_extras = {'Ynm': _Ynm, 'cot': _cot, 'exp': np.exp}
 
 
 def _spherical_harmonic_sympy(l, m):
@@ -72,36 +72,11 @@ def _spherical_harmonic_sympy(l, m):
     L, M = sympy.symbols('l, m')
     theta, phi = sympy.symbols('theta, phi')
     harm = sympy.Ynm(L, M, theta, phi)
+    if m < 0:
+        # Phase shift to align definition of Ymn with defnition in paper.
+        harm *= -1j
     harm = harm.subs([(L, l), (M, m)])
     return harm, theta, phi
-
-
-def _real_spherical_harmonic_sympy(l, m):
-    """
-    Return a real spherical harmonic.
-
-    Parameters
-    ----------
-    l, m: int
-        Spherical harmonic numbers.
-
-    Returns
-    -------
-    harm :
-    theta, phi : sympy.core.symbol.Symbol
-
-    See also
-    --------
-    sympy.functions.special.spherical_harmonics.Ynm
-    """
-    sph, theta, phi = _spherical_harmonic_sympy(l, m)
-    if m == 0:
-        return sph, theta, phi
-    elif m < 0:
-        # Multiply by i to get imaginary part later
-        return sympy.sqrt(2) * (-1)**m * 1j * sph, theta, phi
-    elif m > 0:
-        return sympy.sqrt(2) * (-1)**m * sph, theta, phi
 
 
 def _c(l, zss):
@@ -142,12 +117,13 @@ def Br(l, m, zss):
     function :
         Has the signature ``Br(z, theta, phi)``.
     """
-    sph, t, p = _real_spherical_harmonic_sympy(l, m)
+    sph, t, p = _spherical_harmonic_sympy(l, m)
     sph = sympy.lambdify((t, p), sph, _extras)
 
-    def f(r, theta, phi):
+    @u.quantity_input
+    def f(z, theta: u.deg, phi: u.deg):
         theta, phi = _normalise_angles(theta, phi)
-        return _c(l, zss)(r) * np.real(sph(theta, phi))
+        return _c(l, zss)(z) * np.real(sph(theta, phi))
 
     return f
 
@@ -168,7 +144,7 @@ def Btheta(l, m, zss):
     function :
         Has the signature ``Btheta(z, theta, phi)``.
     """
-    sph, t, p = _real_spherical_harmonic_sympy(l, m)
+    sph, t, p = _spherical_harmonic_sympy(l, m)
     sph = sympy.diff(sph, t)
     sph = sympy.lambdify((t, p), sph, [_extras, 'numpy'])
 
@@ -196,7 +172,7 @@ def Bphi(l, m, zss):
     function :
         Has the signature ``Bphi(z, theta, phi)``.
     """
-    sph, t, p = _real_spherical_harmonic_sympy(l, m)
+    sph, t, p = _spherical_harmonic_sympy(l, m)
     sph = sympy.diff(sph, p)
     sph = sympy.lambdify((t, p), sph, [_extras, 'numpy'])
 

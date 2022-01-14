@@ -3,6 +3,7 @@ import distutils.version
 import astropy
 
 # Import pfsspy sub-modules to have them available through pfsspy.{name}
+import pfsspy.analytic
 import pfsspy.coords
 import pfsspy.fieldline
 # Import this to register map sources

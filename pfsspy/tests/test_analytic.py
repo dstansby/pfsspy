@@ -24,4 +24,4 @@ def test_br_rss():
     f = analytic.Br(l, m, zss)
     phi = 0 * u.deg
     theta = 0 * u.deg
-    assert f(zss, theta, phi) == 0.5 * np.sqrt(3 / np.pi) * c
+    assert f(zss, theta, phi) == -0.5 * np.sqrt(3 / np.pi) * c
