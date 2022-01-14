@@ -5,6 +5,10 @@ Changelog
 
 1.1.0
 -----
+New requirements
+~~~~~~~~~~~~~~~~
+pfsspy now depends on python >= 3.8.
+
 Bug fixes
 ~~~~~~~~~
 - Updated the sunpy package requirement to include all packages needed to use

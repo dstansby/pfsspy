@@ -3,7 +3,7 @@ Installing
 
 pfsspy requires
 
-- python >= 3.7
+- python >= 3.8
 - sunpy >= 3.0
 
 and can be installed from PyPi using

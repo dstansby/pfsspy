@@ -16,21 +16,21 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: linux py37-mindeps
-            os: ubuntu-20.04
-            python-version: '3.7'
-            pip-extras: '"sunpy<3.1" "astropy<4.2"'
-          - name: linux py38
+          - name: linux py38-mindeps
             os: ubuntu-20.04
             python-version: '3.8'
+            pip-extras: '"sunpy<3.1" "astropy<4.2"'
           - name: linux py39
             os: ubuntu-20.04
             python-version: '3.9'
+          - name: linux py310-numba
+            os: ubuntu-20.04
+            python-version: '3.10'
             pip-extras: numba
 
-          - name: devdeps
+          - name: linux py310-devdeps
             os: ubuntu-20.04
-            python-version: '3.9'
+            python-version: '3.10'
             pip-extras: git+https://github.com/astropy/astropy git+https://github.com/sunpy/sunpy
 
     steps:
