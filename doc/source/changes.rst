@@ -9,6 +9,9 @@ Bug fixes
 ~~~~~~~~~
 - Updated the sunpy package requirement to include all packages needed to use
   sunpy maps.
+- Any traced field line points that are out of bounds in latitude (ie. have a
+  latitude > 90 deg) are now filtered out. This was previously only an issue
+  for very low tracing step sizes.
 
 1.0.1
 -----
