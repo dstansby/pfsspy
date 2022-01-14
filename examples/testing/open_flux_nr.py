@@ -41,45 +41,25 @@ def open_flux_numeric(l, m, zss, nrho):
 ###############################################################################
 # Set the source surface height, and the (l, m) values to investigate
 zss = 2
-lms = [10]
 
 fig, ax = plt.subplots()
-# nrhos = np.arange(10, 51, 2)
-nrhos = [10, 50]
+nrhos = np.arange(10, 51, 2)
 
-df = pd.DataFrame(index=nrhos, columns=lms)
+df = pd.DataFrame(index=nrhos, columns=[])
 
-for lm in lms:
-    l = lm // 10
-    m = lm % 10
-    print(f"l={l}, m={m}")
-    flux_analytic = open_flux_analytic(l, m, zss)
-    flux_numeric = []
-    for nrho in tqdm(nrhos):
-        flux_numeric.append(open_flux_numeric(l, m, zss, nrho))
-    flux_numeric = np.array(flux_numeric)
-    flux_ratio = flux_numeric / flux_analytic
-    df[lm] = flux_ratio
+for l in range(1, 6):
+    for m in range(-l, l+1):
+        lm = str(l) + str(m)
+        print(f"l={l}, m={m}")
+        flux_analytic = open_flux_analytic(l, m, zss)
+        flux_numeric = []
+        for nrho in tqdm(nrhos):
+            flux_numeric.append(open_flux_numeric(l, m, zss, nrho))
+        flux_numeric = np.array(flux_numeric)
+        flux_ratio = flux_numeric / flux_analytic
+        df[lm] = flux_ratio
 
 
 ###############################################################################
 # Save a copy of the data
-df.to_csv('open_flux_results.csv')
-df = pd.read_csv('open_flux_results.csv', index_col=0)
-
-for lm in lms:
-    l = lm // 10
-    m = lm % 10
-    color = {1: 'tab:blue', 2: 'tab:orange', 3: 'tab:green'}[l]
-    marker = {0: 'o', 1: 10, 2: 11}[m]
-    ax.plot(nrhos, df[str(lm)],
-            marker=marker, color=color,
-            label=f'l={l}, m={m}')
-
-ax.legend()
-ax.set_ylim(1)
-ax.set_xlim(8)
-ax.yaxis.grid(linestyle='--')
-ax.set_xlabel('$n_{r}$')
-ax.set_ylabel(r'$\Phi_{pfsspy} / \Phi_{analytic}$')
-plt.show()
+df.to_csv('results/open_flux_results.csv')
