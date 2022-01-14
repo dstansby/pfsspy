@@ -3,6 +3,13 @@
 Changelog
 =========
 
+1.1.0
+-----
+Bug fixes
+~~~~~~~~~
+- Updated the sunpy package requirement to include all packages needed to use
+  sunpy maps.
+
 1.0.1
 -----
 Bug fixes
