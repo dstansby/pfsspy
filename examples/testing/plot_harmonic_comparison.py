@@ -3,47 +3,10 @@ Spherical harmonic comparisons
 ==============================
 Comparing analytical spherical harmonic solutions to PFSS output.
 """
-import astropy.units as u
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-import numpy as np
-import sunpy.map
-from helpers import LMAxes
 
-import pfsspy
-from pfsspy import analytic
-
-
-###############################################################################
-# Setup some useful functions for testing
-def theta_phi(nphi, ns):
-    # Return a theta, phi grid with a given numer of points
-    phi = np.linspace(0, 2 * np.pi, nphi)
-    s = np.linspace(-1, 1, ns)
-    s, phi = np.meshgrid(s, phi)
-    theta = np.arccos(s)
-    return theta * u.rad, phi * u.rad
-
-
-def brss_pfsspy(nphi, ns, nrho, rss, l, m):
-    # Return the pfsspy solution for given input parameters
-    theta, phi = theta_phi(nphi, ns)
-
-    br_in = analytic.Br(l, m, rss)(1, theta, phi)
-
-    header = pfsspy.utils.carr_cea_wcs_header('2020-1-1', br_in.shape)
-    input_map = sunpy.map.Map((br_in.T, header))
-
-    pfss_input = pfsspy.Input(input_map, nrho, rss)
-    pfss_output = pfsspy.pfss(pfss_input)
-    return pfss_output.bc[0][:, :, -1].T
-
-
-def brss_analytic(nphi, ns, rss, l, m):
-    # Return the analytic solution for given input parameters
-    theta, phi = theta_phi(nphi, ns)
-    return analytic.Br(l, m, rss)(rss, theta, phi).T
-
+from helpers import LMAxes, brss_analytic, brss_pfsspy
 
 ###############################################################################
 # Compare the the pfsspy solution to the analytic solutions. Cuts are taken
@@ -53,7 +16,7 @@ ns = 180
 rss = 2
 nrho = 20
 
-nl = 5
+nl = 2
 axs = LMAxes(nl=nl)
 
 for l in range(1, nl+1):

@@ -7,9 +7,15 @@ import astropy.units as u
 import numpy as np
 import pandas as pd
 from astropy.coordinates import SkyCoord
-from helpers import pffspy_output, phi_fline_coords, theta_fline_coords
 
 from pfsspy import tracing
+
+from helpers import (
+    pffspy_output,
+    phi_fline_coords,
+    result_dir,
+    theta_fline_coords,
+)
 
 l = 3
 m = 3
@@ -79,5 +85,5 @@ dthetas = dthetas.mask(np.abs(dthetas) > 30).max(axis=1)
 dphis = pd.DataFrame(data=np.array(dphis), index=step_sizes)
 dphis = dphis.mask(np.abs(dphis) > 30).max(axis=1)
 
-dthetas.to_csv(f'results/flines/dthetas_{l}{m}.csv', header=False)
-dphis.to_csv(f'results/flines/dphis_{l}{m}.csv', header=False)
+dthetas.to_csv(result_dir / f'flines/dthetas_{l}{m}.csv', header=False)
+dphis.to_csv(result_dir / f'flines/dphis_{l}{m}.csv', header=False)

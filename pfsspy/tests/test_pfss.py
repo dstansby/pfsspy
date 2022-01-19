@@ -14,6 +14,7 @@ from sunpy.coordinates import frames
 import pfsspy
 import pfsspy.coords
 from pfsspy import tracing
+
 from .example_maps import dipole_map, dipole_result, gong_map, zero_map  # NoQA
 
 R_sun = const.R_sun

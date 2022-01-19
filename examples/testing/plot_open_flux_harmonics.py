@@ -12,9 +12,10 @@ import json
 import matplotlib.cm as cm
 import matplotlib.colors as mcolor
 import matplotlib.pyplot as plt
-from helpers import LMAxes
 
-with open("results/open_flux_harmonics.json", "r") as f:
+from helpers import LMAxes, result_dir
+
+with open(result_dir / "open_flux_harmonics.json", "r") as f:
     results = json.load(f, parse_int=int)
 
 axs = LMAxes(nl=5)

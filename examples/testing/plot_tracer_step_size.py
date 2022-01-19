@@ -5,7 +5,8 @@ Tracer step size
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import pandas as pd
-from helpers import LMAxes
+
+from helpers import LMAxes, result_dir
 
 nl = 3
 
@@ -15,9 +16,9 @@ for l in range(1, nl+1):
     for m in range(-l, l+1):
         ax = axs[l, m]
         try:
-            dphis = pd.read_csv(f'results/flines/dphis_{l}{m}.csv',
+            dphis = pd.read_csv(result_dir / f'flines/dphis_{l}{m}.csv',
                                 header=None, index_col=0)
-            dthetas = pd.read_csv(f'results/flines/dthetas_{l}{m}.csv',
+            dthetas = pd.read_csv(result_dir / f'flines/dthetas_{l}{m}.csv',
                                   header=None, index_col=0)
             print(l, m)
         except FileNotFoundError:
