@@ -7,7 +7,13 @@ Changelog
 -----
 New requirements
 ~~~~~~~~~~~~~~~~
-pfsspy now depends on python >= 3.8.
+pfsspy now depends on Python >= 3.8, and is officially supported with
+Python 3.10
+
+New examples
+~~~~~~~~~~~~
+A host of new examples comparing pfsspy results to analytic solutions have
+been added to the example gallery.
 
 Bug fixes
 ~~~~~~~~~
