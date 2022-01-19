@@ -4,9 +4,6 @@ Open/closed field map
 
 Creating an open/closed field map on the solar surface.
 """
-
-###############################################################################
-# First, import required modules
 import astropy.constants as const
 import astropy.units as u
 import matplotlib.colors as mcolor

@@ -2,9 +2,6 @@
 Analytic dipole field lines
 ===========================
 """
-
-###############################################################################
-# First, import required modules
 import astropy.constants as const
 import astropy.units as u
 import matplotlib.pyplot as plt

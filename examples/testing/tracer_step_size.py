@@ -1,10 +1,7 @@
 """
-Analytic dipole field lines
-===========================
+Tracer step size (calculations)
+===============================
 """
-
-###############################################################################
-# First, import required modules
 import astropy.constants as const
 import astropy.units as u
 import numpy as np
@@ -14,9 +11,6 @@ from helpers import pffspy_output, phi_fline_coords, theta_fline_coords
 
 from pfsspy import tracing
 
-###############################################################################
-# Compare the the pfsspy solution to the analytic solutions. Cuts are taken
-# on the source surface at a constant phi value to do a 1D comparison.
 l = 3
 m = 3
 nphi = 360
@@ -29,9 +23,9 @@ rss = 2
 # Calculate PFSS solution
 pfsspy_out = pffspy_output(nphi, ns, nr, rss, l, m)
 
-rss = rss * const.R_sun
 ###############################################################################
-# Trace some field lines
+# Trace an array of field lines from the source surface down to the solar
+# surface
 n = 90
 # Create 1D theta, phi arrays
 phi = np.linspace(0, 360, n * 2)
@@ -40,6 +34,7 @@ theta = np.arcsin(np.linspace(-0.98, 0.98, n, endpoint=False) + 1/n)
 # Mesh into 2D arrays
 theta, phi = np.meshgrid(theta, phi, indexing='ij')
 theta, phi = theta * u.rad, phi * u.deg
+rss = rss * const.R_sun
 seeds = SkyCoord(radius=rss, lat=theta.ravel(), lon=phi.ravel(),
                  frame=pfsspy_out.coordinate_frame)
 
@@ -62,7 +57,6 @@ for step_size in step_sizes:
     r_out = np.ones_like(theta.value) * const.R_sun * np.nan
     r_out[mask] = flines.open_field_lines.solar_feet.radius
 
-    ###########################################################################
     # Calculate analytical solution
     theta_analytic = theta_fline_coords(r_out, rss, l, m, theta)
     dtheta = (theta_solar - theta_analytic).to_value(u.deg)
@@ -75,6 +69,10 @@ for step_size in step_sizes:
     dthetas.append(dtheta.ravel())
     dphis.append(dphi.ravel())
 
+
+###############################################################################
+# Save results. This saves the maximum error in both phi and theta as a
+# function of thet tracer step size.
 dthetas = pd.DataFrame(data=np.array(dthetas), index=step_sizes)
 dthetas = dthetas.mask(np.abs(dthetas) > 30).max(axis=1)
 

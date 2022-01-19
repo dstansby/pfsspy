@@ -18,9 +18,6 @@ site.
 .. _JSOC: http://jsoc.stanford.edu/
 .. _synoptic maps page: http://jsoc.stanford.edu/HMI/LOS_Synoptic_charts.html
 """
-
-###############################################################################
-# First import the required modules
 import os
 
 import sunpy.map

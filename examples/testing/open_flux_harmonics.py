@@ -1,15 +1,13 @@
 """
-Open flux
-=========
+Open flux comparison (calculations)
+===================================
 Comparing total unsigned flux to analytic solutions.
 
-This script calculates both analytic and numerical values, and saves them
+This script calculates both analytic and numerical values of the total unsigned
+open flux within PFSS solutions of single spherical harmonics, and saves them
 to a .json file. This can be read in by ``plot_open_flux_harmonics.py`` to
 visualise the result.
 """
-
-###############################################################################
-# First, import required modules
 import functools
 import json
 from collections import defaultdict

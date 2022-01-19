@@ -1,12 +1,8 @@
 """
 Spherical harmonic comparisons
 ==============================
-
 Comparing analytical spherical harmonic solutions to PFSS output.
 """
-
-###############################################################################
-# First, import required modules
 import astropy.units as u
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker

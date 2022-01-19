@@ -4,9 +4,6 @@ Parsing ADAPT Ensemble .fits files
 
 Parse an ADAPT FITS file into a `sunpy.map.MapSequence`.
 """
-
-###############################################################################
-# Necessary imports
 import matplotlib.pyplot as plt
 import sunpy.io
 import sunpy.map

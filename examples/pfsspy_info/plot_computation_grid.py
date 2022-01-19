@@ -1,8 +1,8 @@
 r"""
-pfsspy magnetic field grid
-==========================
+Magnetic field grid
+===================
 
-A plot of the grid corners, from which the magnetic field values are taken
+A plot of the grid corners which the magnetic field values are taken from
 when tracing magnetic field lines.
 
 Notice how the spacing becomes larger at the poles, and closer to the source
