@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from helpers import open_flux_analytic, open_flux_numeric
+from helpers import open_flux_analytic, open_flux_numeric, result_dir
 
 ###############################################################################
 # Set the source surface height and range of radial grid points
@@ -40,4 +40,4 @@ for l in range(1, 6):
 
 ###############################################################################
 # Save a copy of the data
-df.to_csv('results/open_flux_results.csv')
+df.to_csv(result_dir / 'open_flux_results.csv')

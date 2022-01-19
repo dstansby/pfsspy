@@ -11,7 +11,7 @@ visualise the result.
 import json
 from collections import defaultdict
 
-from helpers import open_flux_analytic, open_flux_numeric
+from helpers import open_flux_analytic, open_flux_numeric, result_dir
 
 ###############################################################################
 # Set the source surface height, and the (l, m) values to investigate
@@ -35,6 +35,6 @@ for l in range(1, 6):
         results['numeric'][l][m] = float(flux_numeric)
 
 # open file for writing, "w"
-with open("results/open_flux_harmonics.json", "w") as f:
+with open(result_dir / "open_flux_harmonics.json", "w") as f:
     # write json object to file
     f.write(json.dumps(results))

@@ -1,4 +1,5 @@
 import functools
+import pathlib
 
 import astropy.units as u
 import matplotlib.pyplot as plt
@@ -11,6 +12,8 @@ from sympy.abc import x
 
 import pfsspy.analytic as analytic
 import pfsspy.utils
+
+result_dir = (pathlib.Path(__file__) / '..' / 'results').resolve()
 
 pi = np.pi * u.rad
 

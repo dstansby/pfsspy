@@ -16,7 +16,7 @@ ns = 180
 rss = 2
 nrho = 20
 
-nl = 5
+nl = 2
 axs = LMAxes(nl=nl)
 
 for l in range(1, nl+1):
