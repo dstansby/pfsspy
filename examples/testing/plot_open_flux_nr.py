@@ -10,6 +10,7 @@ cells in the pfsspy grid.
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import pandas as pd
+
 from helpers import LMAxes
 
 df = pd.read_csv('results/open_flux_results.csv', index_col=0)

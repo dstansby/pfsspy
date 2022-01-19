@@ -8,34 +8,10 @@ open flux within PFSS solutions of single spherical harmonics, and saves them
 to a .json file. This can be read in by ``plot_open_flux_harmonics.py`` to
 visualise the result.
 """
-import functools
 import json
 from collections import defaultdict
 
-import astropy.units as u
-import numpy as np
-import scipy.integrate
-from helpers import brss_pfsspy
-
-from pfsspy import analytic
-
-
-def open_flux_analytic(l, m, zss):
-    Br = analytic.Br(l, m, zss)
-    Br = functools.partial(Br, zss)
-
-    def absBr(theta, phi):
-        return np.abs(Br(theta * u.rad, phi * u.rad)) * np.sin(theta)
-    res = scipy.integrate.nquad(absBr, ranges=[[0, np.pi], [0, 2 * np.pi]])
-    return res[0]
-
-
-def open_flux_numeric(l, m, zss, nrho):
-    nphi = 360
-    ns = 180
-    br = brss_pfsspy(nphi, ns, nrho, zss, l, m)
-    return np.sum(np.abs(br)) * (4 * np.pi) / nphi / ns
-
+from helpers import open_flux_analytic, open_flux_numeric
 
 ###############################################################################
 # Set the source surface height, and the (l, m) values to investigate

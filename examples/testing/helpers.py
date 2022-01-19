@@ -1,7 +1,10 @@
+import functools
+
 import astropy.units as u
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
+import scipy.integrate
 import sunpy.map
 from sympy import acos, asin, cos, lambdify, sin
 from sympy.abc import x
@@ -46,6 +49,33 @@ def brss_analytic(nphi, ns, rss, l, m):
     # Return the analytic solution for given input parameters
     theta, phi = theta_phi_grid(nphi, ns)
     return analytic.Br(l, m, rss)(rss, theta, phi).T
+
+
+def open_flux_analytic(l, m, zss):
+    """
+    Calculate analytic unsigned open flux for spherical harmonic (*l*, *m*) and
+    a source surface radius of *zss*.
+    """
+    Br = analytic.Br(l, m, zss)
+    Br = functools.partial(Br, zss)
+
+    def absBr(theta, phi):
+        return np.abs(Br(theta * u.rad, phi * u.rad)) * np.sin(theta)
+
+    res = scipy.integrate.nquad(absBr, ranges=[[0, np.pi], [0, 2 * np.pi]])
+    return res[0]
+
+
+def open_flux_numeric(l, m, zss, nrho):
+    """
+    Calculate numerical unsigned open flux for spherical harmonic (*l*, *m*)
+    a source surface radius of *zss* and *nrho* grid points in the radial
+    direction.
+    """
+    nphi = 360
+    ns = 180
+    br = brss_pfsspy(nphi, ns, nrho, zss, l, m)
+    return np.sum(np.abs(br)) * (4 * np.pi) / nphi / ns
 
 
 ######################

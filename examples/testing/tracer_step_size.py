@@ -7,9 +7,10 @@ import astropy.units as u
 import numpy as np
 import pandas as pd
 from astropy.coordinates import SkyCoord
-from helpers import pffspy_output, phi_fline_coords, theta_fline_coords
 
 from pfsspy import tracing
+
+from helpers import pffspy_output, phi_fline_coords, theta_fline_coords
 
 l = 3
 m = 3

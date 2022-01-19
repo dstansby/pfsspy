@@ -8,10 +8,11 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 import sunpy.map
-from helpers import LMAxes
 
 import pfsspy
 from pfsspy import analytic
+
+from helpers import LMAxes
 
 
 ###############################################################################

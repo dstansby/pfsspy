@@ -8,9 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.visualization import quantity_support
-from helpers import pffspy_output, phi_fline_coords, theta_fline_coords
 
 from pfsspy import tracing
+
+from helpers import pffspy_output, phi_fline_coords, theta_fline_coords
 
 quantity_support()
 
