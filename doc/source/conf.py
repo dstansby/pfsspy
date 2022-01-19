@@ -60,7 +60,8 @@ sphinx_gallery_conf = {
                                        '../../examples/finding_data',
                                        '../../examples/utils',
                                        '../../examples/pfsspy_info',
-                                       '../../examples/testing'])
+                                       '../../examples/testing']),
+    'reference_url': {'sphinx_gallery': None}
 }
 
 

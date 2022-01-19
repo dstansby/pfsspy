@@ -5,9 +5,6 @@ Dipole source solution
 A simple example showing how to use pfsspy to compute the solution to a dipole
 source field.
 """
-
-###############################################################################
-# First, import required modules
 import astropy.constants as const
 import astropy.units as u
 import matplotlib.patches as mpatch

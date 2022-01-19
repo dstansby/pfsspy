@@ -5,9 +5,6 @@ Overplotting field lines on AIA maps
 This example shows how to take a PFSS solution, trace some field lines, and
 overplot the traced field lines on an AIA 193 map.
 """
-
-###############################################################################
-# First, we import the required modules
 import os
 
 import astropy.units as u

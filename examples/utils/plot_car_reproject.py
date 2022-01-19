@@ -4,8 +4,8 @@ Re-projecting from CAR to CEA
 
 The pfsspy solver takes a cylindrical-equal-area (CEA) projected magnetic field
 map as input, which is equally spaced in sin(latitude). Some synoptic field
-maps are equally spaced in latitude however, which is a plate carée (CAR)
-projection.
+maps are equally spaced in latitude, a plate carée (CAR) projection, and need
+reprojecting.
 
 This example shows how to use the `pfsspy.utils.car_to_cea` function to
 reproject a CAR projection to a CEA projection that pfsspy can take as input.

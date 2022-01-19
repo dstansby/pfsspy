@@ -1,16 +1,15 @@
 """
-Open flux
-=========
-Comparing total unsigned flux to analytic solutions. This is done as a function
-of the number of radial grid cells used in the PFSS calculation.
-"""
+Open flux and radial grid points (calcuations)
+==============================================
+Comparing total unsigned flux to analytic solutions.
 
-###############################################################################
-# First, import required modules
+This script caclulates the ratio of numeric to analytic total unsigned open
+fluxes in PFSS solutions of spherical harmonics, as a function of the number of
+radial grid cells in the pfsspy grid.
+"""
 import functools
 
 import astropy.units as u
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.integrate
@@ -20,7 +19,13 @@ from tqdm import tqdm
 from pfsspy import analytic
 
 
+###############################################################################
+# Define a function to calculate the analytic total open flux
 def open_flux_analytic(l, m, zss):
+    """
+    Calculate analytic unsigned open flux for spherical harmonic (*l*, *m*) and
+    a source surface radius of *zss*.
+    """
     Br = analytic.Br(l, m, zss)
     Br = functools.partial(Br, zss)
 
@@ -31,7 +36,15 @@ def open_flux_analytic(l, m, zss):
     return res[0]
 
 
+###############################################################################
+# Define a function to calculate the numeric total open flux (ie. calculated
+# by pfsspy)
 def open_flux_numeric(l, m, zss, nrho):
+    """
+    Calculate numerical unsigned open flux for spherical harmonic (*l*, *m*)
+    a source surface radius of *zss* and *nrho* grid points in the radial
+    direction.
+    """
     nphi = 360
     ns = 180
     br = brss_pfsspy(nphi, ns, nrho, zss, l, m)
@@ -39,12 +52,15 @@ def open_flux_numeric(l, m, zss, nrho):
 
 
 ###############################################################################
-# Set the source surface height, and the (l, m) values to investigate
+# Set the source surface height and range of radial grid points
 zss = 2
-
-fig, ax = plt.subplots()
 nrhos = np.arange(10, 51, 2)
+print(f'nrhos={nrhos}')
 
+
+###############################################################################
+# Loop through spherical harmonics and do the calculations. Only the ratio
+# of fluxes between the analytic and numeric solutions is saved.
 df = pd.DataFrame(index=nrhos, columns=[])
 
 for l in range(1, 6):

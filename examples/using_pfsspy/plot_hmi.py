@@ -6,13 +6,10 @@ Calculating a PFSS solution from a HMI synoptic map.
 This example shows how to calcualte a PFSS solution from a HMI synoptic map.
 There are a couple of important things that this example shows:
 
-    - HMI maps have non-standard metadata, so this needs to be fixed
-    - HMI synoptic maps are very big (1440 x 3600), so need to be downsampled
-      in order to calculate the PFSS solution in a reasonable time.
+- HMI maps have non-standard metadata, so this needs to be fixed
+- HMI synoptic maps are very big (1440 x 3600), so need to be downsampled
+  in order to calculate the PFSS solution in a reasonable time.
 """
-
-###############################################################################
-# First import the required modules
 import os
 
 import astropy.units as u

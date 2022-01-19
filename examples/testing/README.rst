@@ -1,3 +1,3 @@
-Testing pfsspy
---------------
-Tests of pfsspy.
+Tests
+-----
+Comparisons of the numerical output of pfsspy to analytic solutions.

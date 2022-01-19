@@ -5,9 +5,6 @@ Magnetic field along a field line
 How to get the value of the magnetic field along a field line traced through
 the PFSS solution.
 """
-
-###############################################################################
-# First, import required modules
 import astropy.constants as const
 import astropy.units as u
 import matplotlib.pyplot as plt

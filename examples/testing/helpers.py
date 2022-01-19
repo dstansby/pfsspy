@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import astropy.units as u
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -11,7 +9,6 @@ from sympy.abc import x
 import pfsspy.analytic as analytic
 import pfsspy.utils
 
-figdir = Path('/Users/dstansby/Dropbox/Work/Papers/20PFSSTest/figs')
 pi = np.pi * u.rad
 
 

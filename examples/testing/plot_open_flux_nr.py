@@ -1,9 +1,11 @@
 """
-Open flux
-=========
+Open flux and radial grid points
+================================
 
-Comparing total unsigned flux to analytic solutions, as a function of
-number of radial grid cells used in the PFSS calculation.
+The script visualises results from ``open_flux_harmonics.py``.
+It shows the ratio of numeric to analytic total unsigned open fluxes in PFSS
+solutions of spherical harmonics, as a function of the number of radial grid
+cells in the pfsspy grid.
 """
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker

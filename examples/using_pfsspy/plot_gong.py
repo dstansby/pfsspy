@@ -4,9 +4,6 @@ GONG PFSS extrapolation
 
 Calculating PFSS solution for a GONG synoptic magnetic field map.
 """
-
-###############################################################################
-# First, import required modules
 import astropy.constants as const
 import astropy.units as u
 import matplotlib.pyplot as plt

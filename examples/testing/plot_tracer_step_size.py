@@ -1,10 +1,7 @@
 """
-Visualising tracer step size
-============================
+Tracer step size
+================
 """
-
-###############################################################################
-# First, import required modules
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import pandas as pd

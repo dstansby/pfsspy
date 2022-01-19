@@ -1,7 +1,7 @@
 """
 Tracer performance
 ==================
-A quick script to compare the performance of the python and fortran tracers.
+Comparing the performance of Python and FORTRAN tracers.
 """
 import timeit
 
