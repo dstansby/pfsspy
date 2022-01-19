@@ -1,6 +1,8 @@
 """
-Analytic dipole field lines
-===========================
+Field line error map
+====================
+This script produces a map of errors between analytic field line equations
+and field lines numerically traced by pfsspy.
 """
 import astropy.constants as const
 import astropy.units as u
@@ -15,10 +17,6 @@ from helpers import pffspy_output, phi_fline_coords, theta_fline_coords
 
 quantity_support()
 
-
-###############################################################################
-# Compare the the pfsspy solution to the analytic solutions. Cuts are taken
-# on the source surface at a constant phi value to do a 1D comparison.
 l = 3
 m = 3
 nphi = 360
@@ -33,7 +31,7 @@ pfsspy_out = pffspy_output(nphi, ns, nr, rss, l, m)
 
 rss = rss * const.R_sun
 ###############################################################################
-# Trace some field lines
+# Trace field lines
 n = 90
 # Create 1D theta, phi arrays
 phi = np.linspace(0, 360, n * 2)
@@ -72,13 +70,6 @@ theta_solar[mask] = flines.open_field_lines.solar_feet.lat
 theta_analytic = theta_fline_coords(r_out, rss, l, m, theta)
 dtheta = theta_solar - theta_analytic
 
-fig, axs = plt.subplots(nrows=2, sharex=True)
-axs[0].scatter(phi_solar.to(u.deg), phi_analytic.to(u.deg), label='phi')
-axs[1].scatter(theta_solar.to(u.deg), theta_analytic.to(u.deg), label='theta')
-[ax.legend() for ax in axs]
-
-###########################################################################
-# Calculate analytical solution
 fig, axs = plt.subplots(nrows=2, sharex=True, sharey=True)
 
 
