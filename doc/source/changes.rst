@@ -3,6 +3,11 @@
 Changelog
 =========
 
+1.1.1
+-----
+Fixed imports so pfsspy does not depend on ``sympy`` as a runtime dependency.
+(``sympy`` is still needed for the ``analytic`` module however).
+
 1.1.0
 -----
 New requirements

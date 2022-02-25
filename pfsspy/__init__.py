@@ -1,5 +1,9 @@
 # Import pfsspy sub-modules to have them available through pfsspy.{name}
-import pfsspy.analytic
+try:
+    import pfsspy.analytic
+except ModuleNotFoundError:
+    # If sympy isn't installed
+    pass
 import pfsspy.coords
 import pfsspy.fieldline
 # Import this to register map sources
