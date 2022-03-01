@@ -31,7 +31,7 @@ jobs:
           - name: linux py310-devdeps
             os: ubuntu-20.04
             python-version: '3.10'
-            pip-extras: git+https://github.com/astropy/astropy git+https://github.com/sunpy/sunpy
+            pip-extras: git+https://github.com/astropy/astropy git+https://github.com/sunpy/sunpy git+https://github.com/dstansby/streamtracer
 
     steps:
     - uses: actions/checkout@v2
