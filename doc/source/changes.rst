@@ -6,7 +6,7 @@ Changelog
 1.1.2
 -----
 - Added project status documentation.
-- Bumped the minimum version of astropy to 4.3.
+- Bumped the minimum version of astropy to 5.0.
 - Fixed ADAPT map reading with sunpy >= 4.0.
 
 1.1.1
