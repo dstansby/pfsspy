@@ -24,8 +24,8 @@ def test_gong_source(gong_map):
 
 
 def test_adapt_map(adapt_map):
-    import sunpy.io
-    adapt_fits = sunpy.io.fits.read(adapt_map)
+    import astropy.io
+    adapt_fits = astropy.io.fits.open(adapt_map)
     for map_slice in adapt_fits[0].data:
         m = sunpy.map.Map((map_slice, adapt_fits[0].header))
         assert isinstance(m, pfsspy.map.ADAPTMap)
