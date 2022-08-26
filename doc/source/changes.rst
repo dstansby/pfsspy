@@ -5,7 +5,8 @@ Changelog
 
 1.1.2
 -----
-Added project status documentation.
+- Added project status documentation.
+- Bumped the minimum version of astropy to 4.2.
 
 1.1.1
 -----
