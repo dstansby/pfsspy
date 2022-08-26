@@ -3,6 +3,10 @@
 Changelog
 =========
 
+1.1.2
+-----
+Added project status documentation.
+
 1.1.1
 -----
 Fixed imports so pfsspy does not depend on ``sympy`` as a runtime dependency.
