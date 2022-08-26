@@ -18,7 +18,7 @@ Contents
    pfsspy
    performance
    changes
-   project_statusAd
+   project_status
    numerical_method
    synoptic_fits
 
