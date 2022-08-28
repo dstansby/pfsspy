@@ -31,7 +31,7 @@ class Input:
     :math:`s = \cos (\theta)`. See `pfsspy.grid` for more
     information on the coordinate system.
     """
-    def __init__(self, br, nr, rss, brout="radial"):
+    def __init__(self, br, nr, rss, brout="radial", br1=[]):
         if not isinstance(br, sunpy.map.GenericMap):
             raise ValueError('br must be a sunpy Map')
         if np.any(~np.isfinite(br.data)):
@@ -46,6 +46,7 @@ class Input:
         self.dtime = self.map.date
         self.br = self.map.data
         self.brout = brout
+        self.br1 = br1
 
         # Force some nice defaults
         self._map_in.plot_settings['cmap'] = 'RdBu'

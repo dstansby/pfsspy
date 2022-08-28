@@ -17,7 +17,7 @@ def _eigh(A):
     return np.linalg.eigh(A)
 
 
-def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brt1, brout):
+def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brout, brt1):
     for l in range(ns):
         # Ignore the l=0 and m=0 term; for a globally divergence free field
         # this term is zero anyway, but numerically it may be small which
@@ -35,7 +35,7 @@ def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brt1, b
             clm = ratio * dlm
 
         if brout == "closed":
-            cdlm1 = np.dot(Q[:, l], brt1[:, m])/lam[l]*rss**2
+            cdlm1 = np.dot(Q[:, l], brt1[:, m]) / lam[l] * rss**2
             clm = (cdlm1 - ffm[l]**nr * cdlm) / (ffp[l]**nr - ffm[l]**nr)
             dlm = (cdlm1 - ffp[l]**nr * cdlm) / (ffm[l]**nr - ffp[l]**nr)
 
@@ -113,6 +113,7 @@ def pfss(input):
     sc = input.grid.sc
 
     brout = input.brout
+    br1 = input.br1
 
     k = np.linspace(0, nr, nr + 1)
 
@@ -126,8 +127,8 @@ def pfss(input):
     brt = np.fft.rfft(br0, axis=1)
     brt = brt.astype(np.complex128)
 
-    brt1 = np.fft.rfft(0*br0, axis=1)
-    # brt1 = brt1.astype(np.complex128)
+    brt1 = np.fft.rfft(br1, axis=1)
+    brt1 = brt1.astype(np.complex128)
 
     # Prepare tridiagonal matrix:
     # - create off-diagonal part of the matrix:
@@ -159,7 +160,7 @@ def pfss(input):
         ffm = e1 / ffp
 
         # - compute radial term for each l (for this m):
-        psi, psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brt1, brout)
+        psi, psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brout, brt1)
 
         if (m > 0):
             psi[:, :, nphi - m] = np.conj(psi[:, :, m])
