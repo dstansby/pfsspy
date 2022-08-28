@@ -127,8 +127,10 @@ def pfss(input):
     brt = np.fft.rfft(br0, axis=1)
     brt = brt.astype(np.complex128)
 
-    brt1 = np.fft.rfft(br1, axis=1)
-    brt1 = brt1.astype(np.complex128)
+    brt1 = None
+    if brout == "br":
+        brt1 = np.fft.rfft(br1, axis=1)
+        brt1 = brt1.astype(np.complex128)
 
     # Prepare tridiagonal matrix:
     # - create off-diagonal part of the matrix:
