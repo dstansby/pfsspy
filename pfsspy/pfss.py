@@ -17,7 +17,7 @@ def _eigh(A):
     return np.linalg.eigh(A)
 
 
-def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir):
+def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brt1, brout):
     for l in range(ns):
         # Ignore the l=0 and m=0 term; for a globally divergence free field
         # this term is zero anyway, but numerically it may be small which
@@ -27,10 +27,18 @@ def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir):
         # - sum (c_{lm} + d_{lm}) * lam_{l}
         # lam[l] is small so this blows up
         cdlm = np.dot(Q[:, l], np.asfortranarray(brt[:, m])) / lam[l]
-        # - ratio c_{lm}/d_{lm} [numerically safer this way up]
-        ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
-        dlm = cdlm / (1.0 + ratio)
-        clm = ratio * dlm
+
+        if brout == "radial":
+            # - ratio c_{lm}/d_{lm} [numerically safer this way up]
+            ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
+            dlm = cdlm / (1.0 + ratio)
+            clm = ratio * dlm
+
+        if brout == "closed":
+            cdlm1 = np.dot(Q[:, l], brt1[:, m])/lam[l]*rss**2
+            clm = (cdlm1 - ffm[l]**nr * cdlm) / (ffp[l]**nr - ffm[l]**nr)
+            dlm = (cdlm1 - ffp[l]**nr * cdlm) / (ffm[l]**nr - ffp[l]**nr)
+
         psir[:, l] = clm * ffp[l]**k + dlm * ffm[l]**k
 
     # - compute entry for this m in psit = Sum_l c_{lm}Q_{lm}**j
@@ -91,6 +99,7 @@ def pfss(input):
     nr = input.grid.nr
     ns = input.grid.ns
     nphi = input.grid.nphi
+    rss = input.grid.rss
 
     # Coordinates:
     ds = input.grid.ds
@@ -103,6 +112,8 @@ def pfss(input):
     sg = input.grid.sg
     sc = input.grid.sc
 
+    brout = input.brout
+
     k = np.linspace(0, nr, nr + 1)
 
     Fp = sg * 0  # Lp/Ls on p-ribs
@@ -114,6 +125,9 @@ def pfss(input):
     # FFT in phi of photospheric distribution at each latitude:
     brt = np.fft.rfft(br0, axis=1)
     brt = brt.astype(np.complex128)
+
+    brt1 = np.fft.rfft(0*br0, axis=1)
+    # brt1 = brt1.astype(np.complex128)
 
     # Prepare tridiagonal matrix:
     # - create off-diagonal part of the matrix:
@@ -145,7 +159,7 @@ def pfss(input):
         ffm = e1 / ffp
 
         # - compute radial term for each l (for this m):
-        psi, psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir)
+        psi, psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brt1, brout)
 
         if (m > 0):
             psi[:, :, nphi - m] = np.conj(psi[:, :, m])
