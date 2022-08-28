@@ -31,7 +31,7 @@ class Input:
     :math:`s = \cos (\theta)`. See `pfsspy.grid` for more
     information on the coordinate system.
     """
-    def __init__(self, br, nr, rss, brout="radial", br1=[]):
+    def __init__(self, br, nr, rss, brout="radial", br1=None):
         if not isinstance(br, sunpy.map.GenericMap):
             raise ValueError('br must be a sunpy Map')
         if np.any(~np.isfinite(br.data)):
