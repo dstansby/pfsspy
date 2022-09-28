@@ -2,6 +2,7 @@
 Code for calculating a PFSS extrapolation.
 """
 import numpy as np
+import sunpy.map
 
 import pfsspy
 
@@ -17,7 +18,7 @@ def _eigh(A):
     return np.linalg.eigh(A)
 
 
-def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brout, brt1):
+def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brt_outer):
     for l in range(ns):
         # Ignore the l=0 and m=0 term; for a globally divergence free field
         # this term is zero anyway, but numerically it may be small which
@@ -28,14 +29,13 @@ def _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brout, 
         # lam[l] is small so this blows up
         cdlm = np.dot(Q[:, l], np.asfortranarray(brt[:, m])) / lam[l]
 
-        if brout == "radial":
+        if brt_outer is None:
             # - ratio c_{lm}/d_{lm} [numerically safer this way up]
             ratio = (ffm[l]**(nr - 1) - ffm[l]**nr) / (ffp[l]**nr - ffp[l]**(nr - 1))
             dlm = cdlm / (1.0 + ratio)
             clm = ratio * dlm
-
-        if brout == "br":
-            cdlm1 = np.dot(Q[:, l], brt1[:, m]) / lam[l] * rss**2
+        else:
+            cdlm1 = np.dot(Q[:, l], brt_outer[:, m]) / lam[l] * rss**2
             clm = (cdlm1 - ffm[l]**nr * cdlm) / (ffp[l]**nr - ffm[l]**nr)
             dlm = (cdlm1 - ffp[l]**nr * cdlm) / (ffm[l]**nr - ffp[l]**nr)
 
@@ -112,8 +112,7 @@ def pfss(input):
     sg = input.grid.sg
     sc = input.grid.sc
 
-    brout = input.brout
-    br1 = input.br1
+    br_outer = input.br_outer
 
     k = np.linspace(0, nr, nr + 1)
 
@@ -127,10 +126,11 @@ def pfss(input):
     brt = np.fft.rfft(br0, axis=1)
     brt = brt.astype(np.complex128)
 
-    brt1 = None
-    if brout == "br":
-        brt1 = np.fft.rfft(br1, axis=1)
-        brt1 = brt1.astype(np.complex128)
+    if isinstance(br_outer, np.ndarray):
+        brt_outer = np.fft.rfft(br_outer, axis=1)
+        brt_outer = brt_outer.astype(np.complex128)
+    else:
+        brt_outer = None
 
     # Prepare tridiagonal matrix:
     # - create off-diagonal part of the matrix:
@@ -162,7 +162,7 @@ def pfss(input):
         ffm = e1 / ffp
 
         # - compute radial term for each l (for this m):
-        psi, psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brout, brt1)
+        psi, psir = _compute_r_term(m, k, ns, Q, brt, lam, ffm, nr, ffp, psi, psir, rss, brt_outer)
 
         if (m > 0):
             psi[:, :, nphi - m] = np.conj(psi[:, :, m])
