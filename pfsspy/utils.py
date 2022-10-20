@@ -107,7 +107,7 @@ def carr_cea_wcs_header(dtime, shape, map_center_longitude=0*u.deg):
        https://doi.org/10.1051/0004-6361:20054262
     """
     # Check map_center_longitude has units of degrees
-    assert hasattr(map_center_longitude,"unit"), (
+    assert hasattr(map_center_longitude, "unit"), (
         f"Keyword `map_center_longitude`={map_center_longitude} has no "
         + f"`astropy.units` attribute, must have units and be `astropy.units.deg`."
     )
