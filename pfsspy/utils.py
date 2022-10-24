@@ -87,7 +87,7 @@ def load_adapt(adapt_path):
     adaptMapSequence = sunpy.map.Map(data_header_pairs, sequence=True)
     return adaptMapSequence
 
-
+@u.quantity_input
 def carr_cea_wcs_header(dtime, shape, *, map_center_longitude=0*u.deg):
     """
     Create a Carrington WCS header for a Cylindrical Equal Area (CEA)
@@ -110,16 +110,6 @@ def carr_cea_wcs_header(dtime, shape, *, map_center_longitude=0*u.deg):
     .. [1] W. T. Thompson, "Coordinate systems for solar image data",
        https://doi.org/10.1051/0004-6361:20054262
     """
-    # Check map_center_longitude has units of degrees
-    assert hasattr(map_center_longitude, "unit"), (
-        f"Keyword `map_center_longitude`={map_center_longitude} has no "
-        + f"`astropy.units` attribute, must have units and be `astropy.units.deg`."
-    )
-    assert map_center_longitude.unit == u.deg, (
-        f"Keyword `map_center_longitude`={map_center_longitude} does not have "
-        +f"units of `astropy.units.deg`"
-    )
-
     # If datetime is None, put in a dummy value here to make
     # make_fitswcs_header happy, then strip it out at the end
     obstime = dtime or astropy.time.Time('2000-1-1')
