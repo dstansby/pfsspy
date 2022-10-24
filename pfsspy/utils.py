@@ -100,7 +100,7 @@ def carr_cea_wcs_header(dtime, shape, *, map_center_longitude=0*u.deg):
     shape : tuple
         Map shape. The first entry should be number of points in longitude, the
         second in latitude.
-    map_center_longitude : astropy.Quantity
+    map_center_longitude : astropy.units.Quantity
         Change the world coordinate longitude of the central image pixel to allow
         for different roll angles of the Carrington map. Default to 0 deg. Must
         be supplied with units of `astropy.units.deg`
