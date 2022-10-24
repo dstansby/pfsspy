@@ -87,6 +87,7 @@ def load_adapt(adapt_path):
     adaptMapSequence = sunpy.map.Map(data_header_pairs, sequence=True)
     return adaptMapSequence
 
+
 @u.quantity_input
 def carr_cea_wcs_header(dtime, shape, *, map_center_longitude=0*u.deg):
     """

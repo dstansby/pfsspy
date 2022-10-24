@@ -1,5 +1,6 @@
-import astropy.units as u
 import datetime
+
+import astropy.units as u
 import numpy as np
 import pytest
 import sunpy.map
@@ -117,18 +118,19 @@ def test_roll_map(gong_map):
                        match='lh_edge_lon must be in'):
         utils.roll_map(adapt_map, lh_edge_lon=361 * u.deg)
 
+
 def test_cea_header():
     # Assert default reference pixel is at 180 deg lon
     cea_default = utils.carr_cea_wcs_header(
-        datetime.datetime(2020,1,1),
-        [360,180]
+        datetime.datetime(2020, 1, 1),
+        [360, 180]
     )
     assert cea_default['crval1'] == 0.0
 
     # Assert custom reference pixel is expected lon
     cea_shift = utils.carr_cea_wcs_header(
-        datetime.datetime(2020,1,1),
-        [360,180],
+        datetime.datetime(2020, 1, 1),
+        [360, 180],
         map_center_longitude=10.0*u.deg
     )
     assert cea_shift['crval1'] == 10.0
@@ -137,14 +139,14 @@ def test_cea_header():
     # 1: No units
     with pytest.raises(u.UnitTypeError):
         cea_default = utils.carr_cea_wcs_header(
-            datetime.datetime(2020,1,1),
-            [360,180],
+            datetime.datetime(2020, 1, 1),
+            [360, 180],
             map_center_longitude=0.0
         )
     # 2: Wrong Units
     with pytest.raises(u.UnitTypeError):
         cea_default = utils.carr_cea_wcs_header(
-            datetime.datetime(2020,1,1),
-            [360,180],
+            datetime.datetime(2020, 1, 1),
+            [360, 180],
             map_center_longitude=0.0*u.m
         )
