@@ -1,8 +1,8 @@
 import astropy.units as u
+import datetime
 import numpy as np
 import pytest
 import sunpy.map
-import datetime
 
 import pfsspy
 from pfsspy import utils
