@@ -88,7 +88,7 @@ def load_adapt(adapt_path):
     return adaptMapSequence
 
 
-def carr_cea_wcs_header(dtime, shape, map_center_longitude=0*u.deg):
+def carr_cea_wcs_header(dtime, shape, *, map_center_longitude=0*u.deg):
     """
     Create a Carrington WCS header for a Cylindrical Equal Area (CEA)
     projection. See [1]_ for information on how this is constructed.
