@@ -120,7 +120,7 @@ def test_roll_map(gong_map):
 
 
 def test_cea_header():
-    # Assert default reference pixel is at 180 deg lon
+    # Assert default reference pixel is at 0 deg lon
     cea_default = utils.carr_cea_wcs_header(
         datetime.datetime(2020, 1, 1),
         [360, 180]
