@@ -428,11 +428,11 @@ class Output:
 
         Parameters
         ----------
-        coords : `astropy.SkyCoord`
+        coords : `astropy.coordinates.SkyCoord`
             An arbitary point or set of points (length N >= 1) in the PFSS
             model domain (1Rs < r < Rss).
 
-        out_type : str, optional
+        out_type : str
             Takes values 'spherical' (default) or 'cartesian' and specifies
             whether the output vector is in spherical coordinates
             (B_r, B_theta, B_phi) or cartesian (B_x, B_y, B_z).

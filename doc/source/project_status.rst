@@ -7,10 +7,12 @@ Most of the package was written by myself, with some community contributions.
 I am the sole maintainer of the package, which is currently feature complete (providing a spherical PFSS solver in Python that integrates well with the SunPy package ecosystem).
 
 Going forward the only changes to the package will be:
+
 - Fixing `identified bugs <https://github.com/dstansby/pfsspy/issues?q=is%3Aopen+is%3Aissue+label%3ABug>`__
 - Adding tightly scoped `new features <https://github.com/dstansby/pfsspy/issues?q=is%3Aopen+is%3Aissue+label%3AEnhancement>`__ to improve usability or integrate better with other SunPy packages.
 - Improving the documentation.
 - Retaining compatibility with future versions of the package dependencies (e.g. sunpy, Matplotlib...)
+
 I intend to remain the sole maintainer of the package, but since I'm not currently active in solar physics research don't have lots of time to work on pfsspy.
 As a priority I will maintain the issue list with well scoped pieces of work that others can contribute to fixing.
 
