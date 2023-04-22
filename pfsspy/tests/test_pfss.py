@@ -40,6 +40,32 @@ def test_pfss(gong_map):
     np.testing.assert_allclose(br, expected, atol=1e-13, rtol=0)
 
 
+def test_pfss_br_outer(gong_map):
+    # Regression test to check that the output of pfss doesn't change
+    # when an equivalent custom outer boundary condition is provided
+    m = sunpy.map.Map(gong_map)
+    # Resample to lower res for easier comparisons
+    m = m.resample([30, 15] * u.pix)
+    m = sunpy.map.Map(m.data - np.mean(m.data), m.meta)
+    expected = np.loadtxt(test_data / 'br_in.txt')
+    np.testing.assert_equal(m.data, expected)
+
+    # Get a source surface
+    br_outer_in = pfsspy.Input(m, 50, 2)
+    br_outer_out = pfsspy.pfss(br_outer_in)
+    br_outer = br_outer_out.source_surface_br
+
+    # Use calculated source surface as outer boundary condition
+    pfss_in = pfsspy.Input(m, 50, 2, br_outer)
+    pfss_out = pfsspy.pfss(pfss_in)
+
+    br = pfss_out.source_surface_br.data
+    assert br.shape == m.data.shape
+    expected = np.loadtxt(test_data / 'br_out.txt')
+    # atol is emperically set for tests to pass on CI
+    np.testing.assert_allclose(br, expected, atol=1e-13, rtol=0)
+
+
 def test_bunit(gong_map):
     # Regression test to check that the output of pfss doesn't change
     m = sunpy.map.Map(gong_map)
