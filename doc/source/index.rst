@@ -2,14 +2,10 @@
 
 pfsspy documentation
 ====================
-pfsspy is a python package for carrying out Potential Field Source Surface
-modelling, a commonly used magnetic field model of the Sun and other stars.
+pfsspy is a python package for carrying out Potential Field Source Surface modelling, a commonly used magnetic field model of the Sun and other stars.
 
 .. note::
-  If you find any bugs or have any suggestions for improvement, please raise
-  an issue here: https://github.com/dstansby/pfsspy/issues
-
-
+  If you find any bugs or have any suggestions for improvement, please raise an issue here: https://github.com/dstansby/pfsspy/issues
 
 Contents
 --------
@@ -22,7 +18,7 @@ Contents
    pfsspy
    performance
    changes
-   contributing
+   project_status
    numerical_method
    synoptic_fits
 

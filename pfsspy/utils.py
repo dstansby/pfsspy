@@ -2,9 +2,9 @@ import os
 
 import astropy.constants as const
 import astropy.coordinates as coord
+import astropy.io
 import astropy.time
 import numpy as np
-import sunpy.io
 import sunpy.map
 import sunpy.time
 from astropy import units as u
@@ -76,7 +76,7 @@ def load_adapt(adapt_path):
     -------
     adaptMapSequence : `sunpy.map.MapSequence`
     """
-    adapt_fits = sunpy.io.fits.read(adapt_path)
+    adapt_fits = astropy.io.fits.open(adapt_path)
     header = adapt_fits[0].header
     if header['MODEL'] != 'ADAPT':
         raise ValueError(f"{os.path.basename(adapt_path)} header['MODEL'] "
@@ -88,7 +88,8 @@ def load_adapt(adapt_path):
     return adaptMapSequence
 
 
-def carr_cea_wcs_header(dtime, shape):
+@u.quantity_input
+def carr_cea_wcs_header(dtime, shape, *, map_center_longitude=0*u.deg):
     """
     Create a Carrington WCS header for a Cylindrical Equal Area (CEA)
     projection. See [1]_ for information on how this is constructed.
@@ -100,6 +101,10 @@ def carr_cea_wcs_header(dtime, shape):
     shape : tuple
         Map shape. The first entry should be number of points in longitude, the
         second in latitude.
+    map_center_longitude : astropy.units.Quantity
+        Change the world coordinate longitude of the central image pixel to allow
+        for different roll angles of the Carrington map. Default to 0 deg. Must
+        be supplied with units of `astropy.units.deg`
 
     References
     ----------
@@ -111,7 +116,7 @@ def carr_cea_wcs_header(dtime, shape):
     obstime = dtime or astropy.time.Time('2000-1-1')
 
     frame_out = coord.SkyCoord(
-        0 * u.deg, 0 * u.deg, const.R_sun, obstime=obstime,
+        map_center_longitude, 0 * u.deg, const.R_sun, obstime=obstime,
         frame="heliographic_carrington", observer='self')
     # Construct header
     header = sunpy.map.make_fitswcs_header(
