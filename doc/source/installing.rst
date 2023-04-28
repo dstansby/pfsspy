@@ -1,12 +1,6 @@
 Installing
 ----------
-
-pfsspy requires
-
-- python >= 3.8
-- sunpy >= 3.0
-
-and can be installed from PyPi using
+pfsspy can be installed from PyPi using
 
 .. code::
 
