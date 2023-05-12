@@ -2,7 +2,6 @@
 Code for calculating a PFSS extrapolation.
 """
 import numpy as np
-import sunpy.map
 
 import pfsspy
 
