@@ -2,6 +2,12 @@
 
 Changelog
 =========
+1.2.0
+-----
+- Allow the center of map coordinates to be specified in `pfsspy.utils.carr_cea_wcs_header`.
+- Fixed a deprecation warning emitted with sunpy 4.1.
+- Bumped the minimum Python version to 3.9, and added explicit support for Python 3.11.
+- Bumped the minimum version of sunpy to 4.0.
 
 1.1.2
 -----
