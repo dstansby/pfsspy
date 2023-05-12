@@ -10,7 +10,6 @@ import os
 import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
-import sunpy.io.fits
 import sunpy.map
 from astropy.coordinates import SkyCoord
 
