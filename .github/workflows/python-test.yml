@@ -27,6 +27,10 @@ jobs:
             python-version: '3.10'
             pip-extras: numba
 
+          - name: linux py311
+            os: ubuntu-20.04
+            python-version: '3.11'
+
           - name: linux py311-devdeps
             os: ubuntu-20.04
             python-version: '3.11'
