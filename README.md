@@ -15,3 +15,7 @@ Full documentation for the package can be found at https://pfsspy.readthedocs.io
 Code of conduct
 ---------------
 This is a community package, which has adopted the SunPy code of conduct. Please follow the [code of conduct](CODE_OF_CONDUCT.md) when interacting with others within the pfsspy community.
+
+Contributing
+------------
+`pfsspy` is **not** accepting new features, as it is considered feature complete. Issues reporting bugs, and pull requests fixing bugs, improving performance, or improving documentation are welcome and encouraged.
