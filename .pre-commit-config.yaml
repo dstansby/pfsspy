@@ -6,7 +6,7 @@ repos:
           - id: isort
     # Remove unused Python imports
     - repo: https://github.com/PyCQA/autoflake
-      rev: v2.1.1
+      rev: v2.2.0
       hooks:
         - id: autoflake
           args: ["--in-place", "--remove-all-unused-imports", "--ignore-init-module-imports"]
